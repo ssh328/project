@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <th:block th:replace="~{ partial/header.html :: headerfrag }"></th:block>
+    <link rel="stylesheet" href="/star.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+
+<body class="d-flex flex-column vh-100">
+
+    <div th:replace="~{ nav.html::navbar }"></div>
+
+    <main class="container mt-5 pt-5">
+        <div class="row d-flex flex-column align-items-center justify-content-center mt-4">
+            <div class="text-danger text-center">
+
+                <th:block th:replace="~{partial/flash.html :: flashMessages}"></th:block>
+
+            </div>
+
+            <div class="text-center">
+                <h1 th:text="${currentUser.username}"></h1>
+                <form th:action="@{/my/{userId}/profile-image(userId=${currentUser.id})}"
+                      id="profileForm"
+                      enctype="multipart/form-data"
+                      method="post"
+                      class="mt-4 mb-3">
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="mb-3" id="image_preview" data-bs-toggle="modal"
+                             data-bs-target="#imageModal">
+                            <img id="preview_img" class="rounded-circle border shadow-sm my_page_profile_size"
+                                 th:src="${currentUser.dp}"
+                                 th:attr="data-original-src=${currentUser.dp}">
+                        </div>
+
+                        <div class="d-flex align-items-center mt-3">
+                            <a href="#" id="profile_edit_btn"
+                               class="btn btn-outline-warning">편집</a>
+                            <input id="file_input" name="img" type="file"
+                                   class="form-control d-none" onchange="toggleSubmitButton()">
+                            <button id="saveButton" type="submit"
+                                    class="btn btn-outline-warning ms-2" disabled>변경하기</button>
+                            <input type="hidden" name="image" id="image-url">
+                        </div>
+
+                    </div>
+                </form>
+
+                <hr class="mb-3" style="width: 50%; margin: 0 auto;">
+
+                <form th:action="@{/verify-password}" method="GET" class="text-center mb-3">
+                    <input type="hidden" name="nextAction" value="change-password">
+                    <button type="submit" class="btn btn-outline-warning">비밀번호 변경</button>
+                </form>
+
+                <hr class="mb-3" style="width: 50%; margin: 0 auto;">
+
+                <form th:action="@{/verify-password}" method="get" class="text-center mb-3">
+                    <input type="hidden" name="nextAction" value="delete-account">
+                    <button type="submit" class="btn btn-outline-danger">회원탈퇴</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Modal -->
+        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" inert>
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <img th:src="${currentUser.dp}" class="img-fluid" alt="큰 이미지" style="width: 100%; height: auto;">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <th:block th:replace="~{ partial/footer.html :: footerFragment }"></th:block>
+
+    <script src="/js/userProfileUpload.js"></script>
+    <script src="/js/modal.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"></script>
+</body>
+</html>

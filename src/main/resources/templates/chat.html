@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <th:block th:replace="~{ partial/header.html :: headerfrag }"></th:block>
+</head>
+<body class="d-flex flex-column vh-100">
+    <!-- 상단 네비게이션 -->
+    <div th:replace="~{ nav.html::navbar }"></div>
+
+    <main class="d-flex justify-content-center align-items-center mt-5 pt-3">
+        <!-- container element in which TalkJS will display a chat UI -->
+        <div id="talkjs-container" style="width: 90%; margin: 10px; height: 750px">
+            <i>Loading chat...</i>
+        </div>
+    </main>
+
+    <!-- 하단 푸터 -->
+    <th:block th:replace="~{ partial/footer.html :: footerFragment }"></th:block>
+
+    <script>
+        (function (t, a, l, k, j, s) {
+            s = a.createElement('script');
+            s.async = 1;
+            s.src = "https://cdn.talkjs.com/talk.js";
+            a.head.appendChild(s);
+            k = t.Promise;
+            t.Talk = {
+                v: 3,
+                ready: {
+                    then: function (f) {
+                        if (k) return new k(function (r, e) {
+                            l.push([f, r, e])
+                        });
+                        l
+                            .push([f])
+                    },
+                    catch: function () {
+                        return k && new k()
+                    },
+                    c: l
+                }
+            };
+        })(window, document, []);
+    </script>
+
+    <script src = "https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script th:inline="javascript">
+        window.userId = [[${userId}]];
+        window.postWriterId = [[${postWriterId}]];
+    </script>
+
+    <script src="/js/script.js" async defer></script>
+</body>
+</html>

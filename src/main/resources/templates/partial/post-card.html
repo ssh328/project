@@ -1,0 +1,49 @@
+<!-- fragments/postCard.html -->
+<div th:fragment="postCard(post, likedPostIds, viewCounts)">
+    <div class="card" style="width: 100%;">
+        <a class="text-decoration-none text-dark" th:href="@{'/detail/' + ${post.id}}">
+            <div class="position-relative">
+                <img th:if="${post.firstImageUrl != null}" th:src="${post.firstImageUrl}" class="card-img-top card-img-square" alt="">
+                <img th:unless="${post.firstImageUrl != null}" src="https://placehold.co/300" class="card-img-top card-img-square" alt="기본 이미지">
+                <span th:switch="${i.status}" class="position-absolute top-0 start-0 m-2 badge rounded-pill bg-success" th:text="${post.statusDescription}">
+                    <span th:case="${T(com.song.project.post.PostStatus).ON_SALE}" class="badge bg-success"></span>
+                    <span th:case="${T(com.song.project.post.PostStatus).RESERVED}" class="badge bg-warning"></span>
+                    <span th:case="${T(com.song.project.post.PostStatus).SOLD}" class="badge bg-secondary"></span>
+                    <span th:case="*"></span>
+                </span>
+            </div>
+            <div class="card-body py-2">
+                <h5 class="card-title text-truncate"
+                    style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                    th:text="${post.title}"></h5>
+                <div class="d-flex justify-content-between align-items-center">
+                    <p class="card-text mb-0 fw-bold text-muted"
+                       th:text="${#numbers.formatInteger(post.price, 0, 'COMMA')} + '원'"></p>
+                    <small class="text-muted" th:text="${post.relativeTime}"></small>
+                </div>
+            </div>
+        </a>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item py-1">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-truncate d-inline-block w-100" th:text="'posted by ' + ${post.userId}"></span>
+                    <div class="d-flex align-items-center">
+                        <span class="heart_btn increase-cnt-btn me-2 d-flex align-items-center" th:attr="data-post-id=${post.id}">
+                            <i class="fa-solid fa-heart fa-bounce"
+                               th:if="${!likedPostIds.isEmpty() and likedPostIds.contains(post.id)}"
+                               style="color: #ff0000; --fa-animation-iteration-count: 0;"></i>
+                            <i class="fa-regular fa-heart"
+                               th:unless="${!likedPostIds.isEmpty() and likedPostIds.contains(post.id)}"
+                               style="color: #000000;"></i>
+                            <span class="like-count small fw-semibold text-muted ms-1" th:text="${post.like_cnt}"></span>
+                        </span>
+                        <span class="d-flex align-items-center">
+                            <i class="fa-solid fa-eye"></i>
+                            <span class="small fw-semibold text-muted ms-1" th:text="${viewCounts[post.id]}"></span>
+                        </span>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>

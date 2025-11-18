@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <th:block th:replace="~{ partial/header.html :: headerfrag }"></th:block>
+</head>
+
+<body class="d-flex flex-column vh-100">
+    <!-- 상단 네비게이션 -->
+    <div th:replace="~{ nav.html::navbar }"></div>
+
+    <main class="container mt-5 pt-5">
+
+        <h1 class="mb-4">좋아요 상품</h1>
+
+        <!-- 게시글 카드 목록 -->
+        <div class="row row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3 mb-5">
+            <div class="col" th:each="post : ${posts.content}">
+                <th:block th:replace="~{partial/post-card.html :: postCard(${post}, ${likedPostIds}, ${viewCounts})}"></th:block>
+            </div>
+        </div>
+
+        <!-- 좋아요 게시글 없을 때 메시지 -->
+        <div th:if="${totalPages == 0}" class="text-center my-5 text-muted">
+            <i class="fa-solid fa-magnifying-glass fa-2x mb-3"></i>
+            <p>관심있는 게시물이 없습니다.</p>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div th:replace="~{ partial/pagination.html :: pagination('/my/likes', ${currentPage}, ${totalPages}, 'page') }"></div>
+    </main>
+
+    <!-- 하단 푸터 -->
+    <th:block th:replace="~{ partial/footer.html :: footerFragment }"></th:block>
+
+    <script src="/js/like.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"></script>
+</body>
+</html>

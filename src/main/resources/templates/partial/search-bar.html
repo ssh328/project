@@ -1,0 +1,15 @@
+<div class="row mb-4" th:fragment="searchbar">
+    <div class="col-12">
+        <form class="d-flex" action="/search" method="GET">
+            <div class="input-group">
+                <input type="hidden" th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+                <input name="searchText" class="form-control" type="search" placeholder="검색어를 입력하세요" aria-label="Search">
+                <input type="hidden" name="page" value="1">
+                <button class="btn btn-outline-success" type="submit">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

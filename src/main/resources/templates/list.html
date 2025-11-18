@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <th:block th:replace="~{ partial/header.html :: headerfrag }"></th:block>
+</head>
+
+<body class="d-flex flex-column vh-100">
+
+    <!-- 상단 네비게이션 -->
+    <div th:replace="~{ nav.html::navbar }"></div>
+
+    <main class="container mt-5 pt-5">
+        <!-- 플래시 메시지 -->
+        <div class="text-danger text-center">
+            <th:block th:replace="~{partial/flash.html :: flashMessages}"></th:block>
+        </div>
+
+        <!-- 검색창 -->
+        <div th:replace="~{ partial/search-bar.html::searchbar }"></div>
+
+        <!-- 필터 및 오프캔버스 -->
+        <div class="row mb-3">
+            <div class="col-12 d-flex justify-content-between align-items-center">
+                <th:block th:replace="~{ partial/offcanvas.html :: offcanvas }"></th:block>
+
+                <!-- 상태 필터링 버튼 -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="btn-group" role="group" aria-label="상태 필터">
+                            <a th:href="@{/list(page=1, status=null)}"
+                               class="btn btn-outline-secondary"
+                               th:classappend="${selectedStatus == null} ? 'active'">
+                                전체
+                            </a>
+
+                            <a th:each="s : ${statuses}"
+                               th:href="@{/list(page=1, status=${s.name()})}"
+                               class="btn btn-outline-secondary"
+                               th:classappend="${selectedStatus == s.name()} ? 'active'"
+                               th:text="${s.description}">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 게시글 카드 목록 -->
+        <div class="row row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3 mb-5">
+            <div class="col" th:each="post : ${posts.content}">
+                <th:block th:replace="~{partial/post-card.html :: postCard(${post}, ${likedPostIds}, ${viewCounts})}"></th:block>
+            </div>
+        </div>
+
+        <!-- 게시글 없을 때 메시지 -->
+        <div th:if="${totalPages == 0}" class="text-center my-5 text-muted">
+            <i class="fa-solid fa-magnifying-glass fa-2x mb-3"></i>
+            <p>등록된 게시물이 없습니다.</p>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div th:if="${totalPages > 0}"
+             th:replace="~{ partial/pagination.html :: pagination('/list', ${currentPage}, ${totalPages}, 'page') }">
+        </div>
+    </main>
+
+    <!-- 하단 푸터 -->
+    <th:block th:replace="~{ partial/footer.html :: footerFragment }"></th:block>
+
+    <script src="/js/like.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"></script>
+</body>
+</html>
