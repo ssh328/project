@@ -22,6 +22,11 @@ public class LikeService {
     private final RecommendedPostService recommendedPostService;
 
     public Map<String, Object> toggleLike(Long postId, CustomUser user) {
+
+        // 조회 쿼리를 줄이기 위해 Likes 엔티티는 그대로 유지
+        // User 객체 대신 “ID만 가진 더미 객체”를 넘김
+        // User 엔티티 전체를 조회하지 않아도 되고,
+        // JPA는 userRef의 id 값만 읽어서 외래키(userId)에 저장
         User userRef = new User();
         userRef.setId(user.id);
 
