@@ -1,12 +1,6 @@
 package com.song.project.controller;
 
 import com.song.project.CustomUser;
-import com.song.project.entity.Likes;
-import com.song.project.entity.Post;
-import com.song.project.entity.User;
-import com.song.project.repository.LikeRepository;
-import com.song.project.repository.PostRepository;
-import com.song.project.service.RecommendedPostService;
 import com.song.project.service.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -15,12 +9,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
 public class LikeController {
     private final LikeService likeService;
+
+    @PostMapping("/like/{postId}")
+    @ResponseBody
+    public Map<String, Object> toggleLike(@PathVariable Long postId, Authentication auth) {
+        if (auth == null || !auth.isAuthenticated()) {
+            return Map.of("loggedIn", false, "message", "로그인이 필요합니다.");
+        }
+
+        CustomUser user = (CustomUser) auth.getPrincipal();
+        return likeService.toggleLike(postId, user);
+    }
 }
