@@ -7,6 +7,7 @@ import com.song.project.entity.User;
 import com.song.project.repository.LikeRepository;
 import com.song.project.repository.PostRepository;
 import com.song.project.service.RecommendedPostService;
+import com.song.project.service.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -21,5 +22,5 @@ import java.util.Optional;
 @Controller
 @RequiredArgsConstructor
 public class LikeController {
-
+    private final LikeService likeService;
 }
