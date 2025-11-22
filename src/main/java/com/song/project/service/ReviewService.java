@@ -32,4 +32,15 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
+    public void deleteReview(Long reviewId, CustomUser customUser) {
+        Review review = reviewRepository.findById(reviewId)
+            .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
+
+        if (!review.getReviewer().getUsername().equals(customUser.getUsername())) {
+            throw new IllegalArgumentException("본인이 작성한 리뷰만 삭제 가능");
+        }
+        
+        reviewRepository.delete(review);
+    }
+
 }
