@@ -1,13 +1,10 @@
 package com.song.project.controller;
 import com.song.project.CustomUser;
+import com.song.project.service.ReviewService;
 import com.song.project.entity.Review;
-import com.song.project.entity.User;
-import com.song.project.repository.ReviewRepository;
-import com.song.project.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -19,48 +16,34 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequiredArgsConstructor
 public class ReviewController {
-    private final ReviewRepository reviewRepository;
-    private final UserRepository userRepository; 
+    private final ReviewService reviewService;
 
-   @PostMapping("/review")
-   String Review(@RequestParam String content,
-                     @RequestParam int rating,
-                     @RequestParam Long targetUserId,
-                     Authentication auth) {
+    @PostMapping("/review")
+    String Review(@RequestParam String content,
+                        @RequestParam int rating,
+                        @RequestParam Long targetUserId,
+                        Authentication auth) {
 
-       CustomUser user = (CustomUser) auth.getPrincipal();
-       User reviewer = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new IllegalArgumentException("로그인 유저 없음"));
+        CustomUser user = getUserId(auth);
+        Review review = reviewService.createReview(content, rating, targetUserId, user);
 
-       User targetUser = userRepository.findById(targetUserId)
-       .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
+        return "redirect:/profile/" + review.getTargetUser().getUsername();
 
-       Review review = new Review();
-       review.setContent(content);
-       review.setTargetUser(targetUser);
-       review.setRating(rating);
-       review.setReviewer(reviewer);
-
-       reviewRepository.save(review);
-
-       return "redirect:/profile/" + targetUser.getUsername();
-   }
-
-   @DeleteMapping("/review/{id}")
-   ResponseEntity<String> deleteReview (@PathVariable Long id, Authentication auth) {
-    
-    Review review = reviewRepository.findById(id).orElse(null);
-    if (review == null) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                             .body("리뷰를 찾을 수 없습니다.");
     }
 
-    CustomUser user = (CustomUser) auth.getPrincipal();;
-
-    if (!review.getReviewer().getUsername().equals(user.getUsername())) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("본인이 작성한 리뷰만 삭제 가능");
+    @DeleteMapping("/review/{id}")
+    ResponseEntity<String> deleteReview(@PathVariable Long id, Authentication auth) {
+        CustomUser user = getUserId(auth);
+        reviewService.deleteReview(id, user);
+        return ResponseEntity.ok("삭제 완료");
     }
-    
-    reviewRepository.delete(review);
-    return ResponseEntity.ok("삭제 완료");
-   }
+
+    // Authentication에서 사용자 ID 추출
+    private CustomUser getUserId(Authentication auth) {
+        if (auth != null && auth.isAuthenticated()) {
+            CustomUser user = (CustomUser) auth.getPrincipal();
+            return user;
+        }
+        return null;
+    }
 }
