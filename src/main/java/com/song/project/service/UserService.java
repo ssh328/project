@@ -16,7 +16,6 @@ import com.song.project.entity.Post;
 import com.song.project.entity.User;
 import com.song.project.repository.LikeRepository;
 import com.song.project.repository.UserRepository;
-import com.song.project.service.PostViewCountService;
 import com.song.project.JwtUtil;
 import com.song.project.dto.PostListDto;
 import com.song.project.dto.UserProfileDto;
