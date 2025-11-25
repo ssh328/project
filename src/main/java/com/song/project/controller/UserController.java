@@ -2,20 +2,12 @@ package com.song.project.controller;
 
 import com.song.project.CustomUser;
 import com.song.project.JwtUtil;
-import com.song.project.dto.PostListDto;
 import com.song.project.dto.UserProfileDto;
-import com.song.project.entity.Likes;
-import com.song.project.entity.Post;
-import com.song.project.entity.User;
 
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties.Http;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 
 import org.springframework.http.ResponseCookie;
@@ -25,23 +17,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import java.util.stream.Collectors;
-
-import com.song.project.repository.LikeRepository;
-import com.song.project.repository.PostRepository;
-import com.song.project.repository.UserRepository;
-import com.song.project.service.PostViewCountService;
 import com.song.project.service.UserService;
 
 @Controller
@@ -49,7 +31,6 @@ import com.song.project.service.UserService;
 public class UserController {
     private final UserService userService;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final PostViewCountService postViewCountService;
 
     @GetMapping("/register")
     public String register() {
@@ -193,6 +174,7 @@ public class UserController {
         return "verify-password.html";
     }
 
+    // 이메일/비밀번호 확인 -> HttpOnly cookie 발급 후 리다이렉트
     @PostMapping("/verify-password")
     @PreAuthorize("isAuthenticated()")
     public String verifyPassword(@RequestParam String email, 
@@ -206,7 +188,7 @@ public class UserController {
         try {
             String verifiedToken = userService.verifyPassword(user.id, email, password);
 
-            // HttpOnly cookie 생성
+            // HttpOnly cookie 생성 (Secure, SameSite=Strict 권장)
             ResponseCookie cookie = ResponseCookie.from("verifited_token", verifiedToken)
                 .httpOnly(true)
                 .secure(false)
@@ -246,11 +228,13 @@ public class UserController {
             return "redirect:/verify-password";
         }
 
+        // 1차 검증: 토큰이 위조/만료되지 않았는지 확인
         if (!JwtUtil.validateTemporaryToken(verifiedToken)) {
             redirectAttributes.addFlashAttribute("errorMessage", "유효하지 않거나 만료된 인증입니다.");
             return "redirect:/verify-password";
         }
 
+        // 2차 검증: 토큰의 용도(type)가 올바른지 확인
         var claims = JwtUtil.extractToken(verifiedToken);
         if (!"verify".equals(claims.get("type"))) {
             redirectAttributes.addFlashAttribute("errorMessage", "잘못된 인증 토큰입니다.");
@@ -270,7 +254,7 @@ public class UserController {
                     .maxAge(0)
                     .sameSite("Strict")
                     .build();
-                    
+
             response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
             
             redirectAttributes.addFlashAttribute("successMessage", "비밀번호가 성공적으로 변경되었습니다.");
@@ -299,11 +283,13 @@ public class UserController {
             return "redirect:/verify-password?nextAction=delete-account";
         }
 
+        // 1차 검증: 토큰이 위조/만료되지 않았는지 확인
         if (!JwtUtil.validateTemporaryToken(verifiedToken)) {
             redirectAttributes.addFlashAttribute("errorMessage", "유효하지 않거나 만료된 인증입니다.");
             return "redirect:/verify-password?nextAction=delete-account";
         }
 
+        // 2차 검증: 토큰의 용도(type)가 올바른지 확인
         var claims = JwtUtil.extractToken(verifiedToken);
         if (!"verify".equals(claims.get("type"))) {
             redirectAttributes.addFlashAttribute("errorMessage", "잘못된 인증 토큰입니다.");
@@ -315,7 +301,7 @@ public class UserController {
         try {
             userService.deleteAccount(user.id);
             
-            // 쿠키 삭제
+            // 로그인 토큰 쿠키 삭제, 이후 자동 로그아웃 처리
             ResponseCookie clearJwt = ResponseCookie.from("jwt", "")
                     .httpOnly(true)
                     .secure(false)
@@ -324,6 +310,7 @@ public class UserController {
                     .sameSite("Strict")
                     .build();
             
+            // 본인 인증 토큰 쿠키 삭제
             ResponseCookie deleteCookie = ResponseCookie.from("verified_token", "")
                     .httpOnly(true)
                     .secure(false)

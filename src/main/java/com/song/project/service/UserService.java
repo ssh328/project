@@ -111,6 +111,7 @@ public class UserService {
             throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
         }
 
+        // 임시 토큰 생성 (5분 유효)
         return JwtUtil.createTemporaryToken(
             user.getUsername(), 
             user.getId(), 
