@@ -8,7 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import com.song.project.CustomUser;
-import com.song.project.dto.PostEditDto;
+import com.song.project.dto.PostListDto;
 import com.song.project.repository.LikeRepository;
 import com.song.project.repository.PostRepository;
 import com.song.project.service.PostViewCountService;
@@ -64,13 +64,13 @@ public class RecentPostController {
         List<Long> ids = recentPostService.getRecentPosts(userId);
 
         // DB에서 해당 게시글 조회
-        List<PostEditDto> posts = postRepository.findAllById(ids).stream()
-                .map(PostEditDto::from)
+        List<PostListDto> posts = postRepository.findAllById(ids).stream()
+                .map(PostListDto::from)
                 .collect(Collectors.toList());
 
         // 조회수 합산용 처리
         List<Long> postIds = posts.stream()
-        .map(PostEditDto::getId)
+        .map(PostListDto::getId)
         .collect(Collectors.toList());
 
         // Redis 조회수 가져오기
