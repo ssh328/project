@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 @Controller
 @PreAuthorize("isAuthenticated()")
 @RequiredArgsConstructor
@@ -63,9 +62,14 @@ public class RecentPostController {
         // Redis에서 최근 본 상품 ID 목록 가져오기
         List<Long> ids = recentPostService.getRecentPosts(userId);
 
-        // DB에서 해당 게시글 조회
-        List<PostListDto> posts = postRepository.findAllById(ids).stream()
+        // DB에서 해당 게시글(최근에 본 순서)대로 정렬
+        Map<Long, PostListDto> postMap = postRepository.findAllById(ids).stream()
                 .map(PostListDto::from)
+                .collect(Collectors.toMap(PostListDto::getId, dto -> dto));
+
+        List<PostListDto> posts = ids.stream()
+                .map(postMap::get)
+                .filter(dto -> dto != null)
                 .collect(Collectors.toList());
 
         // 조회수 합산용 처리
