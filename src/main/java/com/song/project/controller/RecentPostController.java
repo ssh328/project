@@ -56,8 +56,7 @@ public class RecentPostController {
     @GetMapping
     public String getRecentPosts(Model model, Authentication auth) {
         // 사용자 ID 추출
-        CustomUser user = (CustomUser) auth.getPrincipal();
-        Long userId = user.id;
+        Long userId = getUserId(auth);
 
         // Redis에서 최근 본 상품 ID 목록 가져오기
         List<Long> ids = recentPostService.getRecentPosts(userId);
@@ -95,7 +94,7 @@ public class RecentPostController {
 
     private Long getUserId(Authentication auth) {
         // CustomUser에서 ID 추출 방식에 맞게 수정 필요
-        com.song.project.CustomUser user = (com.song.project.CustomUser) auth.getPrincipal();
+        CustomUser user = (CustomUser) auth.getPrincipal();
         return user.id;
     }
 }
