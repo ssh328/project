@@ -8,17 +8,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import com.song.project.CustomUser;
-import com.song.project.dto.PostListDto;
-import com.song.project.repository.LikeRepository;
-import com.song.project.repository.PostRepository;
-import com.song.project.service.PostViewCountService;
 import com.song.project.service.RecentPostService;
+import com.song.project.service.RecentPostService.RecentPostsResult;
 
 import org.springframework.ui.Model;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Controller
 @PreAuthorize("isAuthenticated()")
@@ -26,9 +19,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/recent-posts")
 public class RecentPostController {
     private final RecentPostService recentPostService;
-    private final PostRepository postRepository;
-    private final LikeRepository likeRepository;
-    private final PostViewCountService postViewCountService;
 
     // 최근 본 상품 ID 추가 - 실제로는 상품 상세 호출할 때 내부에서 호출 추천
     @PostMapping("/add/{postId}")
@@ -58,38 +48,15 @@ public class RecentPostController {
         // 사용자 ID 추출
         Long userId = getUserId(auth);
 
-        // Redis에서 최근 본 상품 ID 목록 가져오기
-        List<Long> ids = recentPostService.getRecentPosts(userId);
+        // 서비스에서 모든 비즈니스 로직 처리
+        RecentPostsResult result = recentPostService.getRecentPostsWithDetails(userId);
 
-        // DB에서 해당 게시글(최근에 본 순서)대로 정렬
-        Map<Long, PostListDto> postMap = postRepository.findAllById(ids).stream()
-                .map(PostListDto::from)
-                .collect(Collectors.toMap(PostListDto::getId, dto -> dto));
+        // 모델에 담기 (뷰 관련 로직만 컨트롤러에 남김)
+        model.addAttribute("posts", result.getPosts());
+        model.addAttribute("likedPostIds", result.getLikedPostIds());
+        model.addAttribute("viewCounts", result.getViewCounts());
 
-        List<PostListDto> posts = ids.stream()
-                .map(postMap::get)
-                .filter(dto -> dto != null)
-                .collect(Collectors.toList());
-
-        // 조회수 합산용 처리
-        List<Long> postIds = posts.stream()
-        .map(PostListDto::getId)
-        .collect(Collectors.toList());
-
-        // Redis 조회수 가져오기
-        Map<Long, Long> redisViewCounts = postViewCountService.getViewCountsForPosts(postIds);
-
-        // 좋아요한 게시글 ID 목록
-        List<Long> likedPostIds = likeRepository.findByUserId(userId).stream()
-                .map(like -> like.getPost().getId())
-                .collect(Collectors.toList());
-
-        // 모델에 담기
-        model.addAttribute("posts", posts);
-        model.addAttribute("likedPostIds", likedPostIds);
-        model.addAttribute("viewCounts", redisViewCounts);
-
-        return "recent-posts.html"; // 최근 본 게시글 템플릿
+        return "recent-posts.html";
     }
 
     private Long getUserId(Authentication auth) {
