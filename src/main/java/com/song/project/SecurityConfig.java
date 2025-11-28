@@ -34,7 +34,6 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository())
                 .ignoringRequestMatchers("/login/jwt")
-                .ignoringRequestMatchers("/delete-image")
                 .ignoringRequestMatchers("/admin/**")
                 .ignoringRequestMatchers("/verify-password")
                 .ignoringRequestMatchers("/change-password")

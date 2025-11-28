@@ -126,6 +126,8 @@ function updateFileInfo() {
 
 // 수정 과정
 saveButton.addEventListener('click', async (e) => {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="csrf-header"]').getAttribute('content');
     e.preventDefault();
 
     let isValid = true;
@@ -158,7 +160,11 @@ saveButton.addEventListener('click', async (e) => {
         if (deletedImages.length > 0) {
             for (const id of deletedImages) {
                 const deleteResponse = await fetch('/delete-image?imageId=' + id, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    }
                 });
             if (!deleteResponse.ok) {
                 throw new Error('이미지 삭제 실패');
