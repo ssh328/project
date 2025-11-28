@@ -71,6 +71,7 @@ public class PostService {
         return data.map(PostListDto::from);
     }
 
+    // 게시물 목록 결과
     public PostListResult getPostListResult(Page<PostListDto> postDtos, Long userId) {
         List<Long> likedPostIds = getLikedPostIds(userId);
         List<Long> postIds = postDtos.stream()
