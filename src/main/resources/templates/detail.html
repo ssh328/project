@@ -161,40 +161,35 @@
                             [[${ 변수 }]] 이런 식으로 넣음
                             -->
                             <button th:if="${loginUserId == postWriterId}" name="delete_btn" class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#deleteModal">삭제</button>
-                                
-                            <!-- Modal -->
-                            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true" inert>
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h1 class="modal-title fs-5 fw-bold" id="deleteModalLabel">게시물 삭제</h1>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            정말 삭제하시겠습니까?
-                                            <input type="text" id="deleteInput" style="display:none;" />
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                                            <button 
-                                            th:onclick="fetch('/delete?id=[[${data.id}]]', {method : 'DELETE'})
-                                            .then(r => r.text())
-                                            .then(() => {
-                                                location.href = '/list';
-                                            })"
-                                            id="deleteButton" name="delete_btn" class="btn btn-outline-danger">삭제하기</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
-                    
                 </div>
-
             </div>
         </div>
     </main>
+
+    <!-- 삭제 모달 (position-sticky 컨테이너 밖으로 이동) -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5 fw-bold" id="deleteModalLabel">게시물 삭제</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    정말 삭제하시겠습니까?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    <button 
+                        id="deleteButton" 
+                        name="delete_btn" 
+                        class="btn btn-outline-danger"
+                        th:data-post-id="${data.id}">삭제하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- 이미지 모달 -->
     <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
@@ -234,8 +229,6 @@
     </div>
     
     <th:block th:replace="~{ partial/footer.html :: footerFragment }"></th:block>
-
-    <!-- <script src="/js/review.js"></script> -->
 
     <script>
         // 최근 본 상품 서버로 전송 (로그인한 경우)
