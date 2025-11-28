@@ -1,5 +1,8 @@
 package com.song.project.service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 import org.springframework.stereotype.Service;
 
 import com.song.project.CustomUser;
@@ -43,4 +46,10 @@ public class ReviewService {
         reviewRepository.delete(review);
     }
 
+    public String encodeUsername(String username) {
+        return URLEncoder.encode(
+            username,
+            StandardCharsets.UTF_8
+        ).replaceAll("\\+", "%20");
+    }
 }

@@ -27,8 +27,9 @@ public class ReviewController {
         CustomUser user = getUserId(auth);
         Review review = reviewService.createReview(content, rating, targetUserId, user);
 
-        return "redirect:/profile/" + review.getTargetUser().getUsername();
+        String encodedUsername = reviewService.encodeUsername(review.getTargetUser().getUsername());
 
+        return "redirect:/profile/" + encodedUsername + "?tab=reviews";
     }
 
     @DeleteMapping("/review/{id}")
