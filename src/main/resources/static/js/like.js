@@ -1,3 +1,6 @@
+const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+const csrfHeader = document.querySelector('meta[name="csrf-header"]').getAttribute('content');
+
 document.querySelectorAll(".increase-cnt-btn").forEach(heart_btn => {
             heart_btn.addEventListener('click', function() {
                 const postId = Number(this.dataset.postId);
@@ -6,7 +9,8 @@ document.querySelectorAll(".increase-cnt-btn").forEach(heart_btn => {
                 fetch(`/like/${postId}`, {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        [csrfHeader]: csrfToken
                     }
                 })
                 .then(res => res.json())
