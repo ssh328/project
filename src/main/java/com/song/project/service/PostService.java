@@ -276,7 +276,14 @@ public class PostService {
             .collect(Collectors.toList());
         Map<Long, Long> viewCounts = getViewCountsForPosts(postIds);
 
-        Page<Review> reviews = reviewRepository.findByTargetUser_Id(userDto.getId(), PageRequest.of(reviewPage - 1, 3));
+        PageRequest reviewPageRequest = PageRequest.of(
+            reviewPage - 1,
+            3,
+            Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+        
+        Page<Review> reviews = reviewRepository.findByTargetUser_Id(
+                userDto.getId(), reviewPageRequest);
 
         List<Long> likedPostIds = getLikedPostIds(user.getId());
 
