@@ -37,7 +37,6 @@ public class SecurityConfig {
                 .ignoringRequestMatchers("/admin/**")
                 .ignoringRequestMatchers("/verify-password")
                 .ignoringRequestMatchers("/change-password")
-                .ignoringRequestMatchers("/post/**")
                 .ignoringRequestMatchers("/recent-posts/**")
         );
 
