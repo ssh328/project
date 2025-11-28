@@ -15,8 +15,11 @@ import com.song.project.dto.PostListDto;
 import com.song.project.dto.PostStatusUpdateDto;
 import com.song.project.dto.PostUpdateDto;
 import com.song.project.dto.RecommendedPostDto;
+import com.song.project.dto.UserProfileDto;
 import com.song.project.entity.Post;
 import com.song.project.entity.PostImage;
+import com.song.project.entity.Review;
+import com.song.project.entity.User;
 import com.song.project.exception.ForbiddenException;
 import com.song.project.exception.NotFoundException;
 import com.song.project.exception.UnauthorizedException;
@@ -24,8 +27,10 @@ import com.song.project.post.PostStatus;
 import com.song.project.repository.LikeRepository;
 import com.song.project.repository.PostImageRepository;
 import com.song.project.repository.PostRepository;
+import com.song.project.repository.ReviewRepository;
 import com.song.project.repository.UserRepository;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -36,13 +41,10 @@ public class PostService {
     private final PostImageRepository postImageRepository;
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
+    private final ReviewRepository reviewRepository;
     private final PostViewCountService postViewCountService;
     private final RecommendedPostService recommendedPostService;
     private final S3Service s3Service;
-
-    // ===========================
-    // 목록 / 검색
-    // ===========================
 
     // 게시물 목록 조회
     public Page<PostListDto> getPosts(String category,
@@ -69,6 +71,37 @@ public class PostService {
         return data.map(PostListDto::from);
     }
 
+    public PostListResult getPostListResult(Page<PostListDto> postDtos, Long userId) {
+        List<Long> likedPostIds = getLikedPostIds(userId);
+        List<Long> postIds = postDtos.stream()
+                .map(PostListDto::getId)
+                .collect(Collectors.toList());
+        Map<Long, Long> viewCounts = getViewCountsForPosts(postIds);
+
+        return new PostListResult(postDtos, likedPostIds, viewCounts);
+    }
+
+    // 검색 결과
+    public SearchResult getSearchResult(Page<PostListDto> postDtos, Long userId) {
+        List<Long> likedPostIds = getLikedPostIds(userId);
+        return new SearchResult(postDtos, likedPostIds);
+    }
+
+    // 상태 파라미터 파싱
+    public PostStatusParseResult getPostStatusParseResult(String status) {
+        PostStatus postStatus = null;
+        String selectedStatus = null;
+        if (status != null && !status.isEmpty() && !"null".equals(status)) {
+            try {
+                postStatus = PostStatus.valueOf(status.toUpperCase());
+                selectedStatus = status;
+            } catch (IllegalArgumentException e) {
+                // 잘못된 상태 값은 무시
+            }
+        }
+        return new PostStatusParseResult(postStatus, selectedStatus);
+    }
+
     // 현재 로그인 사용자가 좋아요한 게시물 ID 목록
     public List<Long> getLikedPostIds(Long userId) {
         if (userId == null) {
@@ -85,14 +118,20 @@ public class PostService {
         return postViewCountService.getViewCountsForPosts(postIds);
     }
 
-    // ===========================
-    // 상세 / 조회수 / 추천
-    // ===========================
-
     // 게시물 단건 조회 (없으면 예외)
     public Post getPostOrThrow(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("게시글을 찾을 수 없습니다."));
+    }
+
+    // 상세 페이지 결과 조회
+    public PostDetailResult getPostDetailResult(Long postId, Long loginUserId, String viewToken) {
+        Post post = getPostOrThrow(postId);
+        Long viewCount = incrementViewCount(postId, loginUserId, viewToken);
+        recommendedPostService.addViewScore(postId);
+        List<RecommendedPostDto> recommendedPosts = getRecommendedPostsByCategory(postId);
+        
+        return new PostDetailResult(post, post.getUser().getId(), loginUserId, viewCount, recommendedPosts);
     }
 
     // 조회수 증가 및 현재 조회수 반환
@@ -109,10 +148,6 @@ public class PostService {
                 .map(RecommendedPostDto::from)
                 .collect(Collectors.toList());
     }
-
-    // ===========================
-    // 생성 / 수정 / 삭제
-    // ===========================
 
     // 게시글 생성
     public Post createPost(Long userId, PostCreateDto dto) {
@@ -226,6 +261,34 @@ public class PostService {
         return postStatus;
     }
 
+        // 프로필 페이지 결과
+    public ProfileResult getProfileResult(String username, int postPage, int reviewPage, Long loginUserId) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+        UserProfileDto userDto = new UserProfileDto(user);
+
+        Page<Post> posts = getPostsByUsername(username, postPage);
+        Page<PostListDto> postDtos = posts.map(PostListDto::from);
+
+        List<Long> postIds = postDtos.stream()
+            .map(PostListDto::getId)
+            .collect(Collectors.toList());
+        Map<Long, Long> viewCounts = getViewCountsForPosts(postIds);
+
+        Page<Review> reviews = reviewRepository.findByTargetUser_Id(userDto.getId(), PageRequest.of(reviewPage - 1, 3));
+
+        List<Long> likedPostIds = getLikedPostIds(user.getId());
+
+        return new ProfileResult(userDto,
+                                 postDtos, 
+                                 reviews, 
+                                 likedPostIds, 
+                                 posts.getTotalPages(), 
+                                 reviews.getTotalPages(), 
+                                 loginUserId, 
+                                 viewCounts);
+    }
+
     // ===========================
     // 유틸리티
     // ===========================
@@ -255,5 +318,92 @@ public class PostService {
     public Page<Post> getPostsByUsername(String username, int page) {
         PageRequest pageRequest = PageRequest.of(page - 1, 20);
         return postRepository.findByUser_Username(username, pageRequest);
+    }
+
+    // DTO 클래스
+    @Getter
+    public static class PostListResult {
+        private Page<PostListDto> posts;
+        private List<Long> likedPostIds;
+        private Map<Long, Long> viewCounts;
+
+        public PostListResult(Page<PostListDto> posts, List<Long> likedPostIds, Map<Long, Long> viewCounts) {
+            this.posts = posts;
+            this.likedPostIds = likedPostIds;
+            this.viewCounts = viewCounts;
+        }
+    }
+
+    @Getter
+    public static class SearchResult {
+        private Page<PostListDto> posts;
+        private List<Long> likedPostIds;
+
+        public SearchResult(Page<PostListDto> posts, List<Long> likedPostIds) {
+            this.posts = posts;
+            this.likedPostIds = likedPostIds;
+        }
+    }
+
+    @Getter
+    public static class PostStatusParseResult {
+        private PostStatus postStatus;
+        private String selectedStatus;
+
+        public PostStatusParseResult(PostStatus postStatus, String selectedStatus) {
+            this.postStatus = postStatus;
+            this.selectedStatus = selectedStatus;
+        }
+    }
+
+    @Getter
+    public static class PostDetailResult {
+        private Post post;
+        private Long postWriterId;
+        private Long loginUserId;
+        private Long viewCount;
+        private List<RecommendedPostDto> recommendedPosts;
+
+        public PostDetailResult(Post post, 
+                                Long postWriterId, 
+                                Long loginUserId, 
+                                Long viewCount, 
+                                List<RecommendedPostDto> recommendedPosts) {
+            this.post = post;
+            this.postWriterId = postWriterId;
+            this.loginUserId = loginUserId;
+            this.viewCount = viewCount;
+            this.recommendedPosts = recommendedPosts;
+        }
+    }
+
+    @Getter
+    public static class ProfileResult {
+        private UserProfileDto user;
+        private Page<PostListDto> posts;
+        private Page<Review> reviews;
+        private List<Long> likedPostIds;
+        private int postTotalPages;
+        private int reviewTotalPages;
+        private Long loginUserId;
+        private Map<Long, Long> viewCounts;
+
+        public ProfileResult(UserProfileDto user, 
+                             Page<PostListDto> posts, 
+                             Page<Review> reviews, 
+                             List<Long> likedPostIds, 
+                             int postTotalPages, 
+                             int reviewTotalPages, 
+                             Long loginUserId, 
+                             Map<Long, Long> viewCounts) {
+            this.user = user;
+            this.posts = posts;
+            this.reviews = reviews;
+            this.likedPostIds = likedPostIds;
+            this.postTotalPages = postTotalPages;
+            this.reviewTotalPages = reviewTotalPages;
+            this.loginUserId = loginUserId;
+            this.viewCounts = viewCounts;
+        }
     }
 }
