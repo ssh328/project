@@ -1,8 +1,14 @@
 const postId = window.postId;
+const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+const csrfHeader = document.querySelector('meta[name="csrf-header"]').getAttribute('content');
 
 // 최근 본 상품 서버로 전송 (로그인한 경우)
 fetch(`/recent-posts/add/${postId}`, {
-    method: 'POST'
+    method: 'POST',
+    headers: {
+        "Content-Type": "application/json",
+        [csrfHeader]: csrfToken
+    }
 });
 
 // ✅ 버튼 클릭 시 채팅 실행
@@ -17,8 +23,6 @@ if (chatButton) {
 
 // 상태 변경 함수
 function changeStatus(status) {
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    const csrfHeader = document.querySelector('meta[name="csrf-header"]').getAttribute('content');
 
     if (!confirm('상태를 변경하시겠습니까?')) {
         return;
