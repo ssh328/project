@@ -35,7 +35,6 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository())
                 .ignoringRequestMatchers("/login/jwt")
                 .ignoringRequestMatchers("/delete-image")
-                .ignoringRequestMatchers("/review/**")
                 .ignoringRequestMatchers("/admin/**")
                 .ignoringRequestMatchers("/verify-password")
                 .ignoringRequestMatchers("/change-password")

@@ -1,12 +1,15 @@
 document.querySelectorAll('.btn-close').forEach(btn => {
     btn.addEventListener('click', async () => {
         const reviewId = btn.getAttribute('data-id');
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="csrf-header"]').getAttribute('content');
 
         try {
             const response = await fetch(`/review/${reviewId}`, {
                 method: 'DELETE',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
                 }
             });
 

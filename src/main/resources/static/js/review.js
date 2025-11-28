@@ -1,7 +1,9 @@
+const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+const csrfHeader = document.querySelector('meta[name="csrf-header"]').getAttribute('content');
+
 document.getElementById('review_btn').addEventListener('click', function() {
         const content = document.getElementById('reviewContent').value.trim();
         const postId = document.getElementById('postId').value;
-        const csrfToken = document.getElementById('csrfToken').value;
 
         if (content.length === 0) {
             alert("댓글을 입력해주세요.");
@@ -16,8 +18,8 @@ document.getElementById('review_btn').addEventListener('click', function() {
         fetch('/review', {
             method: 'POST',
             headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
+            "Content-Type": "application/json",
+            [csrfHeader]: csrfToken
             },
             body: JSON.stringify({ content: content, post_id: postId })
         })
