@@ -3,15 +3,18 @@ package com.song.project.service;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.song.project.entity.Post;
 import com.song.project.repository.PostRepository;
 
 @Service
@@ -85,35 +88,48 @@ public class PostViewCountService {
         System.out.println("Redis keys: " + keys);
         if (keys == null || keys.isEmpty()) return;
 
+        // postId를 키로, Redis 조회수를 값으로 저장
+        Map<Long, Long> postIdToRedisCount = new HashMap<>();
+
+        // Redis에 있는 모든 키 순회
         for (String key : keys) {
             String postIdStr = key.replace(VIEW_PREFIX, "");
             // 유저 조회 키는 제외
             if (postIdStr.contains(":user:") || postIdStr.contains(":guest:")) continue;
 
             Long postId = Long.parseLong(postIdStr);
-
             String value = redisTemplate.opsForValue().get(key);
-            if (value == null) continue;
+            if (value == null) {
+                postIdToRedisCount.put(postId, Long.parseLong(value));
+            }
+        }
 
-            Long redisCount = Long.parseLong(value);
+        if (postIdToRedisCount.isEmpty()) return;
 
-            // DB에서 현재 게시글 조회수 가져오기
-            postRepository.findById(postId).ifPresent(post -> {
-                Long dbCount = post.getViewCount();
-                Long updatedCount;
+        // 배치 조회: 모든 게시물을 한 번에 조회 (N + 1 문제 해결)
+        List<Long> postIds = new ArrayList<>(postIdToRedisCount.keySet());
+        Map<Long, Post> postMap = postRepository.findAllById(postIds)
+                .stream()
+                .collect(Collectors.toMap(Post::getId, post -> post));
 
-                if (dbCount == 0) {
-                    // DB 조회수가 0이면 단순히 Redis 값 추가
-                    updatedCount = redisCount;
-                } else {
-                    // 이미 값이 있으면 기존 DB값 + (Redis 누적값 - DB 반영분)
-                    updatedCount = dbCount + (redisCount - dbCount);
-                }
+        // Redis 조회수를 DB 조회수로 업데이트
+        for (Map.Entry<Long, Long> entry : postIdToRedisCount.entrySet()) {
+            Long postId = entry.getKey();
+            Long redisCount = entry.getValue();
+            Post post = postMap.get(postId);
+            if (post == null) continue;
+            
+            Long dbCount = post.getViewCount();
+            Long updatedCount;
 
-                post.setViewCount(updatedCount);
-                postRepository.save(post);
+            if (dbCount == 0) {
+                updatedCount = redisCount;
+            } else {
+                updatedCount = dbCount + (redisCount - dbCount);
+            }
 
-            });
+            post.setViewCount(updatedCount);
+            postRepository.save(post);
         }
     }
 }

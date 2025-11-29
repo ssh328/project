@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.song.project.controller.S3Service;
 import com.song.project.dto.PostCreateDto;
@@ -141,6 +142,7 @@ public class PostService {
     }
 
     // 카테고리 기반 추천 게시물 목록
+    @Transactional(readOnly = true)
     public List<RecommendedPostDto> getRecommendedPostsByCategory(Post currentPost) {
         // RecommendedPostService에서 이미 EntityGraph로 조회한 Post 객체를 재사용
         List<Post> recommendedPosts = recommendedPostService.recommendPopularByCategory(currentPost);
