@@ -39,6 +39,7 @@ public class UserService {
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
+        user.setRole("default");
         user.setDp("https://javaspringproject.s3.ap-northeast-2.amazonaws.com/project/default-profile-img.png");
 
         User savedUser = userRepository.save(user);
