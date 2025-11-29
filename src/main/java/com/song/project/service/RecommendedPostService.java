@@ -59,12 +59,10 @@ public class RecommendedPostService {
      * 최근 본 게시물 리스트를 기반으로 카테고리를 선택
      * 선택한 카테고리 내에서 Redis에 저장된 점수 기준으로 인기 게시글 Top N 반환
      */
-    public List<Post> recommendPopularByCategory(Long currentPostId) {
-        if (currentPostId == null) return Collections.emptyList();
-
-        Optional<Post> currentPostOpt = postRepository.findById(currentPostId);
-        if (currentPostOpt.isEmpty()) return Collections.emptyList();
-        String category = currentPostOpt.get().getCategory();
+    public List<Post> recommendPopularByCategory(Post currentPost) {
+       
+        if (currentPost == null) return Collections.emptyList();
+        String category = currentPost.getCategory();
 
         // Redis에서 전체 인기 게시글 가져오기
         Set<ZSetOperations.TypedTuple<String>> set = redisTemplate.opsForZSet()
@@ -77,7 +75,7 @@ public class RecommendedPostService {
         for (ZSetOperations.TypedTuple<String> tuple : set) {
             System.out.println("postId=" + tuple.getValue() + ", score=" + tuple.getScore());
             Long postId = Long.valueOf(tuple.getValue().toString());
-            if (!postId.equals(currentPostId)) {
+            if (!postId.equals(currentPost.getId())) {
                 allPostIds.add(postId);
             }
         }

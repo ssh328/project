@@ -130,7 +130,7 @@ public class PostService {
         Post post = getPostOrThrow(postId);
         Long viewCount = incrementViewCount(postId, loginUserId, viewToken);
         recommendedPostService.addViewScore(postId);
-        List<RecommendedPostDto> recommendedPosts = getRecommendedPostsByCategory(postId);
+        List<RecommendedPostDto> recommendedPosts = getRecommendedPostsByCategory(post);
         
         return new PostDetailResult(post, post.getUser().getId(), loginUserId, viewCount, recommendedPosts);
     }
@@ -141,9 +141,9 @@ public class PostService {
     }
 
     // 카테고리 기반 추천 게시물 목록
-    public List<RecommendedPostDto> getRecommendedPostsByCategory(Long currentPostId) {
+    public List<RecommendedPostDto> getRecommendedPostsByCategory(Post currentPost) {
         // RecommendedPostService에서 이미 EntityGraph로 조회한 Post 객체를 재사용
-        List<Post> recommendedPosts = recommendedPostService.recommendPopularByCategory(currentPostId);
+        List<Post> recommendedPosts = recommendedPostService.recommendPopularByCategory(currentPost);
 
         return recommendedPosts.stream()
                 .map(RecommendedPostDto::from)
