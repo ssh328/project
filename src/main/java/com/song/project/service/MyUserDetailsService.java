@@ -28,7 +28,15 @@ public class MyUserDetailsService implements UserDetailsService {
         }
         var user = result.get();
         List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("일반유저"));
+
+        // User 엔티티의 Role 값을 읽어서 권한 부여
+        String role = user.getRole();
+        if (role != null && role.equals("ADMIN")) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        } else {
+            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        }
+
         CustomUser a = new CustomUser(user.getUsername(), user.getPassword(), authorities);
         a.user_id = user.getUser_id();
         a.id = user.getId();
