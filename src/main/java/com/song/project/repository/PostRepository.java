@@ -23,6 +23,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Page<Post> findByCategory(String category, Pageable pageable);
 
+    Page<Post> findByTitleContainingIgnoreCase(String title, Pageable pageable);
+
     @EntityGraph(attributePaths = {"images", "user"})
     @Query("""
         SELECT p FROM Post p

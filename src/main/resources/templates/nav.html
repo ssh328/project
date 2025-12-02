@@ -41,7 +41,9 @@
                     </svg>
                 </a>
             </li>
-
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link" href="/admin/dashboard">관리자</a>
+            </li>
         </ul>
     </div>
 </nav>
