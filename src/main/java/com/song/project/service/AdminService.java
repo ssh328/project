@@ -49,8 +49,7 @@ public class AdminService {
             return userRepository.findAll(pageRequest);
         }
 
-        return userRepository.findByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(
-                keyword, keyword, pageRequest);
+        return userRepository.fullTextSearchUsernameOrEmail(keyword, pageRequest);
     }
 
     // 게시글 목록 (검색 + 상태 필터 + 페이징)
