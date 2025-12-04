@@ -211,6 +211,7 @@ public class PostService {
     }
 
     // 게시글 삭제
+    @Transactional
     public void deletePost(Long postId, Long userId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("게시물을 찾을 수 없습니다."));
@@ -224,8 +225,11 @@ public class PostService {
             String key = s3Service.extractS3Key(img.getImgUrl());
             s3Service.deleteFile(key);
         }
+        
+        likeRepository.deleteAllByPostId(postId);
 
         postRepository.delete(post);
+
     }
 
     // 게시글 이미지 단건 삭제

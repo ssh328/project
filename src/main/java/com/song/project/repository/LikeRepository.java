@@ -8,6 +8,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,4 +26,9 @@ public interface LikeRepository extends JpaRepository<Likes, Long> {
 
     @EntityGraph(attributePaths = {"post"})
     List<Likes> findByPostId(Long postId);
+
+    // postId로 모든 좋아요 삭제
+    @Modifying
+    @Query("DELETE FROM Likes l WHERE l.post.id = :postId")
+    void deleteAllByPostId(@Param("postId") Long postId);
 }
