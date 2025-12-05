@@ -40,6 +40,22 @@ public class UserService {
             throw new BadRequestException("이미 존재하는 아이디입니다.");
         }
 
+        if (userId.length() < 4 || userId.length() > 20) {
+            throw new BadRequestException("아이디는 4자 이상 20자 이하여야 합니다.");
+        }
+        // 영문, 숫자만 허용
+        if (!userId.matches("^[a-zA-Z0-9]+$")) {
+            throw new BadRequestException("아이디는 영문과 숫자만 사용할 수 있습니다.");
+        }
+
+        if (password.length() < 8 || password.length() > 20) {
+            throw new BadRequestException("비밀번호는 8자 이상 20자 이하여야 합니다.");
+        }
+        // 최소 1개 이상의 영문, 숫자 포함
+        if (!password.matches("^(?=.*[a-zA-Z])(?=.*[0-9]).+$")) {
+            throw new BadRequestException("비밀번호는 영문과 숫자를 포함해야 합니다.");
+        }
+
         User user = new User();
         user.setUser_id(userId);
         user.setUsername(username);
