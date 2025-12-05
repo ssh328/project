@@ -7,6 +7,8 @@ import com.song.project.dto.PostListDto;
 import com.song.project.dto.PostStatusUpdateDto;
 import com.song.project.dto.PostUpdateDto;
 import com.song.project.entity.Post;
+import com.song.project.exception.BadRequestException;
+import com.song.project.exception.NotFoundException;
 import com.song.project.post.PostStatus;
 import com.song.project.service.PostService;
 import com.song.project.service.PostService.PostDetailResult;
@@ -152,10 +154,18 @@ public class PostController {
             return "redirect:/new-post";
         }
         
-        Long userId = getUserId(auth);
-        postService.createPost(userId, dto);
-
-        return "redirect:/list";
+        try {
+            Long userId = getUserId(auth);
+            postService.createPost(userId, dto);
+            redirectAttributes.addFlashAttribute("successMessage", "게시물이 등록되었습니다.");
+            return "redirect:/list";
+        } catch (NotFoundException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/new-post";
+        } catch (BadRequestException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/new-post";
+        }
     }
 
     @GetMapping("/presigned-url")

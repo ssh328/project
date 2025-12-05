@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -21,6 +22,7 @@ import com.song.project.entity.Post;
 import com.song.project.entity.PostImage;
 import com.song.project.entity.Review;
 import com.song.project.entity.User;
+import com.song.project.exception.BadRequestException;
 import com.song.project.exception.ForbiddenException;
 import com.song.project.exception.NotFoundException;
 import com.song.project.exception.UnauthorizedException;
@@ -153,6 +155,7 @@ public class PostService {
     }
 
     // 게시글 생성
+    @Transactional
     public Post createPost(Long userId, PostCreateDto dto) {
         var user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
@@ -164,16 +167,28 @@ public class PostService {
         post.setBody(dto.getBody());
         post.setUser(user);
 
-        Post saved = postRepository.save(post);
+        Post saved;
+        try {
+            saved = postRepository.save(post);
+        } catch (DataIntegrityViolationException e) {
+            throw new BadRequestException("게시물 생성에 실패했습니다.");
+        }
 
         // 이미지 저장
         if (dto.getImage() != null && !dto.getImage().isEmpty()) {
             String[] urls = dto.getImage().split(",");
             for (String url : urls) {
-                PostImage postImage = new PostImage();
-                postImage.setImgUrl(url.trim());
-                postImage.setPost(saved);
-                postImageRepository.save(postImage);
+                String trimmedUrl = url.trim();
+                if (!trimmedUrl.isEmpty()) {
+                    try {
+                        PostImage postImage = new PostImage();
+                        postImage.setImgUrl(trimmedUrl);
+                        postImage.setPost(saved);
+                        postImageRepository.save(postImage);
+                    } catch (Exception e) {
+                        throw new BadRequestException("이미지 저장에 실패했습니다.");
+                    }
+                }
             }
         }
 
@@ -181,6 +196,7 @@ public class PostService {
     }
 
     // 게시글 수정
+    @Transactional
     public Post updatePost(PostUpdateDto dto, Long userId) {
         Post post = postRepository.findById(dto.getPostId())
                 .orElseThrow(() -> new NotFoundException("게시글을 찾을 수 없습니다."));
