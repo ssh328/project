@@ -8,6 +8,7 @@ import com.song.project.dto.PostStatusUpdateDto;
 import com.song.project.dto.PostUpdateDto;
 import com.song.project.entity.Post;
 import com.song.project.exception.BadRequestException;
+import com.song.project.exception.ForbiddenException;
 import com.song.project.exception.NotFoundException;
 import com.song.project.exception.UnauthorizedException;
 import com.song.project.post.PostStatus;
@@ -241,9 +242,13 @@ public class PostController {
     @PreAuthorize("isAuthenticated()")
     ResponseEntity<String> delete(@RequestParam Long id, Authentication auth) {
 
-        Long userId = getUserId(auth);
-        postService.deletePost(id, userId);
-        return ResponseEntity.ok("삭제완료");
+        try {
+            Long userId = getUserId(auth);
+            postService.deletePost(id, userId);
+            return ResponseEntity.ok("삭제완료");
+        } catch (NotFoundException | ForbiddenException e) {
+            return ResponseEntity.status(403).body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/delete-image")

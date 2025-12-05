@@ -254,9 +254,12 @@ public class PostService {
             s3Service.deleteFile(key);
         }
         
-        likeRepository.deleteAllByPostId(postId);
-
-        postRepository.delete(post);
+        try {    
+            likeRepository.deleteAllByPostId(postId);
+            postRepository.delete(post);
+        } catch (Exception e) {
+            throw new BadRequestException("게시물 삭제에 실패했습니다.");
+        }
 
     }
 
