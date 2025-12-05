@@ -14,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -75,16 +76,22 @@ public class UserController {
     public Map<String, Object> loginJWT(@RequestBody Map<String, String> data,
                                         HttpServletResponse response) {
         
-        // 인증 처리
-        var authToken = new UsernamePasswordAuthenticationToken(
-            data.get("username"), data.get("password"));
-        var auth = authenticationManagerBuilder.getObject().authenticate(authToken);
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        // JWT 쿠키 설정
-        setJwtCookie(response);
-
-        return Map.of("success", true);
+        try {
+            // 인증 처리
+            var authToken = new UsernamePasswordAuthenticationToken(
+                data.get("username"), data.get("password"));
+            var auth = authenticationManagerBuilder.getObject().authenticate(authToken);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+    
+            // JWT 쿠키 설정
+            setJwtCookie(response);
+    
+            return Map.of("success", true);
+        } catch (BadCredentialsException e) {
+            return Map.of("success", false, "message", "아이디 또는 비밀번호가 일치하지 않습니다.");
+        } catch (Exception e) {
+            return Map.of("success", false, "message", "로그인에 실패했습니다.");
+        }
     }
 
     @PostMapping("/logout/jwt")
