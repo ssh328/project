@@ -3,6 +3,7 @@ package com.song.project.controller;
 import com.song.project.CustomUser;
 import com.song.project.JwtUtil;
 import com.song.project.dto.UserProfileDto;
+import com.song.project.exception.BadRequestException;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -45,18 +46,23 @@ public class UserController {
                         RedirectAttributes redirectAttributes,
                         HttpServletResponse response) {
         
-        // 회원가입 처리
-        userService.register(user_id, password, username, email);
-        
-        // 자동 로그인 처리
-        var authToken = new UsernamePasswordAuthenticationToken(username, password);
-        var auth = authenticationManagerBuilder.getObject().authenticate(authToken);
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        setJwtCookie(response);
-
-        redirectAttributes.addFlashAttribute("successMessage", "환영합니다!");
-        return "redirect:/list";
+        try {
+            // 회원가입 처리
+            userService.register(user_id, password, username, email);
+            
+            // 자동 로그인 처리
+            var authToken = new UsernamePasswordAuthenticationToken(username, password);
+            var auth = authenticationManagerBuilder.getObject().authenticate(authToken);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            
+            setJwtCookie(response);
+    
+            redirectAttributes.addFlashAttribute("successMessage", "환영합니다!");
+            return "redirect:/list";
+        } catch (BadRequestException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/register";
+        }
     }
 
     @GetMapping("/login")

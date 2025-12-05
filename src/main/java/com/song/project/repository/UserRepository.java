@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.song.project.entity.User;
 
@@ -17,4 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             countQuery = "select count(*) from store.user where match(username, email) against(?1)",
             nativeQuery = true)
     Page<User> fullTextSearchUsernameOrEmail(String keyword, Pageable pageable);
+
+    @Query("SELECT u FROM User u WHERE u.user_id = :user_id")
+    Optional<User> findByUser_id(@Param("user_id") String user_id);
 }

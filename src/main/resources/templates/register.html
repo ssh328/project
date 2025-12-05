@@ -8,8 +8,13 @@
 
     <div th:replace="~{ nav.html::navbar }"></div>
 
-    <main class="container mt-5">
-        <div class="container-fluid d-flex align-items-center justify-content-center mt-5 pt-5">
+    <main class="container mt-5 pt-5">
+        <!-- 플래시 메시지 -->
+        <div class="text-danger text-center">
+            <th:block th:replace="~{partial/flash.html :: flashMessages}"></th:block>
+        </div>
+        
+        <div class="container-fluid d-flex align-items-center justify-content-center pt-5">
             <div class="col-md-6 col-lg-6">
                 <h1 class="display-2 signup-border-color mb-4" style="font-weight: 500;">Sign Up</h1>
     

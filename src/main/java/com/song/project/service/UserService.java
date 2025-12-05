@@ -14,6 +14,7 @@ import com.song.project.repository.PostRepository;
 import com.song.project.entity.Likes;
 import com.song.project.entity.Post;
 import com.song.project.entity.User;
+import com.song.project.exception.BadRequestException;
 import com.song.project.repository.LikeRepository;
 import com.song.project.repository.UserRepository;
 import com.song.project.JwtUtil;
@@ -34,6 +35,11 @@ public class UserService {
 
     // 회원가입 처리
     public RegisterResult register(String userId, String password, String username, String email) {
+
+        if (userRepository.findByUser_id(userId).isPresent()) {
+            throw new BadRequestException("이미 존재하는 아이디입니다.");
+        }
+
         User user = new User();
         user.setUser_id(userId);
         user.setUsername(username);
