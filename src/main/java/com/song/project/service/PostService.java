@@ -210,16 +210,28 @@ public class PostService {
         post.setCategory(dto.getCategory());
         post.setBody(dto.getBody());
 
-        Post updated = postRepository.save(post);
+        Post updated;
+        try {
+            updated = postRepository.save(post);
+        } catch (DataIntegrityViolationException e) {
+            throw new BadRequestException("게시물 수정에 실패했습니다.");
+        }
 
         // 새로 업로드된 이미지 처리 (기존 이미지는 유지, 삭제는 별도 API)
         if (dto.getImage() != null && !dto.getImage().isEmpty()) {
             String[] urls = dto.getImage().split(",");
             for (String url : urls) {
-                PostImage postImage = new PostImage();
-                postImage.setImgUrl(url.trim());
-                postImage.setPost(updated);
-                postImageRepository.save(postImage);
+                String trimmedUrl = url.trim();
+                if (!trimmedUrl.isEmpty()) {
+                    try {
+                        PostImage postImage = new PostImage();
+                        postImage.setImgUrl(trimmedUrl);
+                        postImage.setPost(updated);
+                        postImageRepository.save(postImage);
+                    } catch (Exception e) {
+                        throw new BadRequestException("이미지 저장에 실패했습니다.");
+                    }
+                }
             }
         }
 

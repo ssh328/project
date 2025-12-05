@@ -9,6 +9,7 @@ import com.song.project.dto.PostUpdateDto;
 import com.song.project.entity.Post;
 import com.song.project.exception.BadRequestException;
 import com.song.project.exception.NotFoundException;
+import com.song.project.exception.UnauthorizedException;
 import com.song.project.post.PostStatus;
 import com.song.project.service.PostService;
 import com.song.project.service.PostService.PostDetailResult;
@@ -219,10 +220,21 @@ public class PostController {
             return "redirect:/edit/" + dto.getPostId();
         }
         
-        Long userId = getUserId(auth);
-        postService.updatePost(dto, userId);
-
-        return "redirect:/detail/" + dto.getPostId();
+        try {
+            Long userId = getUserId(auth);
+            postService.updatePost(dto, userId);
+            redirectAttributes.addFlashAttribute("successMessage", "게시물이 수정되었습니다.");
+            return "redirect:/detail/" + dto.getPostId();
+        } catch (NotFoundException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/list";
+        } catch (UnauthorizedException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/list";
+        } catch (BadRequestException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/edit/" + dto.getPostId();
+        }
     }
 
     @DeleteMapping("/delete")
