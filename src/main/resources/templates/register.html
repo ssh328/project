@@ -9,10 +9,6 @@
     <div th:replace="~{ nav.html::navbar }"></div>
 
     <main class="container mt-5 pt-5">
-        <!-- 플래시 메시지 -->
-        <div class="text-danger text-center">
-            <th:block th:replace="~{partial/flash.html :: flashMessages}"></th:block>
-        </div>
         
         <div class="container-fluid d-flex align-items-center justify-content-center pt-5">
             <div class="col-md-6 col-lg-6">
@@ -20,6 +16,10 @@
     
                 <!-- 회원가입 폼 -->
                 <form th:action="@{/user-register}" method="post" class="text-center validated-form" novalidate>
+                    <!-- 플래시 메시지 -->
+                    <div class="text-danger text-center">
+                        <th:block th:replace="~{partial/flash.html :: flashMessages}"></th:block>
+                    </div>
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                     <div class="mb-3 form-floating">
                         <input name="username" type="text" class="form-control" id="floatingName" placeholder="Username" required>
