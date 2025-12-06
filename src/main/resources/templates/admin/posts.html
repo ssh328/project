@@ -62,7 +62,7 @@
             <tr th:each="post : ${posts.content}">
                 <td th:text="${post.id}">1</td>
                 <td>
-                    <a th:href="@{|/detail/${post.id}|}" th:text="${post.title}" target="_blank">title</a>
+                    <a th:href="@{|/post/detail/${post.id}|}" th:text="${post.title}" target="_blank">title</a>
                 </td>
                 <td th:text="${#numbers.formatInteger(post.price, 0, 'COMMA')} + '원'">0원</td>
                 <td th:text="${post.category}">카테고리</td>

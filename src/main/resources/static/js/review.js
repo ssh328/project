@@ -47,7 +47,7 @@ document.getElementById('review_btn').addEventListener('click', function() {
             newReview.appendChild(p);
             reviewList.prepend(newReview);
             
-            // 최대 5개까지만 쵸시
+            // 최대 5개까지만 표시
             while (reviewList.children.length > 5) {
                 reviewList.removeChild(reviewList.lastChild);
             }

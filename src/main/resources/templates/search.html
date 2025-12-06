@@ -25,7 +25,7 @@
     </div>
 
     <!-- 게시글 있을 때만 페이지네이션 표시 -->
-    <div th:replace="~{ partial/pagination.html :: pagination('/search?searchText=' + ${searchText}, ${currentPage}, ${totalPages}, 'page') }"></div>
+    <div th:replace="~{ partial/pagination.html :: pagination('/post/search?searchText=' + ${searchText}, ${currentPage}, ${totalPages}, 'page') }"></div>
 
     <th:block th:replace="~{ partial/footer.html :: footerFragment }"></th:block>
 

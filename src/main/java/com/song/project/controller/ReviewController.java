@@ -36,13 +36,13 @@ public class ReviewController {
             String encodedUsername = reviewService.encodeUsername(review.getTargetUser().getUsername());
             redirectAttributes.addFlashAttribute("successMessage", "리뷰가 등록되었습니다.");
 
-            return "redirect:/profile/" + encodedUsername + "?tab=reviews";
+            return "redirect:/post/profile/" + encodedUsername + "?tab=reviews";
         } catch (NotFoundException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/list";
+            return "redirect:/post/list";
         } catch (BadRequestException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/list";
+            return "redirect:/post/list";
         }
     }
 

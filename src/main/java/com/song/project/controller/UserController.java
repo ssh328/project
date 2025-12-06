@@ -59,7 +59,7 @@ public class UserController {
             setJwtCookie(response);
     
             redirectAttributes.addFlashAttribute("successMessage", "환영합니다!");
-            return "redirect:/list";
+            return "redirect:/post/list";
         } catch (BadRequestException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/register";
@@ -97,7 +97,7 @@ public class UserController {
     @PostMapping("/logout/jwt")
     public String logoutJWT(HttpServletResponse response) {
         clearJwtCookie(response);
-        return "redirect:/list";
+        return "redirect:/post/list";
     }
 
     @GetMapping("/my-page")
@@ -267,7 +267,7 @@ public class UserController {
             clearAllAuthCookies(response);
             
             redirectAttributes.addFlashAttribute("successMessage", "계정이 성공적으로 삭제되었습니다.");
-            return "redirect:/list";
+            return "redirect:/post/list";
             
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());

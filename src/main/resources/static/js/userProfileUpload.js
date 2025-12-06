@@ -44,7 +44,7 @@ function toggleSubmitButton() {
         try {
             const profileImage = fileInput.files[0];
             const fileName = profileImage.name;
-            const response = await fetch('/presigned-url?filename=' + fileName);
+            const response = await fetch('/post/presigned-url?filename=' + fileName);
             const result = await response.text();
             const uploadResponse = await fetch(result, {
                 method: 'PUT',

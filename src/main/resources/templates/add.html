@@ -15,7 +15,7 @@
             <th:block th:replace="~{partial/flash.html :: flashMessages}"></th:block>
         </div>
 
-        <form id="postForm" action="/add" method="POST" novalidate class="validated-form">
+        <form id="postForm" action="/post/add" method="POST" novalidate class="validated-form">
             <input type="hidden" th:name="${_csrf.parameterName}"
                 th:value="${_csrf.token}">
 

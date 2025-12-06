@@ -26,7 +26,7 @@ try {
     const data = await response.json();
 
         if (data.success) {
-            window.location.href = '/list';
+            window.location.href = '/post/list';
         } else {
           const errorDiv = document.createElement('div');
           errorDiv.className = 'alert alert-danger alert-dismissible fade show';

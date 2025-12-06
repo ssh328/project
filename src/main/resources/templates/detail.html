@@ -54,7 +54,7 @@
                     <div class="row row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3 mb-5">
                         <div class="col" th:each="post : ${recommendedPosts}">
                             <div class="card" style="width: 100%;">
-                                <a class="text-decoration-none text-dark" th:href="@{'/detail/' + ${post.id}}">
+                                <a class="text-decoration-none text-dark" th:href="@{'/post/detail/' + ${post.id}}">
                                     <div class="position-relative">
                                         <img th:if="${post.firstImageUrl != null}" th:src="${post.firstImageUrl}" class="card-img-top card-img-square" alt="">
                                         <img th:unless="${post.firstImageUrl != null}" src="https://placehold.co/300" class="card-img-top card-img-square" alt="기본 이미지">
@@ -152,7 +152,7 @@
                                 채팅하기
                             </button>
                             
-                            <form th:action="@{/edit/{id}(id=${data.id})}" th:if="${loginUserId == postWriterId}">
+                            <form th:action="@{/post/edit/{id}(id=${data.id})}" th:if="${loginUserId == postWriterId}">
                                 <button type="submit" name="edit_btn" class="btn btn-outline-info w-100 mb-2">수정하기</button>
                             </form>
                             

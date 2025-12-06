@@ -159,7 +159,7 @@ saveButton.addEventListener('click', async (e) => {
     try {
         if (deletedImages.length > 0) {
             for (const id of deletedImages) {
-                const deleteResponse = await fetch('/delete-image?imageId=' + id, {
+                const deleteResponse = await fetch('/post/delete-image?imageId=' + id, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
@@ -177,7 +177,7 @@ saveButton.addEventListener('click', async (e) => {
 
         for (const file of selectedFiles) {
             const fileName = encodeURIComponent(file.name);
-            const response = await fetch('/presigned-url?filename=' + fileName);
+            const response = await fetch('/post/presigned-url?filename=' + fileName);
             const result = await response.text();
 
             const uploadResponse = await fetch(result, {

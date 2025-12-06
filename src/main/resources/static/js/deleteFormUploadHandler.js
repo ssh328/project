@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const csrfHeader = document.querySelector('meta[name="csrf-header"]')?.getAttribute('content');
             
             // 실제 삭제 요청
-            fetch(`/delete?id=${postId}`, {
+            fetch(`/post/delete?id=${postId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return r.text();
             })
             .then(() => {
-                location.href = '/list';
+                location.href = '/post/list';
             })
             .catch(err => {
                 console.error('삭제 실패:', err);

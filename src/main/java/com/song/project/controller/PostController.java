@@ -42,6 +42,7 @@ import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/post")
 public class PostController {
     private final PostService postService;
     private final S3Service s3Service;
@@ -153,20 +154,20 @@ public class PostController {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("errorMessage", 
                 bindingResult.getFieldErrors().get(0).getDefaultMessage());
-            return "redirect:/new-post";
+            return "redirect:/post/new-post";
         }
         
         try {
             Long userId = getUserId(auth);
             postService.createPost(userId, dto);
             redirectAttributes.addFlashAttribute("successMessage", "게시물이 등록되었습니다.");
-            return "redirect:/list";
+            return "redirect:/post/list";
         } catch (NotFoundException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/new-post";
+            return "redirect:/post/new-post";
         } catch (BadRequestException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/new-post";
+            return "redirect:/post/new-post";
         }
     }
 
@@ -218,23 +219,23 @@ public class PostController {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("errorMessage", 
                 bindingResult.getFieldErrors().get(0).getDefaultMessage());
-            return "redirect:/edit/" + dto.getPostId();
+            return "redirect:/post/edit/" + dto.getPostId();
         }
         
         try {
             Long userId = getUserId(auth);
             postService.updatePost(dto, userId);
             redirectAttributes.addFlashAttribute("successMessage", "게시물이 수정되었습니다.");
-            return "redirect:/detail/" + dto.getPostId();
+            return "redirect:/post/detail/" + dto.getPostId();
         } catch (NotFoundException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/list";
+            return "redirect:/post/list";
         } catch (UnauthorizedException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/list";
+            return "redirect:/post/list";
         } catch (BadRequestException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/edit/" + dto.getPostId();
+            return "redirect:/post/edit/" + dto.getPostId();
         }
     }
 
@@ -260,7 +261,7 @@ public class PostController {
         return ResponseEntity.ok("삭제완료");
     }
 
-    @PatchMapping("/post/{id}/status")
+    @PatchMapping("/{id}/status")
     @PreAuthorize("isAuthenticated()")
     @ResponseBody
     ResponseEntity<Map<String, Object>> updateStatus(@PathVariable Long id,

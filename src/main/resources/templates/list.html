@@ -27,14 +27,14 @@
                 <div class="row mb-3">
                     <div class="col-12">
                         <div class="btn-group" role="group" aria-label="상태 필터">
-                            <a th:href="@{/list(page=1, status=null)}"
+                            <a th:href="@{/post/list(page=1, status=null)}"
                                class="btn btn-outline-secondary"
                                th:classappend="${selectedStatus == null} ? 'active'">
                                 전체
                             </a>
 
                             <a th:each="s : ${statuses}"
-                               th:href="@{/list(page=1, status=${s.name()})}"
+                               th:href="@{/post/list(page=1, status=${s.name()})}"
                                class="btn btn-outline-secondary"
                                th:classappend="${selectedStatus == s.name()} ? 'active'"
                                th:text="${s.description}">
@@ -60,7 +60,7 @@
 
         <!-- 페이지네이션 -->
         <div th:if="${totalPages > 0}"
-             th:replace="~{ partial/pagination.html :: pagination('/list', ${currentPage}, ${totalPages}, 'page') }">
+             th:replace="~{ partial/pagination.html :: pagination('/post/list', ${currentPage}, ${totalPages}, 'page') }">
         </div>
     </main>
 

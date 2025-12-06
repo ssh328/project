@@ -1,7 +1,7 @@
 <!-- fragments/postCard.html -->
 <div th:fragment="postCard(post, likedPostIds, viewCounts)">
     <div class="card" style="width: 100%;">
-        <a class="text-decoration-none text-dark" th:href="@{'/detail/' + ${post.id}}">
+        <a class="text-decoration-none text-dark" th:href="@{'/post/detail/' + ${post.id}}">
             <div class="position-relative">
                 <img th:if="${post.firstImageUrl != null}" th:src="${post.firstImageUrl}" class="card-img-top card-img-square" alt="">
                 <img th:unless="${post.firstImageUrl != null}" src="https://placehold.co/300" class="card-img-top card-img-square" alt="기본 이미지">
