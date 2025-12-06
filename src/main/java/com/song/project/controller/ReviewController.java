@@ -14,15 +14,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/review")
 public class ReviewController {
     private final ReviewService reviewService;
 
-    @PostMapping("/review")
+    @PostMapping
     String Review(@RequestParam String content,
                         @RequestParam int rating,
                         @RequestParam Long targetUserId,
@@ -46,7 +48,7 @@ public class ReviewController {
         }
     }
 
-    @DeleteMapping("/review/{id}")
+    @DeleteMapping("/{id}")
     ResponseEntity<String> deleteReview(@PathVariable Long id, Authentication auth) {
         try {
             CustomUser user = getUserId(auth);
