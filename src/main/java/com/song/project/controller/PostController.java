@@ -16,7 +16,6 @@ import com.song.project.service.PostService;
 import com.song.project.service.PostService.PostDetailResult;
 import com.song.project.service.PostService.PostListResult;
 import com.song.project.service.PostService.PostStatusParseResult;
-import com.song.project.service.PostService.ProfileResult;
 import com.song.project.service.PostService.SearchResult;
 
 import lombok.RequiredArgsConstructor;
@@ -284,33 +283,6 @@ public class PostController {
         response.put("status", postStatus.name());
         response.put("statusDescription", postStatus.getDescription());
         return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/profile/{username}")
-    String profileUser(Model model, @PathVariable String username, 
-                       @RequestParam(defaultValue = "1") int postPage,
-                       @RequestParam(defaultValue = "1") int reviewPage,
-                       @RequestParam(defaultValue = "posts") String tab,
-                       Authentication auth) {
-        
-        Long loginUserId = getUserId(auth);
-
-        ProfileResult result = postService.getProfileResult(username, postPage, reviewPage, loginUserId);
-
-        // 모델 설정
-        model.addAttribute("user", result.getUser());
-        model.addAttribute("posts", result.getPosts());
-        model.addAttribute("reviews", result.getReviews());
-        model.addAttribute("likedPostIds", result.getLikedPostIds());
-        model.addAttribute("postCurrentPage", postPage);
-        model.addAttribute("reviewCurrentPage", reviewPage);
-        model.addAttribute("postTotalPages", result.getPostTotalPages());
-        model.addAttribute("reviewTotalPages", result.getReviewTotalPages());
-        model.addAttribute("loginUserId", result.getLoginUserId());
-        model.addAttribute("viewCounts", result.getViewCounts());
-        model.addAttribute("tab", tab);
-        
-        return "profile.html";
     }
 
     // 헬퍼 메서드

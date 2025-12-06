@@ -27,6 +27,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.Map;
 
 import com.song.project.service.UserService;
+import com.song.project.service.UserService.ProfileResult;
 
 @Controller
 @RequiredArgsConstructor
@@ -162,6 +163,33 @@ public class UserController {
         
         userService.updateUserProfileImage(userId, image);
         return "redirect:/setting";
+    }
+
+    @GetMapping("/profile/{username}")
+    String profileUser(Model model, @PathVariable String username, 
+                       @RequestParam(defaultValue = "1") int postPage,
+                       @RequestParam(defaultValue = "1") int reviewPage,
+                       @RequestParam(defaultValue = "posts") String tab,
+                       Authentication auth) {
+        
+        CustomUser loginUser = (CustomUser) auth.getPrincipal();
+
+        ProfileResult result = userService.getProfileResult(username, postPage, reviewPage, loginUser.id);
+
+        // 모델 설정
+        model.addAttribute("user", result.getUser());
+        model.addAttribute("posts", result.getPosts());
+        model.addAttribute("reviews", result.getReviews());
+        model.addAttribute("likedPostIds", result.getLikedPostIds());
+        model.addAttribute("postCurrentPage", postPage);
+        model.addAttribute("reviewCurrentPage", reviewPage);
+        model.addAttribute("postTotalPages", result.getPostTotalPages());
+        model.addAttribute("reviewTotalPages", result.getReviewTotalPages());
+        model.addAttribute("loginUserId", result.getLoginUserId());
+        model.addAttribute("viewCounts", result.getViewCounts());
+        model.addAttribute("tab", tab);
+        
+        return "profile.html";
     }
 
     @GetMapping("/verify-password")

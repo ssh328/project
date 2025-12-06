@@ -6,13 +6,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.song.project.repository.PostRepository;
+import com.song.project.repository.ReviewRepository;
 import com.song.project.entity.Likes;
 import com.song.project.entity.Post;
+import com.song.project.entity.Review;
 import com.song.project.entity.User;
 import com.song.project.exception.BadRequestException;
 import com.song.project.repository.LikeRepository;
@@ -31,6 +35,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
+    private final ReviewRepository reviewRepository;
     private final PostViewCountService postViewCountService;
 
     // 회원가입 처리
@@ -135,6 +140,51 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    // 사용자명으로 게시글 목록 조회
+    public Page<Post> getPostsByUsername(String username, int page) {
+        PageRequest pageRequest = PageRequest.of(page - 1, 20);
+        return postRepository.findByUser_Username(username, pageRequest);
+    }
+
+    // 여러 게시물에 대한 Redis 조회수 조회
+    public Map<Long, Long> getViewCountsForPosts(List<Long> postIds) {
+        return postViewCountService.getViewCountsForPosts(postIds);
+    }
+
+    public ProfileResult getProfileResult(String username, int postPage, int reviewPage, Long loginUserId) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+        UserProfileDto userDto = new UserProfileDto(user);
+
+        Page<Post> posts = getPostsByUsername(username, postPage);
+        Page<PostListDto> postDtos = posts.map(PostListDto::from);
+
+        List<Long> postIds = postDtos.stream()
+            .map(PostListDto::getId)
+            .collect(Collectors.toList());
+        Map<Long, Long> viewCounts = getViewCountsForPosts(postIds);
+
+        PageRequest reviewPageRequest = PageRequest.of(
+            reviewPage - 1,
+            3,
+            Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+        
+        Page<Review> reviews = reviewRepository.findByTargetUser_Id(
+                userDto.getId(), reviewPageRequest);
+
+        List<Long> likedPostIds = getLikedPostIds(user.getId());
+
+        return new ProfileResult(userDto,
+                                 postDtos, 
+                                 reviews, 
+                                 likedPostIds, 
+                                 posts.getTotalPages(), 
+                                 reviews.getTotalPages(), 
+                                 loginUserId, 
+                                 viewCounts);
+    }
+
     // Private Helper Methods
 
     // 사용자 조회, 없으면 예외 발생
@@ -205,6 +255,36 @@ public class UserService {
             this.posts = posts;
             this.likedPostIds = likedPostIds;
             this.totalPages = totalPages;
+            this.viewCounts = viewCounts;
+        }
+    }
+
+    @Getter
+    public static class ProfileResult {
+        private UserProfileDto user;
+        private Page<PostListDto> posts;
+        private Page<Review> reviews;
+        private List<Long> likedPostIds;
+        private int postTotalPages;
+        private int reviewTotalPages;
+        private Long loginUserId;
+        private Map<Long, Long> viewCounts;
+
+        public ProfileResult(UserProfileDto user, 
+                             Page<PostListDto> posts, 
+                             Page<Review> reviews, 
+                             List<Long> likedPostIds, 
+                             int postTotalPages, 
+                             int reviewTotalPages, 
+                             Long loginUserId, 
+                             Map<Long, Long> viewCounts) {
+            this.user = user;
+            this.posts = posts;
+            this.reviews = reviews;
+            this.likedPostIds = likedPostIds;
+            this.postTotalPages = postTotalPages;
+            this.reviewTotalPages = reviewTotalPages;
+            this.loginUserId = loginUserId;
             this.viewCounts = viewCounts;
         }
     }

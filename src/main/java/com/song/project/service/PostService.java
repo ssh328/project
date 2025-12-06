@@ -17,11 +17,8 @@ import com.song.project.dto.PostListDto;
 import com.song.project.dto.PostStatusUpdateDto;
 import com.song.project.dto.PostUpdateDto;
 import com.song.project.dto.RecommendedPostDto;
-import com.song.project.dto.UserProfileDto;
 import com.song.project.entity.Post;
 import com.song.project.entity.PostImage;
-import com.song.project.entity.Review;
-import com.song.project.entity.User;
 import com.song.project.exception.BadRequestException;
 import com.song.project.exception.ForbiddenException;
 import com.song.project.exception.NotFoundException;
@@ -30,7 +27,6 @@ import com.song.project.post.PostStatus;
 import com.song.project.repository.LikeRepository;
 import com.song.project.repository.PostImageRepository;
 import com.song.project.repository.PostRepository;
-import com.song.project.repository.ReviewRepository;
 import com.song.project.repository.UserRepository;
 
 import lombok.Getter;
@@ -44,7 +40,6 @@ public class PostService {
     private final PostImageRepository postImageRepository;
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
-    private final ReviewRepository reviewRepository;
     private final PostViewCountService postViewCountService;
     private final RecommendedPostService recommendedPostService;
     private final S3Service s3Service;
@@ -299,40 +294,40 @@ public class PostService {
         return postStatus;
     }
 
-        // 프로필 페이지 결과
-    public ProfileResult getProfileResult(String username, int postPage, int reviewPage, Long loginUserId) {
-        User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
-        UserProfileDto userDto = new UserProfileDto(user);
+    // 프로필 페이지 결과
+    // public ProfileResult getProfileResult(String username, int postPage, int reviewPage, Long loginUserId) {
+    //     User user = userRepository.findByUsername(username)
+    //         .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+    //     UserProfileDto userDto = new UserProfileDto(user);
 
-        Page<Post> posts = getPostsByUsername(username, postPage);
-        Page<PostListDto> postDtos = posts.map(PostListDto::from);
+    //     Page<Post> posts = getPostsByUsername(username, postPage);
+    //     Page<PostListDto> postDtos = posts.map(PostListDto::from);
 
-        List<Long> postIds = postDtos.stream()
-            .map(PostListDto::getId)
-            .collect(Collectors.toList());
-        Map<Long, Long> viewCounts = getViewCountsForPosts(postIds);
+    //     List<Long> postIds = postDtos.stream()
+    //         .map(PostListDto::getId)
+    //         .collect(Collectors.toList());
+    //     Map<Long, Long> viewCounts = getViewCountsForPosts(postIds);
 
-        PageRequest reviewPageRequest = PageRequest.of(
-            reviewPage - 1,
-            3,
-            Sort.by(Sort.Direction.DESC, "createdAt")
-        );
+    //     PageRequest reviewPageRequest = PageRequest.of(
+    //         reviewPage - 1,
+    //         3,
+    //         Sort.by(Sort.Direction.DESC, "createdAt")
+    //     );
         
-        Page<Review> reviews = reviewRepository.findByTargetUser_Id(
-                userDto.getId(), reviewPageRequest);
+    //     Page<Review> reviews = reviewRepository.findByTargetUser_Id(
+    //             userDto.getId(), reviewPageRequest);
 
-        List<Long> likedPostIds = getLikedPostIds(user.getId());
+    //     List<Long> likedPostIds = getLikedPostIds(user.getId());
 
-        return new ProfileResult(userDto,
-                                 postDtos, 
-                                 reviews, 
-                                 likedPostIds, 
-                                 posts.getTotalPages(), 
-                                 reviews.getTotalPages(), 
-                                 loginUserId, 
-                                 viewCounts);
-    }
+    //     return new ProfileResult(userDto,
+    //                              postDtos, 
+    //                              reviews, 
+    //                              likedPostIds, 
+    //                              posts.getTotalPages(), 
+    //                              reviews.getTotalPages(), 
+    //                              loginUserId, 
+    //                              viewCounts);
+    // }
 
     // ===========================
     // 유틸리티
@@ -422,33 +417,33 @@ public class PostService {
         }
     }
 
-    @Getter
-    public static class ProfileResult {
-        private UserProfileDto user;
-        private Page<PostListDto> posts;
-        private Page<Review> reviews;
-        private List<Long> likedPostIds;
-        private int postTotalPages;
-        private int reviewTotalPages;
-        private Long loginUserId;
-        private Map<Long, Long> viewCounts;
+    // @Getter
+    // public static class ProfileResult {
+    //     private UserProfileDto user;
+    //     private Page<PostListDto> posts;
+    //     private Page<Review> reviews;
+    //     private List<Long> likedPostIds;
+    //     private int postTotalPages;
+    //     private int reviewTotalPages;
+    //     private Long loginUserId;
+    //     private Map<Long, Long> viewCounts;
 
-        public ProfileResult(UserProfileDto user, 
-                             Page<PostListDto> posts, 
-                             Page<Review> reviews, 
-                             List<Long> likedPostIds, 
-                             int postTotalPages, 
-                             int reviewTotalPages, 
-                             Long loginUserId, 
-                             Map<Long, Long> viewCounts) {
-            this.user = user;
-            this.posts = posts;
-            this.reviews = reviews;
-            this.likedPostIds = likedPostIds;
-            this.postTotalPages = postTotalPages;
-            this.reviewTotalPages = reviewTotalPages;
-            this.loginUserId = loginUserId;
-            this.viewCounts = viewCounts;
-        }
-    }
+    //     public ProfileResult(UserProfileDto user, 
+    //                          Page<PostListDto> posts, 
+    //                          Page<Review> reviews, 
+    //                          List<Long> likedPostIds, 
+    //                          int postTotalPages, 
+    //                          int reviewTotalPages, 
+    //                          Long loginUserId, 
+    //                          Map<Long, Long> viewCounts) {
+    //         this.user = user;
+    //         this.posts = posts;
+    //         this.reviews = reviews;
+    //         this.likedPostIds = likedPostIds;
+    //         this.postTotalPages = postTotalPages;
+    //         this.reviewTotalPages = reviewTotalPages;
+    //         this.loginUserId = loginUserId;
+    //         this.viewCounts = viewCounts;
+    //     }
+    // }
 }
