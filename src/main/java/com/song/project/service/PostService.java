@@ -294,41 +294,6 @@ public class PostService {
         return postStatus;
     }
 
-    // 프로필 페이지 결과
-    // public ProfileResult getProfileResult(String username, int postPage, int reviewPage, Long loginUserId) {
-    //     User user = userRepository.findByUsername(username)
-    //         .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
-    //     UserProfileDto userDto = new UserProfileDto(user);
-
-    //     Page<Post> posts = getPostsByUsername(username, postPage);
-    //     Page<PostListDto> postDtos = posts.map(PostListDto::from);
-
-    //     List<Long> postIds = postDtos.stream()
-    //         .map(PostListDto::getId)
-    //         .collect(Collectors.toList());
-    //     Map<Long, Long> viewCounts = getViewCountsForPosts(postIds);
-
-    //     PageRequest reviewPageRequest = PageRequest.of(
-    //         reviewPage - 1,
-    //         3,
-    //         Sort.by(Sort.Direction.DESC, "createdAt")
-    //     );
-        
-    //     Page<Review> reviews = reviewRepository.findByTargetUser_Id(
-    //             userDto.getId(), reviewPageRequest);
-
-    //     List<Long> likedPostIds = getLikedPostIds(user.getId());
-
-    //     return new ProfileResult(userDto,
-    //                              postDtos, 
-    //                              reviews, 
-    //                              likedPostIds, 
-    //                              posts.getTotalPages(), 
-    //                              reviews.getTotalPages(), 
-    //                              loginUserId, 
-    //                              viewCounts);
-    // }
-
     // ===========================
     // 유틸리티
     // ===========================
@@ -416,34 +381,4 @@ public class PostService {
             this.recommendedPosts = recommendedPosts;
         }
     }
-
-    // @Getter
-    // public static class ProfileResult {
-    //     private UserProfileDto user;
-    //     private Page<PostListDto> posts;
-    //     private Page<Review> reviews;
-    //     private List<Long> likedPostIds;
-    //     private int postTotalPages;
-    //     private int reviewTotalPages;
-    //     private Long loginUserId;
-    //     private Map<Long, Long> viewCounts;
-
-    //     public ProfileResult(UserProfileDto user, 
-    //                          Page<PostListDto> posts, 
-    //                          Page<Review> reviews, 
-    //                          List<Long> likedPostIds, 
-    //                          int postTotalPages, 
-    //                          int reviewTotalPages, 
-    //                          Long loginUserId, 
-    //                          Map<Long, Long> viewCounts) {
-    //         this.user = user;
-    //         this.posts = posts;
-    //         this.reviews = reviews;
-    //         this.likedPostIds = likedPostIds;
-    //         this.postTotalPages = postTotalPages;
-    //         this.reviewTotalPages = reviewTotalPages;
-    //         this.loginUserId = loginUserId;
-    //         this.viewCounts = viewCounts;
-    //     }
-    // }
 }
