@@ -23,10 +23,11 @@ import com.song.project.service.UserService.ProfileResult;
 
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/user")
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("/my-page")
+    @GetMapping("/mypage")
     @PreAuthorize("isAuthenticated()")
     public String myPage() {
         return "mypage.html";

@@ -20,7 +20,7 @@
 
             <div class="text-center">
                 <h1 th:text="${currentUser.username}"></h1>
-                <form th:action="@{/my/{userId}/profile-image(userId=${currentUser.id})}"
+                <form th:action="@{/user/my/{userId}/profile-image(userId=${currentUser.id})}"
                       id="profileForm"
                       enctype="multipart/form-data"
                       method="post"
@@ -48,14 +48,14 @@
 
                 <hr class="mb-3" style="width: 50%; margin: 0 auto;">
 
-                <form th:action="@{/verify-password}" method="GET" class="text-center mb-3">
+                <form th:action="@{/user/verify-password}" method="GET" class="text-center mb-3">
                     <input type="hidden" name="nextAction" value="change-password">
                     <button type="submit" class="btn btn-outline-warning">비밀번호 변경</button>
                 </form>
 
                 <hr class="mb-3" style="width: 50%; margin: 0 auto;">
 
-                <form th:action="@{/verify-password}" method="get" class="text-center mb-3">
+                <form th:action="@{/user/verify-password}" method="get" class="text-center mb-3">
                     <input type="hidden" name="nextAction" value="delete-account">
                     <button type="submit" class="btn btn-outline-danger">회원탈퇴</button>
                 </form>

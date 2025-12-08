@@ -29,7 +29,7 @@
                             aria-controls="home-tab-pane" 
                             th:classappend="${tab == 'posts'} ? 'active'" 
                             aria-selected="true"
-                            th:href="@{'/profile/' + ${user.username} + '?tab=posts'}">판매 물품
+                            th:href="@{'/user/profile/' + ${user.username} + '?tab=posts'}">판매 물품
                     </a>
                 </li>
 
@@ -37,7 +37,7 @@
                     <a class="nav-link" id="profile-tab" data-bs-target="#profile-tab-pane" type="button"
                        role="tab" aria-controls="profile-tab-pane" th:classappend="${tab == 'reviews'} ? 'active'"
                         aria-selected="false" 
-                        th:href="@{'/profile/' + ${user.username} + '?tab=reviews'}">거래 후기
+                        th:href="@{'/user/profile/' + ${user.username} + '?tab=reviews'}">거래 후기
                     </a>
                 </li>
             </ul>
@@ -68,7 +68,7 @@
                          <!-- 판매물품 페이지네이션 -->
                         <div id="posts-pagination"
                              th:if="${tab == 'posts'} and ${postTotalPages != null and postCurrentPage != null}"
-                             th:replace="~{ partial/pagination.html :: pagination('/profile/' + ${user.username} + '?tab=posts', ${postCurrentPage}, ${postTotalPages}, 'postPage') }">
+                             th:replace="~{ partial/pagination.html :: pagination('/user/profile/' + ${user.username} + '?tab=posts', ${postCurrentPage}, ${postTotalPages}, 'postPage') }">
                         </div>
                     </div>
                 </div>
@@ -162,7 +162,7 @@
                         <!-- 거래후기 페이지네이션 -->
                         <div id="reviews-pagination"
                              th:if="${tab == 'reviews'} and ${reviewTotalPages != null and reviewCurrentPage != null}"
-                             th:replace="~{ partial/pagination.html :: pagination('/profile/' + ${user.username} + '?tab=reviews', ${reviewCurrentPage}, ${reviewTotalPages}, 'reviewPage') }">
+                             th:replace="~{ partial/pagination.html :: pagination('/user/profile/' + ${user.username} + '?tab=reviews', ${reviewCurrentPage}, ${reviewTotalPages}, 'reviewPage') }">
                         </div>
                     </div>
                 </div>

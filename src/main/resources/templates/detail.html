@@ -37,7 +37,7 @@
                     </div>
 
                     <div class="ms-3 mb-3">
-                        <a th:href="@{/profile/{username}(username=${data.user.username})}" class="d-flex align-items-center text-decoration-none text-muted">
+                        <a th:href="@{/user/profile/{username}(username=${data.user.username})}" class="d-flex align-items-center text-decoration-none text-muted">
                             <img th:src="${data.user.dp}" class="rounded-circle" width="50" height="50" alt="알 수 없음">
                             <h5 class="ms-2 mb-0" th:text="${data.user.username} + '님의 프로필 보기'"></h5>
                         </a>
