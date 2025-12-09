@@ -98,9 +98,9 @@ public class UserController {
                        @RequestParam(defaultValue = "posts") String tab,
                        Authentication auth) {
         
-        CustomUser loginUser = (CustomUser) auth.getPrincipal();
+        Long loginUserId = getUserId(auth);
 
-        ProfileResult result = userService.getProfileResult(username, postPage, reviewPage, loginUser.id);
+        ProfileResult result = userService.getProfileResult(username, postPage, reviewPage, loginUserId);
 
         // 모델 설정
         model.addAttribute("user", result.getUser());
@@ -230,6 +230,15 @@ public class UserController {
     }
 
     // Private Helper Methods
+
+    // Authentication에서 사용자 ID 추출 (null-safe)
+    private Long getUserId(Authentication auth) {
+        if (auth != null && auth.isAuthenticated()) {
+            CustomUser user = (CustomUser) auth.getPrincipal();
+            return user.id;
+        }
+        return null;
+    }
 
     // 본인 인증 토큰 쿠키를 설정
     private void setVerifiedTokenCookie(HttpServletResponse response, String verifiedToken) {
