@@ -44,7 +44,6 @@ import java.util.UUID;
 @RequestMapping("/post")
 public class PostController {
     private final PostService postService;
-    private final S3Service s3Service;
 
     @GetMapping("/list")
     String all_post(Model model,
@@ -170,31 +169,6 @@ public class PostController {
         }
     }
 
-    @GetMapping("/presigned-url")
-    @PreAuthorize("isAuthenticated()")
-    @ResponseBody
-    String getURL(@RequestParam String filename) {
-
-        // 확장자 추출
-        String extension = "";
-
-        int dotIndex = filename.lastIndexOf(".");
-        if (dotIndex != -1) {
-            extension = filename.substring(dotIndex);
-        }
-
-        // UUID로 unique 파일명 생성
-        String uniqueFileName = UUID.randomUUID().toString() + extension;
-
-        // S3에 저장될 경로 구성
-        String key = "project/" + uniqueFileName;
-
-        // Presigned URL 생성
-        String result = s3Service.createPresignedUrl(key);
-
-        return result;
-    }
-
     @GetMapping("/edit/{id}")
     @PreAuthorize("isAuthenticated()")
     String edit(Model model, @PathVariable Long id, Authentication auth) {
@@ -249,15 +223,6 @@ public class PostController {
         } catch (NotFoundException | ForbiddenException e) {
             return ResponseEntity.status(403).body(e.getMessage());
         }
-    }
-
-    @DeleteMapping("/delete-image")
-    @PreAuthorize("isAuthenticated()")
-    ResponseEntity<String> deleteImages(@RequestParam Long imageId, Authentication auth) {
-
-        Long userId = getUserId(auth);
-        postService.deleteImage(imageId, userId);
-        return ResponseEntity.ok("삭제완료");
     }
 
     @PatchMapping("/{id}/status")
