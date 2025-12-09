@@ -30,7 +30,7 @@ public class UserController {
     @GetMapping("/mypage")
     @PreAuthorize("isAuthenticated()")
     public String myPage() {
-        return "mypage.html";
+        return "user/mypage.html";
     }
 
     @GetMapping("/my/posts")
@@ -49,7 +49,7 @@ public class UserController {
         model.addAttribute("totalPages", result.getTotalPages());
         model.addAttribute("viewCounts", result.getViewCounts());
 
-        return "mypost.html";
+        return "user/mypost.html";
     }
 
     @GetMapping("/my/likes")
@@ -68,7 +68,7 @@ public class UserController {
         model.addAttribute("totalPages", result.getTotalPages());
         model.addAttribute("viewCounts", result.getViewCounts());
 
-        return "mylike.html";
+        return "user/mylike.html";
     }
 
     @GetMapping("/setting")
@@ -79,7 +79,7 @@ public class UserController {
 
         UserProfileDto userDto = userService.getUserProfile(loginUserId);
         model.addAttribute("currentUser", userDto);
-        return "setting.html";
+        return "user/setting.html";
     }
 
     @PostMapping("/my/{userId}/profile-image")
@@ -115,7 +115,7 @@ public class UserController {
         model.addAttribute("viewCounts", result.getViewCounts());
         model.addAttribute("tab", tab);
         
-        return "profile.html";
+        return "user/profile.html";
     }
 
     @GetMapping("/verify-password")
@@ -123,7 +123,7 @@ public class UserController {
     public String verifyPasswordForm(Model model, 
                                 @RequestParam(required = false) String nextAction) {
         model.addAttribute("nextAction", nextAction);
-        return "verify-password.html";
+        return "user/verify-password.html";
     }
 
     // 이메일/비밀번호 확인 -> HttpOnly cookie 발급 후 리다이렉트
@@ -161,7 +161,7 @@ public class UserController {
     @GetMapping("/change-password")
     @PreAuthorize("isAuthenticated()")
     public String changePasswordForm() {
-        return "change-password.html";
+        return "user/change-password.html";
     }
 
     @PostMapping("/change-password")
@@ -197,7 +197,7 @@ public class UserController {
     @GetMapping("/delete-account")
     @PreAuthorize("isAuthenticated()")
     public String deleteAccountForm() {
-        return "delete-account.html";
+        return "user/delete-account.html";
     }
 
     @PostMapping("/delete-account")

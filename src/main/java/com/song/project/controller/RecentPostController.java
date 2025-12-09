@@ -56,7 +56,7 @@ public class RecentPostController {
         model.addAttribute("likedPostIds", result.getLikedPostIds());
         model.addAttribute("viewCounts", result.getViewCounts());
 
-        return "recent-posts.html";
+        return "user/recent-posts.html";
     }
 
     private Long getUserId(Authentication auth) {

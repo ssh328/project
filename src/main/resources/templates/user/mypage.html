@@ -5,7 +5,7 @@
 </head>
 <body class="d-flex flex-column vh-100">
 
-    <div th:replace="~{ nav.html::navbar }"></div>
+    <div th:replace="~{ partial/nav.html::navbar }"></div>
 
     <main class="container mt-5 pt-5">
         <div class="row d-flex align-items-center justify-content-center mt-5">
@@ -19,19 +19,19 @@
                 <h2 class="mb-4">Menu</h2>  <!-- 메뉴 제목 추가 -->
 
                 <div class="mb-3">
-                    <a href="/setting" class="text-muted text-decoration-none h5">개인 설정</a>
+                    <a href="/user/setting" class="text-muted text-decoration-none h5">개인 설정</a>
                 </div>
 
                 <hr class="mb-3" style="width: 50%; margin: 0 auto;">
 
                 <div class="mb-3">
-                    <a href="/my/posts" class="text-muted text-decoration-none h5">나의 상품</a>
+                    <a href="/user/my/posts" class="text-muted text-decoration-none h5">나의 상품</a>
                 </div>
 
                 <hr class="mb-3" style="width: 50%; margin: 0 auto;">
 
                 <div class="mb-3">
-                    <a href="/my/likes" class="text-muted text-decoration-none h5">좋아요</a>
+                    <a href="/user/my/likes" class="text-muted text-decoration-none h5">좋아요</a>
                 </div>
 
                 <hr class="mb-3" style="width: 50%; margin: 0 auto;">

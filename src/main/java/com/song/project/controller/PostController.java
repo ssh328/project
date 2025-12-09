@@ -81,7 +81,7 @@ public class PostController {
         model.addAttribute("selectedStatus", statusResult.getSelectedStatus());
         model.addAttribute("statuses", PostStatus.values());
 
-        return "list.html";
+        return "post/list.html";
     }
 
     @GetMapping("/search")
@@ -104,7 +104,7 @@ public class PostController {
         model.addAttribute("totalPages", postDtos.getTotalPages());
         model.addAttribute("searchText", searchText);
 
-        return "search.html";
+        return "post/search.html";
     }
 
     @GetMapping("/detail/{id}")
@@ -132,14 +132,14 @@ public class PostController {
         model.addAttribute("viewCount", result.getViewCount());
         model.addAttribute("recommendedPosts", result.getRecommendedPosts());
 
-        return "detail.html";
+        return "post/detail.html";
     }
 
     @GetMapping("/new-post")
     @PreAuthorize("isAuthenticated()")
     String add_post(Model model) {
         model.addAttribute("categories", postService.getCategories());
-        return "add.html";
+        return "post/add.html";
     }
 
     @PostMapping("/add")
@@ -179,7 +179,7 @@ public class PostController {
         PostEditDto postEditDto = PostEditDto.from(post);
         model.addAttribute("data", postEditDto);
         model.addAttribute("categories", postService.getCategories());
-        return "edit.html";
+        return "post/edit.html";
     }
 
     @PostMapping("/edit")

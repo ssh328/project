@@ -35,7 +35,7 @@ public class ChatController {
             System.out.println("postWriterId :" + postWriterId);
         }
         
-        return "chat.html";
+        return "chat/chat.html";
     }
 
     // @PostMapping(value = "/createUser")

@@ -13,11 +13,11 @@
         <hr>
         <div class="offcanvas-body pt-1">
             <div class="d-flex justify-content-end mb-3">
-                <a th:href="@{/list}">초기화</a>
+                <a th:href="@{/post/list}">초기화</a>
             </div>
 
             <h5 class="fw-bold">카테고리</h5>
-            <form id="filterForm" th:action="@{/list}" method="get">
+            <form id="filterForm" th:action="@{/post/list}" method="get">
                 <div th:each="categoryItem, iterStat : ${categories}" class="form-check">
                     <input class="form-check-input category_radio"
                         type="radio"
