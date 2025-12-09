@@ -39,9 +39,9 @@ public class UserController {
                             Authentication auth, 
                             @RequestParam(defaultValue = "1") int page) {
 
-        CustomUser user = (CustomUser) auth.getPrincipal();
+        Long loginUserId = getUserId(auth);
 
-        UserService.MyPostResult result = userService.getMyPosts(user.id, page);
+        UserService.MyPostResult result = userService.getMyPosts(loginUserId, page);
 
         model.addAttribute("likedPostIds", result.getLikedPostIds());
         model.addAttribute("posts", result.getPosts());
@@ -58,9 +58,9 @@ public class UserController {
                             Authentication auth, 
                             @RequestParam(defaultValue = "1") int page) {
 
-        CustomUser user = (CustomUser) auth.getPrincipal();
+        Long loginUserId = getUserId(auth);
 
-        UserService.MyLikeResult result = userService.getMyLikes(user.id, page);
+        UserService.MyLikeResult result = userService.getMyLikes(loginUserId, page);
 
         model.addAttribute("likedPostIds", result.getLikedPostIds());
         model.addAttribute("posts", result.getPosts());
@@ -75,9 +75,9 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     public String setting(Model model, 
                         Authentication auth) {
-        CustomUser user = (CustomUser) auth.getPrincipal();
+        Long loginUserId = getUserId(auth);
 
-        UserProfileDto userDto = userService.getUserProfile(user.id);
+        UserProfileDto userDto = userService.getUserProfile(loginUserId);
         model.addAttribute("currentUser", userDto);
         return "setting.html";
     }
@@ -135,10 +135,10 @@ public class UserController {
                                 Authentication auth, 
                                 HttpServletResponse response, 
                                 RedirectAttributes redirectAttributes) {
-        CustomUser user = (CustomUser) auth.getPrincipal();
+        Long loginUserId = getUserId(auth);
 
         try {
-            String verifiedToken = userService.verifyPassword(user.id, email, password);
+            String verifiedToken = userService.verifyPassword(loginUserId, email, password);
 
             // HttpOnly cookie 생성
             setVerifiedTokenCookie(response, verifiedToken);
@@ -177,10 +177,10 @@ public class UserController {
             return "redirect:/verify-password";
         }
 
-        CustomUser user = (CustomUser) auth.getPrincipal();
+        Long loginUserId = getUserId(auth);
 
         try {
-            userService.changePassword(user.id, newPassword);
+            userService.changePassword(loginUserId, newPassword);
             
             // 사용 완료된 토큰 쿠키 삭제
             clearVerifiedTokenCookie(response);
@@ -212,10 +212,10 @@ public class UserController {
             return "redirect:/verify-password?nextAction=delete-account";
         }
 
-        CustomUser user = (CustomUser) auth.getPrincipal();
+        Long loginUserId = getUserId(auth);
 
         try {
-            userService.deleteAccount(user.id);
+            userService.deleteAccount(loginUserId);
             
             // 모든 인증 쿠키 삭제
             clearAllAuthCookies(response);
