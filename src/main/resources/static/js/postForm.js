@@ -76,7 +76,7 @@ saveButton.addEventListener('click', async (e) => {
     try {
         for (const file of selectedFiles) {
             const fileName = encodeURIComponent(file.name);
-            const response = await fetch('/post/presigned-url?filename=' + fileName);
+            const response = await fetch('/presigned-url?filename=' + fileName);
             const result = await response.text();
 
             const uploadResponse = await fetch(result, {
