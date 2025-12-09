@@ -1,13 +1,10 @@
 <nav class="navbar navbar-expand-sm navbar-dark nav-bg-color fixed-top" th:fragment="navbar">
-    <a class="navbar-brand mx-2" href="/">Resale Store</a>
+    <a class="navbar-brand mx-2" href="/post/list">Resale Store</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#expandme" aria-controls="expandme" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="expandme">
         <ul class="navbar-nav ms-auto text-center">
-            <li class="nav-item">
-                <a class="nav-link" href="/">홈</a>
-            </li>
             <li class="nav-item">
                 <a class="nav-link" href="/post/list">모든 상품</a>
             </li>
@@ -47,18 +44,3 @@
         </ul>
     </div>
 </nav>
-
-    <!-- <a class="logo">SpringMall</a>
-    <a href="/list">List</a>
-    <div sec:authorize="isAnonymous()">
-        <a href="/login">로그인</a>
-    </div>
-    <div sec:authorize="isAuthenticated()">
-        <a href="/new-post">new-post</a>
-        <span sec:authentication="name"></span>
-        <form th:action="@{/logout/jwt}" method="post">
-            <button type="submit">jwt로그아웃</button>
-        </form>
-    </div>
-</div> -->
-
