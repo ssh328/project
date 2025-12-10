@@ -11,7 +11,6 @@ import com.song.project.post.PostStatus;
 import com.song.project.entity.PostImage;
 import com.song.project.entity.Post;
 
-
 @Getter
 @Setter
 public class PostEditDto {
@@ -24,7 +23,7 @@ public class PostEditDto {
     private Integer like_cnt;
     private PostStatus status;
     private List<PostImage> images;
-    private String userId; // 사용자 ID만 필요하므로 User 객체 대신 String으로
+    private String userId;
 
     // Post 엔티티를 PostEditDto로 변환하는 정적 메서드
     public static PostEditDto from(Post post) {

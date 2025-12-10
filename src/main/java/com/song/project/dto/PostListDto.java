@@ -8,7 +8,6 @@ import lombok.Setter;
 import com.song.project.post.PostStatus;
 import com.song.project.entity.Post;
 
-
 @Getter
 @Setter
 public class PostListDto {
@@ -21,7 +20,7 @@ public class PostListDto {
     private Integer like_cnt;
     private PostStatus status;
     private String firstImageUrl;
-    private String userId; // 사용자 ID만 필요하므로 User 객체 대신 String으로
+    private String userId;
 
     // Post 엔티티를 PostListDto로 변환하는 정적 메서드
     public static PostListDto from(Post post) {

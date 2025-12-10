@@ -25,6 +25,6 @@ public class PostUpdateDto {
     @NotBlank(message = "내용을 입력해주세요.")
     @Size(min = 10, max = 10000, message = "내용은 10자 이상 10,000자 이하여야 합니다.")
     private String body;
-
-    private String image; // 선택적 필드
+    
+    private String image;
 }
