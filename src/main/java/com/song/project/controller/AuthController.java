@@ -99,6 +99,10 @@ public class AuthController {
         return "redirect:/post/list";
     }
 
+    // ===========================
+    // 헬퍼 메서드
+    // ===========================
+
     // JWT 쿠키 설정
     private void setJwtCookie(HttpServletResponse response) {
         var jwt = JwtUtil.createToken(SecurityContextHolder.getContext().getAuthentication());

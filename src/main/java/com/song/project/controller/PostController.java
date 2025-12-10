@@ -259,7 +259,6 @@ public class PostController {
     // ===========================
 
     private Long getUserId(Authentication auth) {
-
         if (auth != null && auth.isAuthenticated()) {
             CustomUser user = (CustomUser) auth.getPrincipal();
             return user.id;

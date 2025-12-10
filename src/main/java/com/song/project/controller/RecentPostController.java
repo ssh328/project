@@ -55,7 +55,10 @@ public class RecentPostController {
     }
 
     private Long getUserId(Authentication auth) {
-        CustomUser user = (CustomUser) auth.getPrincipal();
-        return user.id;
+        if (auth != null && auth.isAuthenticated()) {
+            CustomUser user = (CustomUser) auth.getPrincipal();
+            return user.id;
+        }
+        return null;
     }
 }
