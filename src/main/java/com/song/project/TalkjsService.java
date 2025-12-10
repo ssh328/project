@@ -57,5 +57,3 @@ public class TalkjsService {
         }
     }
 }
-
-// 대화 삭제 기능 서비스
