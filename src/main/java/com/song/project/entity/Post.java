@@ -51,7 +51,6 @@ public class Post {
     private PostStatus status = PostStatus.ON_SALE;
 
     // 하나의 Post는 여러 이미지 소유
-    // One(Post) -> Many(이미지)
     @ToString.Exclude
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
@@ -59,14 +58,12 @@ public class Post {
     private List<PostImage> images = new ArrayList<>();
 
     // 여러 Post는 하나의 User를 가리킴
-    // Many(Post) -> One(User)
     // Post.userId 외래키로 User를 참조
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId") // DB에 userId 컬럼 생성
     private User user;
 
     // 하나의 Post는 여러 Like 가리킴
-    // One(Post) -> Many(Like)
     @ToString.Exclude
     @OneToMany(mappedBy = "post")
     List<Likes> likes = new ArrayList<>();

@@ -20,15 +20,11 @@ public class User {
     private String user_id;
     private String email;
     private String password;
-    // private String name; // Chat.java에서 옮김
-    private String dp;   // Chat.java에서 옮김
-    private String role; // Chat.java에서 옮김
+    private String dp;
+    private String role;
 
     // 하나의 User가 여러 Like 가리킴
     @ToString.Exclude
-    // 컬럼 하나 만든 다음 타입을 List<다른테이블>로 집어넣고
-    // 그리고 @OneToMany(mappedBy = "내 컬럼 훔쳐쓰고있는 다른 컬럼명") 이걸 붙여줍니다.
-    // 그럼 내 id를 훔쳐서 쓰고 있는 테이블의 행들을 전부 출력해줍니다.
     @OneToMany(mappedBy = "user")
     List<Likes> likes = new ArrayList<>();
 
