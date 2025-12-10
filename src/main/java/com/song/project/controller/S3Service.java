@@ -43,7 +43,6 @@ public class S3Service {
         .build();
 
         s3Client.deleteObject(deleteObjectRequest);
-        System.out.println("Deleted from S3: " + key);
     }
 
     public String extractS3Key(String imageUrl) {

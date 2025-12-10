@@ -45,6 +45,7 @@ import java.util.UUID;
 public class PostController {
     private final PostService postService;
 
+    // 게시물 리스트
     @GetMapping("/list")
     String all_post(Model model,
                     Authentication auth,
@@ -67,7 +68,6 @@ public class PostController {
         // 게시물 목록 결과
         PostListResult result = postService.getPostListResult(postDtos, userId);
 
-        // 모델 설정
         model.addAttribute("posts", postDtos);
         model.addAttribute("likedPostIds", result.getLikedPostIds());
         model.addAttribute("viewCounts", result.getViewCounts());
@@ -84,12 +84,12 @@ public class PostController {
         return "post/list.html";
     }
 
+    // 게시물 검색
     @GetMapping("/search")
     String search(Model model, Authentication auth,
             @RequestParam String searchText,
             @RequestParam(defaultValue = "1") int page) {
         
-        // 게시글 검색
         Page<PostListDto> postDtos = postService.searchPosts(searchText, page);
 
         Long userId = getUserId(auth);
@@ -97,7 +97,6 @@ public class PostController {
         // 검색 결과
         SearchResult result = postService.getSearchResult(postDtos, userId);
 
-        // 모델 설정
         model.addAttribute("posts", postDtos);
         model.addAttribute("likedPostIds", result.getLikedPostIds());
         model.addAttribute("currentPage", page);
@@ -107,13 +106,13 @@ public class PostController {
         return "post/search.html";
     }
 
+    // 게시물 상세
     @GetMapping("/detail/{id}")
     String show_post(Model model, @PathVariable Long id,  
                         Authentication auth,
                         HttpServletRequest request,
                         HttpServletResponse response) {
 
-        // 로그인 사용자 ID
         Long loginUserId = getUserId(auth);
 
         // 비로그인 사용자용 viewToken 처리
@@ -125,7 +124,6 @@ public class PostController {
         // 상세 페이지 결과
         PostDetailResult result = postService.getPostDetailResult(id, loginUserId, viewToken);
 
-        // 모델 설정
         model.addAttribute("data", result.getPost());
         model.addAttribute("postWriterId", result.getPostWriterId());
         model.addAttribute("loginUserId", loginUserId);
@@ -135,6 +133,7 @@ public class PostController {
         return "post/detail.html";
     }
 
+    // 게시물 추가 페이지
     @GetMapping("/new-post")
     @PreAuthorize("isAuthenticated()")
     String add_post(Model model) {
@@ -142,6 +141,7 @@ public class PostController {
         return "post/add.html";
     }
 
+    // 게시물 추가
     @PostMapping("/add")
     @PreAuthorize("isAuthenticated()")
     String addPost(@Valid @ModelAttribute PostCreateDto dto,
@@ -169,6 +169,7 @@ public class PostController {
         }
     }
 
+    // 게시물 수정 페이지
     @GetMapping("/edit/{id}")
     @PreAuthorize("isAuthenticated()")
     String edit(Model model, @PathVariable Long id, Authentication auth) {
@@ -182,6 +183,7 @@ public class PostController {
         return "post/edit.html";
     }
 
+    // 게시물 수정
     @PostMapping("/edit")
     @PreAuthorize("isAuthenticated()")
     String editPost(@Valid @ModelAttribute PostUpdateDto dto,
@@ -212,6 +214,7 @@ public class PostController {
         }
     }
 
+    // 게시물 삭제
     @DeleteMapping("/delete")
     @PreAuthorize("isAuthenticated()")
     ResponseEntity<String> delete(@RequestParam Long id, Authentication auth) {
@@ -225,6 +228,7 @@ public class PostController {
         }
     }
 
+    // 게시물 상태 변경
     @PatchMapping("/{id}/status")
     @PreAuthorize("isAuthenticated()")
     @ResponseBody
@@ -250,9 +254,10 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+    // ===========================
     // 헬퍼 메서드
+    // ===========================
 
-    // Authentication에서 사용자 ID 추출
     private Long getUserId(Authentication auth) {
 
         if (auth != null && auth.isAuthenticated()) {

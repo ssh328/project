@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ReviewController {
     private final ReviewService reviewService;
 
+    // 리뷰 생성
     @PostMapping
     String Review(@RequestParam String content,
                         @RequestParam int rating,
@@ -48,6 +49,7 @@ public class ReviewController {
         }
     }
 
+    // 리뷰 삭제
     @DeleteMapping("/{id}")
     ResponseEntity<String> deleteReview(@PathVariable Long id, Authentication auth) {
         try {
@@ -61,7 +63,6 @@ public class ReviewController {
         }
     }
 
-    // Authentication에서 사용자 ID 추출
     private CustomUser getUserId(Authentication auth) {
         if (auth != null && auth.isAuthenticated()) {
             CustomUser user = (CustomUser) auth.getPrincipal();

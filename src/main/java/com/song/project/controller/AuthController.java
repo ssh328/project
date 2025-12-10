@@ -28,11 +28,13 @@ public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final AuthService authService;
 
+    // 회원가입 페이지
     @GetMapping("/register")
     public String register() {
         return "auth/register.html";
     }
 
+    // 회원가입
     @PostMapping("/user-register")
     public String addUser(@RequestParam String user_id,
                         @RequestParam String password,
@@ -60,11 +62,13 @@ public class AuthController {
         }
     }
 
+    // 로그인 페이지
     @GetMapping("/login")
     public String login() {
         return "auth/login.html";
     }
 
+    // 로그인
     @PostMapping("/login/jwt")
     @ResponseBody
     public Map<String, Object> loginJWT(@RequestBody Map<String, String> data,
@@ -88,6 +92,7 @@ public class AuthController {
         }
     }
 
+    // 로그아웃
     @PostMapping("/logout/jwt")
     public String logoutJWT(HttpServletResponse response) {
         clearJwtCookie(response);

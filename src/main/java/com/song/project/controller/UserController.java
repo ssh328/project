@@ -27,12 +27,14 @@ import com.song.project.service.UserService.ProfileResult;
 public class UserController {
     private final UserService userService;
 
+    // 마이페이지
     @GetMapping("/mypage")
     @PreAuthorize("isAuthenticated()")
     public String myPage() {
         return "user/mypage.html";
     }
 
+    // 내 게시물 목록
     @GetMapping("/my/posts")
     @PreAuthorize("isAuthenticated()")
     public String getMyPosts(Model model, 
@@ -52,6 +54,7 @@ public class UserController {
         return "user/mypost.html";
     }
 
+    // 내 좋아요 목록
     @GetMapping("/my/likes")
     @PreAuthorize("isAuthenticated()")
     public String getMyLikes(Model model, 
@@ -71,6 +74,7 @@ public class UserController {
         return "user/mylike.html";
     }
 
+    // 설정 페이지
     @GetMapping("/setting")
     @PreAuthorize("isAuthenticated()")
     public String setting(Model model, 
@@ -82,6 +86,7 @@ public class UserController {
         return "user/setting.html";
     }
 
+    // 프로필 이미지 업로드
     @PostMapping("/my/{userId}/profile-image")
     @PreAuthorize("isAuthenticated()")
     public String uploadProfileImage(@PathVariable Long userId, 
@@ -91,6 +96,7 @@ public class UserController {
         return "redirect:/setting";
     }
 
+    // 프로필 페이지
     @GetMapping("/profile/{username}")
     String profileUser(Model model, @PathVariable String username, 
                        @RequestParam(defaultValue = "1") int postPage,
@@ -118,6 +124,7 @@ public class UserController {
         return "user/profile.html";
     }
 
+    // 이메일/비밀번호 확인 페이지
     @GetMapping("/verify-password")
     @PreAuthorize("isAuthenticated()")
     public String verifyPasswordForm(Model model, 
@@ -158,12 +165,14 @@ public class UserController {
         }
     }
 
+    // 비밀번호 변경 페이지
     @GetMapping("/change-password")
     @PreAuthorize("isAuthenticated()")
     public String changePasswordForm() {
         return "user/change-password.html";
     }
 
+    // 비밀번호 변경
     @PostMapping("/change-password")
     @PreAuthorize("isAuthenticated()")
     public String changePassword(@CookieValue(value = "verified_token", required = false) String verifiedToken, 
@@ -194,12 +203,14 @@ public class UserController {
         }
     }
 
+    // 계정 삭제 페이지
     @GetMapping("/delete-account")
     @PreAuthorize("isAuthenticated()")
     public String deleteAccountForm() {
         return "user/delete-account.html";
     }
 
+    // 계정 삭제
     @PostMapping("/delete-account")
     @PreAuthorize("isAuthenticated()")
     public String deleteAccount(@CookieValue(value = "verified_token", required = false) String verifiedToken,
@@ -229,9 +240,10 @@ public class UserController {
         }
     }
 
-    // Private Helper Methods
+    // ===========================
+    // 헬퍼 메서드
+    // ===========================
 
-    // Authentication에서 사용자 ID 추출 (null-safe)
     private Long getUserId(Authentication auth) {
         if (auth != null && auth.isAuthenticated()) {
             CustomUser user = (CustomUser) auth.getPrincipal();
@@ -258,7 +270,7 @@ public class UserController {
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
-    // 모든 인증 관련 쿠키를 삭제 (JWT + verified_token).
+    // 모든 인증 관련 쿠키를 삭제 (JWT + verified_token)
     private void clearAllAuthCookies(HttpServletResponse response) {
         ResponseCookie jwtCookie = createResponseCookie("jwt", "", 0);
         ResponseCookie verifiedCookie = createResponseCookie("verified_token", "", 0);
@@ -277,7 +289,7 @@ public class UserController {
                 .build();
     }
 
-    // 본인 인증 토큰을 검증합니다.
+    // 본인 인증 토큰을 검증
     // @param verifiedToken 검증할 토큰
     // @return 검증 실패 시 에러 메시지, 성공 시 null
     private String validateVerifiedToken(String verifiedToken) {

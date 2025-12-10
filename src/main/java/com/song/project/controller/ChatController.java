@@ -17,6 +17,7 @@ public class ChatController {
     @Autowired
     UserRepository userRepository;
 
+    // 채팅 페이지
     @GetMapping("/chat")
     String chat(Model model, @RequestParam(required = false) Long postWriterId, Authentication auth) {
 
@@ -38,17 +39,9 @@ public class ChatController {
         return "chat/chat.html";
     }
 
-    // @PostMapping(value = "/createUser")
-    // @ResponseBody
-    // public ResponseEntity<User> createUser(@RequestBody User user) {
-    //     return new ResponseEntity<>(userRepository.save(user), HttpStatus.OK);
-    // }
-
+    // 유저 정보 조회
     @GetMapping(value = "/getUser")
     @ResponseBody
-    // public ResponseEntity<User> getUser(@RequestParam(required = true) Long userId) {
-    //     return new ResponseEntity<>(userRepository.findById(userId).get(), HttpStatus.OK);
-    // }
     public ResponseEntity<UserDto> getUser(@RequestParam(required = false) Long userId) {
         User user = userRepository.findById(userId).get();
         UserDto userDto = new UserDto(user);

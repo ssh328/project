@@ -16,6 +16,7 @@ import java.util.Map;
 public class LikeController {
     private final LikeService likeService;
 
+    // 좋아요 토글
     @PostMapping("/like/{postId}")
     @ResponseBody
     public Map<String, Object> toggleLike(@PathVariable Long postId, Authentication auth) {

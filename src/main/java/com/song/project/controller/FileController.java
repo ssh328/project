@@ -22,6 +22,7 @@ public class FileController {
     private final PostService postService;
     private final S3Service s3Service;
 
+    // Presigned URL 생성
     @GetMapping("/presigned-url")
     @PreAuthorize("isAuthenticated()")
     @ResponseBody
@@ -47,11 +48,10 @@ public class FileController {
         return result;
     }
 
+    // 이미지 삭제
     @DeleteMapping("/delete-image")
     @PreAuthorize("isAuthenticated()")
     ResponseEntity<String> deleteImages(@RequestParam Long imageId, Authentication auth) {
-
-        // Long userId = getUserId(auth);
 
         CustomUser user = (CustomUser) auth.getPrincipal();
         postService.deleteImage(imageId, user.id);
