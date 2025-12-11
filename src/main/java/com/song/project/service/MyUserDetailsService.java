@@ -8,8 +8,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.song.project.CustomUser;
 import com.song.project.repository.UserRepository;
+import com.song.project.security.CustomUser;
 
 import java.util.ArrayList;
 import java.util.List;

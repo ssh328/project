@@ -5,12 +5,12 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.song.project.CustomUser;
 import com.song.project.entity.Likes;
 import com.song.project.entity.Post;
 import com.song.project.entity.User;
 import com.song.project.repository.LikeRepository;
 import com.song.project.repository.PostRepository;
+import com.song.project.security.CustomUser;
 
 import lombok.RequiredArgsConstructor;
 

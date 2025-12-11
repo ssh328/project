@@ -1,6 +1,5 @@
 package com.song.project.controller;
 
-import com.song.project.CustomUser;
 import com.song.project.dto.PostCreateDto;
 import com.song.project.dto.PostEditDto;
 import com.song.project.dto.PostListDto;
@@ -12,6 +11,7 @@ import com.song.project.exception.BadRequestException;
 import com.song.project.exception.ForbiddenException;
 import com.song.project.exception.NotFoundException;
 import com.song.project.exception.UnauthorizedException;
+import com.song.project.security.CustomUser;
 import com.song.project.service.PostService;
 import com.song.project.service.PostService.PostDetailResult;
 import com.song.project.service.PostService.PostListResult;

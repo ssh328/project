@@ -1,10 +1,10 @@
 package com.song.project.controller;
-import com.song.project.CustomUser;
 import com.song.project.service.ReviewService;
 import com.song.project.entity.Review;
 import com.song.project.exception.BadRequestException;
 import com.song.project.exception.ForbiddenException;
 import com.song.project.exception.NotFoundException;
+import com.song.project.security.CustomUser;
 
 import lombok.RequiredArgsConstructor;
 

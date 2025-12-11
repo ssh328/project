@@ -1,7 +1,7 @@
 package com.song.project.controller;
-import com.song.project.CustomUser;
 import com.song.project.entity.User;
 import com.song.project.repository.UserRepository;
+import com.song.project.security.CustomUser;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

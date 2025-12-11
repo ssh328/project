@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.song.project.CustomUser;
+import com.song.project.security.CustomUser;
 import com.song.project.service.PostService;
 
 import lombok.RequiredArgsConstructor;

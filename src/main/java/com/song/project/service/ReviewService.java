@@ -7,7 +7,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.song.project.CustomUser;
 import com.song.project.entity.Review;
 import com.song.project.entity.User;
 import com.song.project.exception.BadRequestException;
@@ -15,6 +14,7 @@ import com.song.project.exception.ForbiddenException;
 import com.song.project.exception.NotFoundException;
 import com.song.project.repository.ReviewRepository;
 import com.song.project.repository.UserRepository;
+import com.song.project.security.CustomUser;
 
 import lombok.RequiredArgsConstructor;
 

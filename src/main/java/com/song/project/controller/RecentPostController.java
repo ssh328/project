@@ -7,7 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import com.song.project.CustomUser;
+import com.song.project.security.CustomUser;
 import com.song.project.service.RecentPostService;
 import com.song.project.service.RecentPostService.RecentPostsResult;
 

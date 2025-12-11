@@ -1,6 +1,6 @@
 package com.song.project.controller;
 
-import com.song.project.CustomUser;
+import com.song.project.security.CustomUser;
 import com.song.project.service.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
