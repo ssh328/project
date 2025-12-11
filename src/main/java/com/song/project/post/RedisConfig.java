@@ -22,13 +22,6 @@ public class RedisConfig {
         return new LettuceConnectionFactory(host, port);
     }
 
-    // @Bean
-    // public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
-    //     RedisTemplate<String, Object> template = new RedisTemplate<>();
-    //     template.setConnectionFactory(connectionFactory);
-    //     return template;
-    // }
-
     @Bean
     public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory factory) {
         RedisTemplate<String, String> template = new RedisTemplate<>();
