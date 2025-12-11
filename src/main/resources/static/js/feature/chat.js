@@ -1,6 +1,6 @@
 const getAgent = async () => {
   if (!window.postWriterId) return null; // postWriterId가 없으면 null 반환
-  const response = await fetch(`getUser?userId=${window.postWriterId}`);
+  const response = await fetch(`/getUser?userId=${window.postWriterId}`);
   if (!response.ok) return null; // 요청 실패 시 null
   const data = await response.json();
   return new Talk.User({
