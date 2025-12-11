@@ -1,4 +1,4 @@
-package com.song.project.post;
+package com.song.project.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
