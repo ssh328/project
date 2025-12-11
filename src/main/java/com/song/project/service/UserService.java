@@ -20,7 +20,7 @@ import com.song.project.entity.Review;
 import com.song.project.entity.User;
 import com.song.project.repository.LikeRepository;
 import com.song.project.repository.UserRepository;
-import com.song.project.JwtUtil;
+import com.song.project.security.JwtUtil;
 import com.song.project.dto.PostListDto;
 import com.song.project.dto.UserProfileDto;
 

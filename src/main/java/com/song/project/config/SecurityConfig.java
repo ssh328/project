@@ -13,7 +13,7 @@ import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
-import com.song.project.JwtFilter;
+import com.song.project.security.JwtFilter;
 
 @Configuration
 @EnableWebSecurity

@@ -1,4 +1,4 @@
-package com.song.project;
+package com.song.project.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -8,8 +8,6 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-
-import com.song.project.security.CustomUser;
 
 import javax.crypto.SecretKey;
 import java.util.Date;

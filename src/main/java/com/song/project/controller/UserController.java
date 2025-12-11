@@ -1,8 +1,8 @@
 package com.song.project.controller;
 
-import com.song.project.JwtUtil;
 import com.song.project.dto.UserProfileDto;
 import com.song.project.security.CustomUser;
+import com.song.project.security.JwtUtil;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

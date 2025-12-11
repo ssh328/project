@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.song.project.JwtUtil;
 import com.song.project.exception.BadRequestException;
+import com.song.project.security.JwtUtil;
 import com.song.project.service.AuthService;
 
 import jakarta.servlet.http.Cookie;
