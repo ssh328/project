@@ -93,9 +93,9 @@
                                 <h6 th:text="${'카테고리: ' + data.category}" class="text-muted mb-0"></h6>
                                 
                                 <span th:switch="${data.status}" class="badge rounded-pill bg-success" th:text="${data.status.description}">
-                                    <span th:case="${T(com.song.project.post.PostStatus).ON_SALE}" class="badge bg-success"></span>
-                                    <span th:case="${T(com.song.project.post.PostStatus).RESERVED}" class="badge bg-warning"></span>
-                                    <span th:case="${T(com.song.project.post.PostStatus).SOLD}" class="badge bg-secondary"></span>
+                                    <span th:case="${T(com.song.project.entity.PostStatus).ON_SALE}" class="badge bg-success"></span>
+                                    <span th:case="${T(com.song.project.entity.PostStatus).RESERVED}" class="badge bg-warning"></span>
+                                    <span th:case="${T(com.song.project.entity.PostStatus).SOLD}" class="badge bg-secondary"></span>
                                     <span th:case="*"></span>
                                 </span>
                             </div>
@@ -128,19 +128,19 @@
                                 <div class="btn-group" role="group" aria-label="상태 변경">
                                     <button type="button" 
                                             class="btn btn-outline-secondary btn-sm"
-                                            th:classappend="${data.status == T(com.song.project.post.PostStatus).ON_SALE} ? 'active'"
+                                            th:classappend="${data.status == T(com.song.project.entity.PostStatus).ON_SALE} ? 'active'"
                                             onclick="changeStatus('ON_SALE')">
                                         판매중
                                     </button>
                                     <button type="button" 
                                             class="btn btn-outline-secondary btn-sm"
-                                            th:classappend="${data.status == T(com.song.project.post.PostStatus).RESERVED} ? 'active'"
+                                            th:classappend="${data.status == T(com.song.project.entity.PostStatus).RESERVED} ? 'active'"
                                             onclick="changeStatus('RESERVED')">
                                         예약중
                                     </button>
                                     <button type="button" 
                                             class="btn btn-outline-secondary btn-sm"
-                                            th:classappend="${data.status == T(com.song.project.post.PostStatus).SOLD} ? 'active'"
+                                            th:classappend="${data.status == T(com.song.project.entity.PostStatus).SOLD} ? 'active'"
                                             onclick="changeStatus('SOLD')">
                                         판매완료
                                     </button>

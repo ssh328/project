@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.song.project.entity.Post;
-import com.song.project.post.PostStatus;
+import com.song.project.entity.PostStatus;
 
 import org.springframework.data.jpa.repository.EntityGraph;
 

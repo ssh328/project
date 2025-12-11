@@ -1,9 +1,9 @@
 package com.song.project.controller;
 
 import com.song.project.entity.Post;
+import com.song.project.entity.PostStatus;
 import com.song.project.entity.Review;
 import com.song.project.entity.User;
-import com.song.project.post.PostStatus;
 import com.song.project.service.AdminService;
 import com.song.project.service.AdminService.DashboardStats;
 import com.song.project.service.PostService;

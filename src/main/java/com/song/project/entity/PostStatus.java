@@ -1,4 +1,4 @@
-package com.song.project.post;
+package com.song.project.entity;
 
 public enum PostStatus {
     ON_SALE("판매중"),

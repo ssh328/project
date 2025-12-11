@@ -5,8 +5,9 @@ import java.time.LocalDateTime;
 
 import lombok.Getter;
 import lombok.Setter;
-import com.song.project.post.PostStatus;
+
 import com.song.project.entity.Post;
+import com.song.project.entity.PostStatus;
 
 @Getter
 @Setter

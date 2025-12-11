@@ -1,7 +1,6 @@
 package com.song.project.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.song.project.post.PostStatus;
 
 import jakarta.persistence.*;
 import lombok.Getter;

@@ -6,9 +6,9 @@
                 <img th:if="${post.firstImageUrl != null}" th:src="${post.firstImageUrl}" class="card-img-top card-img-square" alt="">
                 <img th:unless="${post.firstImageUrl != null}" src="https://placehold.co/300" class="card-img-top card-img-square" alt="기본 이미지">
                 <span th:switch="${i.status}" class="position-absolute top-0 start-0 m-2 badge rounded-pill bg-success" th:text="${post.statusDescription}">
-                    <span th:case="${T(com.song.project.post.PostStatus).ON_SALE}" class="badge bg-success"></span>
-                    <span th:case="${T(com.song.project.post.PostStatus).RESERVED}" class="badge bg-warning"></span>
-                    <span th:case="${T(com.song.project.post.PostStatus).SOLD}" class="badge bg-secondary"></span>
+                    <span th:case="${T(com.song.project.entity.PostStatus).ON_SALE}" class="badge bg-success"></span>
+                    <span th:case="${T(com.song.project.entity.PostStatus).RESERVED}" class="badge bg-warning"></span>
+                    <span th:case="${T(com.song.project.entity.PostStatus).SOLD}" class="badge bg-secondary"></span>
                     <span th:case="*"></span>
                 </span>
             </div>

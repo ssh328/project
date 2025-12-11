@@ -2,9 +2,9 @@ package com.song.project.service;
 
 import com.song.project.entity.Post;
 import com.song.project.entity.PostImage;
+import com.song.project.entity.PostStatus;
 import com.song.project.entity.Review;
 import com.song.project.entity.User;
-import com.song.project.post.PostStatus;
 import com.song.project.repository.LikeRepository;
 import com.song.project.repository.PostRepository;
 import com.song.project.repository.ReviewRepository;

@@ -7,8 +7,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.song.project.post.PostStatus;
 import com.song.project.entity.PostImage;
+import com.song.project.entity.PostStatus;
 import com.song.project.entity.Post;
 
 @Getter
