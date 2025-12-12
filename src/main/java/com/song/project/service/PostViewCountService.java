@@ -85,7 +85,6 @@ public class PostViewCountService {
     public void flushViewCountsToDB() {
         // Redis에 있는 모든 키 가져오기 (post:view:* 형태)
         Set<String> keys = redisTemplate.keys(VIEW_PREFIX + "*");
-        System.out.println("Redis keys: " + keys);
         if (keys == null || keys.isEmpty()) return;
 
         // postId를 키로, Redis 조회수를 값으로 저장
