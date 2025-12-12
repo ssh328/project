@@ -1,5 +1,7 @@
 package com.song.project.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
+    
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -48,6 +52,8 @@ public class AuthService {
         user.setDp("https://javaspringproject.s3.ap-northeast-2.amazonaws.com/project/default-profile-img.png");
 
         User savedUser = userRepository.save(user);
+        log.info("회원가입 성공: userId={}, username={}, email={}", 
+            savedUser.getUser_id(), savedUser.getUsername(), savedUser.getEmail());
         return new RegisterResult(savedUser);
     }
 

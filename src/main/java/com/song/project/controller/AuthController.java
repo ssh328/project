@@ -2,6 +2,8 @@ package com.song.project.controller;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -25,6 +27,8 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 public class AuthController {
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+    
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final AuthService authService;
 
@@ -54,9 +58,11 @@ public class AuthController {
             
             setJwtCookie(response);
     
+            log.info("회원가입 및 자동 로그인 성공: userId={}, username={}", user_id, username);
             redirectAttributes.addFlashAttribute("successMessage", "환영합니다!");
             return "redirect:/post/list";
         } catch (BadRequestException e) {
+            log.warn("회원가입 실패: userId={}, reason={}", user_id, e.getMessage());
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/register";
         }
@@ -83,11 +89,17 @@ public class AuthController {
     
             // JWT 쿠키 설정
             setJwtCookie(response);
-    
+            
+            String username = data.get("username");
+            log.info("로그인 성공: username={}", username);
             return Map.of("success", true);
         } catch (BadCredentialsException e) {
+            String username = data.get("username");
+            log.warn("로그인 실패: username={}, reason=인증 정보 불일치", username);
             return Map.of("success", false, "message", "아이디 또는 비밀번호가 일치하지 않습니다.");
         } catch (Exception e) {
+            String username = data.get("username");
+            log.error("로그인 예외 발생: username={}", username, e);
             return Map.of("success", false, "message", "로그인에 실패했습니다.");
         }
     }
@@ -96,6 +108,7 @@ public class AuthController {
     @PostMapping("/logout/jwt")
     public String logoutJWT(HttpServletResponse response) {
         clearJwtCookie(response);
+        log.info("로그아웃 성공");
         return "redirect:/post/list";
     }
 

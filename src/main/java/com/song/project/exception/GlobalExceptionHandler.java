@@ -1,6 +1,8 @@
 package com.song.project.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,6 +16,7 @@ import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // API 요청인지 확인
     private boolean isApiRequest(HttpServletRequest request) {
@@ -34,6 +37,7 @@ public class GlobalExceptionHandler {
     // 인증 실패 처리
     @ExceptionHandler(UnauthorizedException.class)
     public Object handleUnauthorized(UnauthorizedException e, RedirectAttributes ra, HttpServletRequest req) {
+        log.warn("인증 실패: {} - URI: {}", e.getMessage(), req.getRequestURI());
         if (isApiRequest(req)) return json(HttpStatus.UNAUTHORIZED, e.getMessage());
         ra.addFlashAttribute("errorMessage", e.getMessage());
         return "redirect:/post/list";
@@ -42,6 +46,7 @@ public class GlobalExceptionHandler {
     // 권한 없음 처리
     @ExceptionHandler(ForbiddenException.class)
     public Object handleForbidden(ForbiddenException e, RedirectAttributes ra, HttpServletRequest req) {
+        log.warn("권한 없음: {} - URI: {}", e.getMessage(), req.getRequestURI());
         if (isApiRequest(req)) return json(HttpStatus.FORBIDDEN, e.getMessage());
         ra.addFlashAttribute("errorMessage", e.getMessage());
         return "redirect:/post/list";
@@ -50,6 +55,7 @@ public class GlobalExceptionHandler {
     // 찾을 수 없음 처리
     @ExceptionHandler(NotFoundException.class)
     public Object handleNotFound(NotFoundException e, RedirectAttributes ra, HttpServletRequest req) {
+        log.warn("리소스 없음: {} - URI: {}", e.getMessage(), req.getRequestURI());
         if (isApiRequest(req)) return json(HttpStatus.NOT_FOUND, e.getMessage());
         ra.addFlashAttribute("errorMessage", e.getMessage());
         return "redirect:/post/list";
@@ -58,6 +64,7 @@ public class GlobalExceptionHandler {
     // 잘못된 요청 처리
     @ExceptionHandler(BadRequestException.class)
     public Object handleBadRequest(BadRequestException e, RedirectAttributes ra, HttpServletRequest req) {
+        log.warn("잘못된 요청: {} - URI: {}", e.getMessage(), req.getRequestURI());
         if (isApiRequest(req)) return json(HttpStatus.BAD_REQUEST, e.getMessage());
         ra.addFlashAttribute("errorMessage", e.getMessage());
         return "redirect:/post/list";
@@ -84,6 +91,7 @@ public class GlobalExceptionHandler {
     // 기타 예외 처리
     @ExceptionHandler(Exception.class)
     public Object handleGeneric(Exception e, RedirectAttributes ra, HttpServletRequest req) {
+        log.error("예상치 못한 예외 발생: URI={}, 메시지={}", req.getRequestURI(), e.getMessage(), e);
         String errorMsg = e.getMessage();
         if (isApiRequest(req)) return json(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다.");
         ra.addFlashAttribute("errorMessage", errorMsg);

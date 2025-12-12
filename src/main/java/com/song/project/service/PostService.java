@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class PostService {
+    private static final Logger log = LoggerFactory.getLogger(PostService.class);
 
     private final PostRepository postRepository;
     private final PostImageRepository postImageRepository;
@@ -165,7 +168,10 @@ public class PostService {
         Post saved;
         try {
             saved = postRepository.save(post);
+            log.info("게시글 생성 성공: postId={}, title={}, userId={}", 
+                saved.getId(), saved.getTitle(), userId);
         } catch (DataIntegrityViolationException e) {
+            log.error("게시물 생성 실패: userId={}, title={}", userId, dto.getTitle(), e);
             throw new BadRequestException("게시물 생성에 실패했습니다.");
         }
 
@@ -181,10 +187,12 @@ public class PostService {
                         postImage.setPost(saved);
                         postImageRepository.save(postImage);
                     } catch (Exception e) {
+                        log.error("이미지 저장 실패: postId={}, url={}", saved.getId(), trimmedUrl, e);
                         throw new BadRequestException("이미지 저장에 실패했습니다.");
                     }
                 }
             }
+            log.debug("게시글 이미지 저장 완료: postId={}", saved.getId());
         }
 
         return saved;
@@ -208,7 +216,10 @@ public class PostService {
         Post updated;
         try {
             updated = postRepository.save(post);
+            log.info("게시글 수정 성공: postId={}, title={}, userId={}", 
+                dto.getPostId(), dto.getTitle(), userId);
         } catch (DataIntegrityViolationException e) {
+            log.error("게시물 수정 실패: postId={}, userId={}", dto.getPostId(), userId, e);
             throw new BadRequestException("게시물 수정에 실패했습니다.");
         }
 
@@ -252,7 +263,10 @@ public class PostService {
         try {    
             likeRepository.deleteAllByPostId(postId);
             postRepository.delete(post);
+            log.info("게시글 삭제 성공: postId={}, title={}, userId={}", 
+                postId, post.getTitle(), userId);
         } catch (Exception e) {
+            log.error("게시물 삭제 실패: postId={}, userId={}", postId, userId, e);
             throw new BadRequestException("게시물 삭제에 실패했습니다.");
         }
 
@@ -290,6 +304,9 @@ public class PostService {
         PostStatus postStatus = PostStatus.valueOf(dto.getStatus().toUpperCase());
         post.setStatus(postStatus);
         postRepository.save(post);
+        
+        log.info("게시글 상태 변경: postId={}, status={}, userId={}", 
+            postId, postStatus, userId);
 
         return postStatus;
     }
