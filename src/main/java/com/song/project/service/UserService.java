@@ -117,7 +117,7 @@ public class UserService {
 
     public ProfileResult getProfileResult(String username, int postPage, int reviewPage, Long loginUserId) {
         User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         UserProfileDto userDto = new UserProfileDto(user);
 
         Page<Post> posts = getPostsByUsername(username, postPage);
