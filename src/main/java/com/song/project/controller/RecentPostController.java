@@ -22,6 +22,7 @@ public class RecentPostController {
 
     // 최근 본 상품 ID 추가
     @PostMapping("/add/{postId}")
+    @ResponseBody
     public ResponseEntity<?> addRecent(@PathVariable Long postId, Authentication auth) {
         
         // 로그인되지 않은 사용자는 무시

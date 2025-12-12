@@ -51,6 +51,7 @@ public class FileController {
     // 이미지 삭제
     @DeleteMapping("/delete-image")
     @PreAuthorize("isAuthenticated()")
+    @ResponseBody
     ResponseEntity<String> deleteImages(@RequestParam Long imageId, Authentication auth) {
 
         CustomUser user = (CustomUser) auth.getPrincipal();

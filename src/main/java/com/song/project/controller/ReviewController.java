@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -51,6 +52,7 @@ public class ReviewController {
 
     // 리뷰 삭제
     @DeleteMapping("/{id}")
+    @ResponseBody
     ResponseEntity<String> deleteReview(@PathVariable Long id, Authentication auth) {
         try {
             CustomUser user = getUserId(auth);

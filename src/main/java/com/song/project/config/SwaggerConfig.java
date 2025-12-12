@@ -15,7 +15,6 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("springdoc-public")
                 .pathsToMatch("/**")
-                .packagesToExclude("com.song.project.exception")
                 .build();
     }
 

@@ -217,6 +217,7 @@ public class PostController {
     // 게시물 삭제
     @DeleteMapping("/delete")
     @PreAuthorize("isAuthenticated()")
+    @ResponseBody
     ResponseEntity<String> delete(@RequestParam Long id, Authentication auth) {
 
         try {
