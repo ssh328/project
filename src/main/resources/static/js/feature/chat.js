@@ -30,7 +30,7 @@ const getUser = async () => {
   const agent = await getAgent();
 
   const session = new Talk.Session({
-    appId: "t6PBdfX9",
+    appId: window.talkjsAppId,
     me: user,
   });
 

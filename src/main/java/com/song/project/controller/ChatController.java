@@ -4,6 +4,7 @@ import com.song.project.repository.UserRepository;
 import com.song.project.security.CustomUser;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -16,6 +17,9 @@ import org.springframework.web.bind.annotation.*;
 public class ChatController {
     @Autowired
     UserRepository userRepository;
+
+    @Value("${talkjs.appId}")
+    private String talkjsAppId;
 
     // 채팅 페이지
     @GetMapping("/chat")
@@ -31,8 +35,9 @@ public class ChatController {
             } else {
                 model.addAttribute("postWriterId", null);
             }
-
         }
+
+        model.addAttribute("talkjsAppId", talkjsAppId);
         
         return "chat/chat.html";
     }
