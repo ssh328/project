@@ -1,5 +1,7 @@
 package com.song.project.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class RecommendedPostService {
+    private static final Logger log = LoggerFactory.getLogger(RecommendedPostService.class);
+    
     private final RedisTemplate<String, String> redisTemplate;
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
@@ -73,10 +77,10 @@ public class RecommendedPostService {
         // 모든 postId를 먼저 수집
         List<Long> allPostIds = new ArrayList<>();
         for (ZSetOperations.TypedTuple<String> tuple : set) {
-            System.out.println("postId=" + tuple.getValue() + ", score=" + tuple.getScore());
             Long postId = Long.valueOf(tuple.getValue().toString());
             if (!postId.equals(currentPost.getId())) {
                 allPostIds.add(postId);
+                log.debug("추천 게시글 후보: postId={}, score={}", postId, tuple.getScore());
             }
         }
 

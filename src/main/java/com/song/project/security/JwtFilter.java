@@ -6,6 +6,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +18,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class JwtFilter extends OncePerRequestFilter {
+    private static final Logger log = LoggerFactory.getLogger(JwtFilter.class);
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -39,9 +42,10 @@ public class JwtFilter extends OncePerRequestFilter {
         Claims claim;
         try {
             claim = JwtUtil.extractToken(jwtCookie);
-            System.out.println(claim);
+            log.debug("JWT 토큰 추출 성공: userId={}, username={}", 
+                claim.get("userId"), claim.get("username"));
         } catch (Exception e) {
-            System.out.println("유효기간 만료되거나 이상함");
+            log.warn("JWT 토큰 유효기간 만료되거나 이상함: {}", e.getMessage());
             filterChain.doFilter(request, response);
             return;
         }
