@@ -32,8 +32,6 @@ public class ChatController {
                 model.addAttribute("postWriterId", null);
             }
 
-            System.out.println("userid :" + user.id);
-            System.out.println("postWriterId :" + postWriterId);
         }
         
         return "chat/chat.html";
@@ -43,7 +41,8 @@ public class ChatController {
     @GetMapping(value = "/getUser")
     @ResponseBody
     public ResponseEntity<UserDto> getUser(@RequestParam(required = false) Long userId) {
-        User user = userRepository.findById(userId).get();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         UserDto userDto = new UserDto(user);
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
