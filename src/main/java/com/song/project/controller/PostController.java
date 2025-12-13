@@ -35,10 +35,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@Tag(name = "게시글 API", description = "게시글 관련 API")
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/post")
@@ -214,7 +222,11 @@ public class PostController {
         }
     }
 
-    // 게시물 삭제
+    @Operation(summary = "게시글 삭제", description = "게시글을 삭제합니다")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "삭제 성공"),
+        @ApiResponse(responseCode = "403", description = "권한 없음")
+    })
     @DeleteMapping("/delete")
     @PreAuthorize("isAuthenticated()")
     @ResponseBody
@@ -229,14 +241,23 @@ public class PostController {
         }
     }
 
-    // 게시물 상태 변경
+    @Operation(summary = "게시글 상태 변경", description = "게시글의 판매 상태를 변경합니다 (판매중/예약중/판매완료)")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "상태 변경 성공",
+            content = @Content(mediaType = "application/json",
+                examples = @ExampleObject(value = "{\"success\": true, \"message\": \"상태가 변경되었습니다.\", \"status\": \"SOLD\", \"statusDescription\": \"판매완료\"}"))),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+        @ApiResponse(responseCode = "401", description = "인증 필요"),
+        @ApiResponse(responseCode = "403", description = "권한 없음")
+    })
     @PatchMapping("/{id}/status")
     @PreAuthorize("isAuthenticated()")
     @ResponseBody
-    ResponseEntity<Map<String, Object>> updateStatus(@PathVariable Long id,
-                                                     @Valid @ModelAttribute PostStatusUpdateDto dto,
-                                                     BindingResult bindingResult,
-                                                     Authentication auth) {
+    ResponseEntity<Map<String, Object>> updateStatus(
+        @PathVariable Long id,
+        @Valid @ModelAttribute PostStatusUpdateDto dto,
+        BindingResult bindingResult,
+        Authentication auth) {
         Map<String, Object> response = new HashMap<>();
         
         if (bindingResult.hasErrors()) {

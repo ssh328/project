@@ -20,10 +20,15 @@ import com.song.project.exception.BadRequestException;
 import com.song.project.security.JwtUtil;
 import com.song.project.service.AuthService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "인증 API", description = "로그인/로그아웃 관련 API")
 @Controller
 @RequiredArgsConstructor
 public class AuthController {
@@ -75,10 +80,16 @@ public class AuthController {
     }
 
     // 로그인
+    @Operation(summary = "로그인", description = "사용자 로그인을 처리하고 JWT 쿠키를 발급합니다")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "로그인 성공"),
+        @ApiResponse(responseCode = "401", description = "인증 실패")
+    })
     @PostMapping("/login/jwt")
     @ResponseBody
-    public Map<String, Object> loginJWT(@RequestBody Map<String, String> data,
-                                        HttpServletResponse response) {
+    public Map<String, Object> loginJWT(
+        @RequestBody Map<String, String> data,
+        HttpServletResponse response) {
         
         try {
             // 인증 처리

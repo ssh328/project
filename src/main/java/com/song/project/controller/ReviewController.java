@@ -19,6 +19,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "리뷰 API", description = "리뷰 관련 API")
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/review")
@@ -50,10 +56,17 @@ public class ReviewController {
         }
     }
 
-    // 리뷰 삭제
+    @Operation(summary = "리뷰 삭제", description = "리뷰를 삭제합니다")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "삭제 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+        @ApiResponse(responseCode = "403", description = "권한 없음")
+    })
     @DeleteMapping("/{id}")
     @ResponseBody
-    ResponseEntity<String> deleteReview(@PathVariable Long id, Authentication auth) {
+    ResponseEntity<String> deleteReview(
+        @PathVariable Long id, 
+        Authentication auth) {
         try {
             CustomUser user = getUserId(auth);
             reviewService.deleteReview(id, user);

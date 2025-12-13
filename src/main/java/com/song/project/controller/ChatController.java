@@ -3,6 +3,11 @@ import com.song.project.entity.User;
 import com.song.project.repository.UserRepository;
 import com.song.project.security.CustomUser;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -12,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "채팅 API", description = "채팅 관련 API")
 @CrossOrigin("*")
 @Controller
 public class ChatController {
@@ -42,10 +48,15 @@ public class ChatController {
         return "chat/chat.html";
     }
 
-    // 유저 정보 조회
+    @Operation(summary = "유저 정보 조회", description = "사용자 ID로 유저 정보를 조회합니다")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "조회 성공"),
+        @ApiResponse(responseCode = "400", description = "사용자를 찾을 수 없습니다.")
+    })
     @GetMapping(value = "/getUser")
     @ResponseBody
-    public ResponseEntity<UserDto> getUser(@RequestParam(required = false) Long userId) {
+    public ResponseEntity<UserDto> getUser(
+        @RequestParam(required = false) Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         UserDto userDto = new UserDto(user);

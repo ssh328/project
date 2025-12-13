@@ -14,19 +14,30 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.song.project.security.CustomUser;
 import com.song.project.service.PostService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "파일 API", description = "파일 업로드/삭제 관련 API")
 @Controller
 @RequiredArgsConstructor
 public class FileController {
     private final PostService postService;
     private final S3Service s3Service;
 
-    // Presigned URL 생성
+    @Operation(summary = "Presigned URL 생성", description = "S3에 파일을 업로드하기 위한 Presigned URL을 생성합니다")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "URL 생성 성공"),
+        @ApiResponse(responseCode = "401", description = "인증 필요")
+    })
     @GetMapping("/presigned-url")
     @PreAuthorize("isAuthenticated()")
     @ResponseBody
-    String getURL(@RequestParam String filename) {
+    String getURL(
+        @RequestParam String filename) {
 
         // 확장자 추출
         String extension = "";
@@ -48,11 +59,17 @@ public class FileController {
         return result;
     }
 
-    // 이미지 삭제
+    @Operation(summary = "이미지 삭제", description = "이미지를 삭제합니다")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "삭제 성공"),
+        @ApiResponse(responseCode = "401", description = "인증 필요")
+    })
     @DeleteMapping("/delete-image")
     @PreAuthorize("isAuthenticated()")
     @ResponseBody
-    ResponseEntity<String> deleteImages(@RequestParam Long imageId, Authentication auth) {
+    ResponseEntity<String> deleteImages(
+        @RequestParam Long imageId, 
+        Authentication auth) {
 
         CustomUser user = (CustomUser) auth.getPrincipal();
         postService.deleteImage(imageId, user.id);
