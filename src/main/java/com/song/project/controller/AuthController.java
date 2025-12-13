@@ -2,8 +2,6 @@ package com.song.project.controller;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -27,12 +25,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Tag(name = "인증 API", description = "로그인/로그아웃 관련 API")
 @Controller
 @RequiredArgsConstructor
 public class AuthController {
-    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
     
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final AuthService authService;

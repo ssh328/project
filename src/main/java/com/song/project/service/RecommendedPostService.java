@@ -1,7 +1,5 @@
 package com.song.project.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
@@ -11,14 +9,15 @@ import com.song.project.repository.LikeRepository;
 import com.song.project.repository.PostRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecommendedPostService {
-    private static final Logger log = LoggerFactory.getLogger(RecommendedPostService.class);
     
     private final RedisTemplate<String, String> redisTemplate;
     private final LikeRepository likeRepository;

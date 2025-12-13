@@ -1,7 +1,5 @@
 package com.song.project.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -11,11 +9,12 @@ import com.song.project.repository.UserRepository;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
     
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
