@@ -38,20 +38,40 @@
         </encoder>
     </appender>
 
-    <!-- 프로젝트 패키지 로그 레벨 설정 -->
-    <logger name="com.song.project" level="DEBUG"/>
-    
-    <!-- Spring 프레임워크 로그 레벨 -->
-    <logger name="org.springframework" level="INFO"/>
-    <logger name="org.springframework.security" level="DEBUG"/>
-    
-    <!-- Hibernate/JPA 로그 레벨 -->
-    <logger name="org.hibernate" level="WARN"/>
-    <logger name="org.hibernate.SQL" level="DEBUG"/>
-    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
-    
-    <!-- Redis 로그 레벨 -->
-    <logger name="org.springframework.data.redis" level="INFO"/>
+    <!-- ===========================
+         Profile 별 로그 레벨
+         =========================== -->
+
+    <springProfile name="dev">
+        <!-- 프로젝트 패키지 로그 레벨 설정 -->
+        <logger name="com.song.project" level="DEBUG"/>
+
+        <!-- Spring 프레임워크 로그 레벨 -->
+        <logger name="org.springframework" level="INFO"/>
+        <logger name="org.springframework.security" level="DEBUG"/>
+
+        <!-- Hibernate/JPA 로그 레벨 -->
+        <logger name="org.hibernate" level="WARN"/>
+        <logger name="org.hibernate.SQL" level="DEBUG"/>
+        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+
+        <!-- Redis 로그 레벨 -->
+        <logger name="org.springframework.data.redis" level="INFO"/>
+    </springProfile>
+
+    <springProfile name="prod">
+        <!-- 운영에서는 과도한 로그를 줄이는 편이 안전 -->
+        <logger name="com.song.project" level="INFO"/>
+
+        <logger name="org.springframework" level="INFO"/>
+        <logger name="org.springframework.security" level="INFO"/>
+
+        <logger name="org.hibernate" level="WARN"/>
+        <logger name="org.hibernate.SQL" level="WARN"/>
+        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="WARN"/>
+
+        <logger name="org.springframework.data.redis" level="INFO"/>
+    </springProfile>
 
     <!-- 루트 로거 -->
     <root level="INFO">
