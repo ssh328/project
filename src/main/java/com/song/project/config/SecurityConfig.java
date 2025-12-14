@@ -47,7 +47,38 @@ public class SecurityConfig {
         );
 
         http.authorizeHttpRequests((authorize) ->
-                authorize.requestMatchers("/**").permitAll()
+            authorize
+            // 공개 경로 (인증 불필요)
+            .requestMatchers(
+                // 인증 관련
+                "/login", "/login/jwt",
+                "/register", "/user-register",
+                "/logout/jwt",
+                
+                // 게시글 조회
+                "/post/list", "/post/search",
+                "/post/detail/**",
+                
+                // 사용자 프로필 조회
+                "/user/profile/**",
+                
+                // 정적 리소스
+                "/main.css", "/pagination.css", "/star.css",
+                "/js/**",
+                
+                // Swagger (dev 환경)
+                "/swagger-ui/**", "/api-docs/**", "/v3/api-docs/**",
+                
+                // 에러 페이지
+                "/error"
+            ).permitAll()
+            
+            // 관리자 전용
+            .requestMatchers("/admin/**")
+                .hasRole("ADMIN")
+            
+            // 나머지 모든 요청은 인증 필요
+            .anyRequest().authenticated()
         );
 
         // 로그인 페이지 지정
