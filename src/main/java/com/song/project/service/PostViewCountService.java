@@ -98,7 +98,7 @@ public class PostViewCountService {
 
             Long postId = Long.parseLong(postIdStr);
             String value = redisTemplate.opsForValue().get(key);
-            if (value == null) {
+            if (value != null && !value.isEmpty()) {
                 postIdToRedisCount.put(postId, Long.parseLong(value));
             }
         }
