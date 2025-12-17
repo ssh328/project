@@ -1,4 +1,4 @@
-package com.song.project.controller;
+package com.song.project.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +21,7 @@ public class S3Service {
     private final S3Presigner s3Presigner;
     private final S3Client s3Client;
 
-    String createPresignedUrl(String path) {
+    public String createPresignedUrl(String path) {
 
         var putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucket)

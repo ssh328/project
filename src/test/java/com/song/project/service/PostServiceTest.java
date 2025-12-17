@@ -1,6 +1,5 @@
 package com.song.project.service;
 
-import com.song.project.controller.S3Service;
 import com.song.project.dto.PostCreateDto;
 import com.song.project.dto.PostStatusUpdateDto;
 import com.song.project.dto.PostUpdateDto;

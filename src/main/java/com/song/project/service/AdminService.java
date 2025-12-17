@@ -9,7 +9,6 @@ import com.song.project.repository.LikeRepository;
 import com.song.project.repository.PostRepository;
 import com.song.project.repository.ReviewRepository;
 import com.song.project.repository.UserRepository;
-import com.song.project.controller.S3Service;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

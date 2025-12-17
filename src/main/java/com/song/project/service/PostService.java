@@ -11,7 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.song.project.controller.S3Service;
 import com.song.project.dto.PostCreateDto;
 import com.song.project.dto.PostListDto;
 import com.song.project.dto.PostStatusUpdateDto;
