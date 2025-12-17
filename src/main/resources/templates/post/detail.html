@@ -230,9 +230,8 @@
     
     <th:block th:replace="~{ partial/footer.html :: footerFragment }"></th:block>
 
-    <script>
-        // PostId를 전역 변수로 설정
-        window.postId = [[${data.id}]];
+    <script th:inline="javascript">
+        window.postId = /*[[${data.id}]]*/ null;
     </script>
     <script src="/js/post/postActions.js"></script>
     <script src="/js/post/deleteHandler.js"></script>
