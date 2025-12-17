@@ -12,7 +12,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
-import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter.HeaderValue;
 
 import com.song.project.security.JwtFilter;
 
@@ -45,31 +44,6 @@ public class SecurityConfig {
 
         http.sessionManagement((session) -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        );
-
-        // XSS 방어를 위한 보안 헤더 설정
-        http.headers(headers -> headers
-                // Content Security Policy (CSP) - 가장 강력한 XSS 방어
-                // 'self': 같은 출처에서만 리소스 로드 허용
-                // 'unsafe-inline': 인라인 스크립트/스타일 허용 (필요시 제거 권장)
-                // 'unsafe-eval': eval() 같은 동적 코드 실행 허용 (필요시 제거 권장)
-                .contentSecurityPolicy(csp -> csp
-                        .policyDirectives("default-src 'self'; " +
-                                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
-                                "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com; " +
-                                "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
-                                "img-src 'self' data: https: http:; " +
-                                "connect-src 'self'; " +
-                                "frame-ancestors 'self';")
-                )
-                // XSS Protection 헤더 (구형 브라우저 호환성)
-                .xssProtection(xss -> xss
-                        .headerValue(HeaderValue.ENABLED_MODE_BLOCK)
-                )
-                // MIME 타입 스니핑 방지 (X-Content-Type-Options: nosniff)
-                .contentTypeOptions(contentTypeOptions -> {})
-                // 클릭재킹 방지 (X-Frame-Options)
-                .frameOptions(frameOptions -> frameOptions.deny())
         );
 
         http.authorizeHttpRequests((authorize) ->
