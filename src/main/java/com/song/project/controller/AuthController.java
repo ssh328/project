@@ -27,6 +27,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 인증 관련 API를 제공하는 컨트롤러
+ * 회원가입, 로그인, 로그아웃 처리
+ */
 @Slf4j
 @Tag(name = "인증 API", description = "로그인/로그아웃 관련 API")
 @Controller
@@ -36,13 +40,17 @@ public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final AuthService authService;
 
-    // 회원가입 페이지
+    /**
+     * 회원가입 페이지 조회
+     */
     @GetMapping("/register")
     public String register() {
         return "auth/register.html";
     }
 
-    // 회원가입
+    /**
+     * 회원가입 처리
+     */
     @PostMapping("/user-register")
     public String addUser(@RequestParam String user_id,
                         @RequestParam String password,
@@ -50,9 +58,7 @@ public class AuthController {
                         @RequestParam String email,
                         RedirectAttributes redirectAttributes,
                         HttpServletResponse response) {
-        
         try {
-            // 회원가입 처리
             authService.register(user_id, password, username, email);
             
             // 자동 로그인 처리
@@ -72,13 +78,17 @@ public class AuthController {
         }
     }
 
-    // 로그인 페이지
+    /**
+     * 로그인 페이지 조회
+     */
     @GetMapping("/login")
     public String login() {
         return "auth/login.html";
     }
 
-    // 로그인
+    /**
+     * 로그인 처리
+     */
     @Operation(summary = "로그인", description = "사용자 로그인을 처리하고 JWT 쿠키를 발급합니다")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "로그인 성공"),
@@ -89,7 +99,6 @@ public class AuthController {
     public Map<String, Object> loginJWT(
         @RequestBody Map<String, String> data,
         HttpServletResponse response) {
-        
         try {
             // 인증 처리
             var authToken = new UsernamePasswordAuthenticationToken(
@@ -114,7 +123,9 @@ public class AuthController {
         }
     }
 
-    // 로그아웃
+    /**
+     * 로그아웃 처리
+     */
     @PostMapping("/logout/jwt")
     public String logoutJWT(HttpServletResponse response) {
         clearJwtCookie(response);
