@@ -20,6 +20,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+/**
+ * 관리자 관련 API를 제공하는 컨트롤러
+ * 대시보드, 사용자 목록, 게시글 목록, 리뷰 목록, 게시글 삭제, 리뷰 삭제
+ * 관리자 권한 필요
+ */
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/admin")
@@ -29,7 +34,9 @@ public class AdminController {
     private final AdminService adminService;
     private final PostService postService;
 
-    // 대시보드
+    /**
+     * 대시보드 통계 조회
+     */
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         DashboardStats stats = adminService.getDashboardStats();
@@ -37,7 +44,9 @@ public class AdminController {
         return "admin/dashboard";
     }
 
-    // 사용자 목록
+    /**
+     * 사용자 목록 조회
+     */
     @GetMapping("/users")
     public String users(@RequestParam(defaultValue = "1") int page,
                         @RequestParam(required = false) String keyword,
@@ -50,15 +59,18 @@ public class AdminController {
         return "admin/users";
     }
 
-    // 게시글 목록
+    /**
+     * 게시물 목록 조회
+     */
     @GetMapping("/posts")
     public String posts(@RequestParam(defaultValue = "1") int page,
                         @RequestParam(required = false) String keyword,
                         @RequestParam(required = false) String category,
                         @RequestParam(required = false) String status,
                         Model model) {
-
         PostStatus postStatus = null;
+
+        // 상태 파싱
         if (status != null && !status.isBlank()) {
             try {
                 postStatus = PostStatus.valueOf(status.toUpperCase());
@@ -80,7 +92,9 @@ public class AdminController {
         return "admin/posts";
     }
 
-    // 리뷰 목록
+    /**
+     * 리뷰 목록 조회
+     */
     @GetMapping("/reviews")
     public String reviews(@RequestParam(defaultValue = "1") int page,
                           Model model) {
@@ -91,7 +105,9 @@ public class AdminController {
         return "admin/reviews";
     }
 
-    // 게시글 삭제
+    /**
+     * 게시물 삭제 (관리자용)
+     */
     @PostMapping("/posts/{id}/delete")
     public String deletePost(@PathVariable Long id,
                              @RequestParam(defaultValue = "1") int page,
@@ -101,7 +117,9 @@ public class AdminController {
                 (keyword != null ? "&keyword=" + keyword : "");
     }
 
-    // 리뷰 삭제
+    /**
+     * 리뷰 삭제 (관리자용)
+     */
     @PostMapping("/reviews/{id}/delete")
     public String deleteReview(@PathVariable Long id,
                                @RequestParam(defaultValue = "1") int page) {
