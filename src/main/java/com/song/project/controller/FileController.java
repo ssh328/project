@@ -22,6 +22,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * 파일 업로드/삭제 관련 API를 제공하는 컨트롤러
+ * S3 업로드를 위한 Presigned URL 생성
+ * 게시글 이미지 삭제
+ */
 @Tag(name = "파일 API", description = "파일 업로드/삭제 관련 API")
 @Controller
 @RequiredArgsConstructor
@@ -29,7 +34,7 @@ public class FileController {
     private final PostService postService;
     private final S3Service s3Service;
 
-    @Operation(summary = "Presigned URL 생성", description = "S3에 파일을 업로드하기 위한 Presigned URL을 생성합니다")
+    @Operation(summary = "Presigned URL 생성", description = "S3에 파일을 업로드하기 위한 Presigned URL을 생성합니다.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "URL 생성 성공"),
         @ApiResponse(responseCode = "401", description = "인증 필요")
@@ -40,9 +45,9 @@ public class FileController {
     String getURL(
         @RequestParam String filename) {
 
-        // 확장자 추출
         String extension = "";
 
+        // 확장자 추출
         int dotIndex = filename.lastIndexOf(".");
         if (dotIndex != -1) {
             extension = filename.substring(dotIndex);
@@ -60,7 +65,7 @@ public class FileController {
         return result;
     }
 
-    @Operation(summary = "이미지 삭제", description = "이미지를 삭제합니다")
+    @Operation(summary = "이미지 삭제", description = "이미지를 삭제합니다.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "삭제 성공"),
         @ApiResponse(responseCode = "401", description = "인증 필요")
