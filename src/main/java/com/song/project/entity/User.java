@@ -16,20 +16,26 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String username;
-    private String user_id;
-    private String email;
-    private String password;
-    private String dp;
-    private String role;
+
+    private String username;    // 사용자 이름
+
+    private String user_id;    // 사용자 아이디
+
+    private String email;    // 사용자 이메일
+
+    private String password;    // 사용자 비밀번호
+
+    private String dp;    // 사용자 프로필 이미지
+
+    private String role;    // 사용자 역할
 
     // 하나의 User가 여러 Like 가리킴
     @ToString.Exclude
     @OneToMany(mappedBy = "user")
-    List<Likes> likes = new ArrayList<>();
+    List<Likes> likes = new ArrayList<>();    // 사용자 좋아요 목록
 
     // 하나의 User가 여러 Post 가리킴
     @ToString.Exclude
     @OneToMany(mappedBy = "user")
-    List<Post> posts = new ArrayList<>();
+    List<Post> posts = new ArrayList<>();    // 사용자 게시물 목록
 }
