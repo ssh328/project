@@ -1,5 +1,8 @@
 package com.song.project.repository;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,19 +15,25 @@ import com.song.project.entity.PostStatus;
 import org.springframework.data.jpa.repository.EntityGraph;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
+    // 페이지 조회
     Page<Post> findPageBy(Pageable page);
 
+    // 제목으로 검색
     @Query(value = "select * from store.post where match(title) against(?1)",
             countQuery = "select count(*) from store.post where match(title) against(?1)",
             nativeQuery = true)
     Page<Post> fullTextSearchWithPaging(String text, Pageable pageable);
 
+    // 사용자 ID로 게시물 목록 조회
     Page<Post> findByUserIdOrderByIdDesc(Long userId, Pageable pageable);
 
+    // 카테고리로 게시물 목록 조회
     Page<Post> findByCategory(String category, Pageable pageable);
 
+    // 제목으로 검색
     Page<Post> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
+    // 필터링된 게시물 목록 조회
     @EntityGraph(attributePaths = {"images", "user"})
     @Query("""
         SELECT p FROM Post p
@@ -39,14 +48,18 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                               @Param("status") PostStatus status,
                               Pageable pageable);
 
+    // 사용자명으로 게시물 목록 조회
     @EntityGraph(attributePaths = {"user", "images"})
     Page<Post> findByUser_Username(String username, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"user", "images"})
-    @Override
-    java.util.List<Post> findAllById(java.lang.Iterable<Long> ids);
 
+    // 주어진 ID 목록에 해당하는 게시물 조회
     @EntityGraph(attributePaths = {"user", "images"})
     @Override
-    java.util.Optional<Post> findById(Long id);
+    List<Post> findAllById(Iterable<Long> ids);
+
+    // 주어진 ID에 해당하는 게시물 조회
+    @EntityGraph(attributePaths = {"user", "images"})
+    @Override
+    Optional<Post> findById(Long id);
 }
