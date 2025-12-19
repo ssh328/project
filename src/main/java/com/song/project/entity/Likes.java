@@ -19,12 +19,12 @@ public class Likes {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId",
             foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private User user;
+    private User user;    // 좋아요를 누른 사용자
 
     // 여러 Likes가 같은 Post를 가리킬 수 있음
     // Like.postId 외래키로 Post 참조
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "postId",
             foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Post post;
+    private Post post;    // 좋아요를 누른 게시물
 }
