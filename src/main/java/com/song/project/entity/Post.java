@@ -25,45 +25,45 @@ public class Post {
     private Long id;
 
     @Column(nullable = false, length = 250)
-    private String title;
+    private String title;    // 게시물 제목
 
     @Column(columnDefinition = "TEXT")
-    private String body;
+    private String body;    // 게시물 내용
 
     @Column(nullable = false)
-    private Integer price;
+    private Integer price;    // 게시물 가격
 
     @Column(nullable = false)
-    private String category;
+    private String category;    // 게시물 카테고리
 
     @CreationTimestamp
-    private LocalDateTime created;
+    private LocalDateTime created;    // 게시물 작성일시
 
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
-    private Integer likeCnt = 0;
+    private Integer likeCnt = 0;    // 게시물 좋아요 수
 
     @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0")
-    private Long viewCount = 0L;
+    private Long viewCount = 0L;    // 게시물 조회수
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'ON_SALE'")
-    private PostStatus status = PostStatus.ON_SALE;
+    private PostStatus status = PostStatus.ON_SALE;    // 게시물 상태
 
     // 하나의 Post는 여러 이미지 소유
     @ToString.Exclude
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     @BatchSize(size = 50)
-    private List<PostImage> images = new ArrayList<>();
+    private List<PostImage> images = new ArrayList<>();    // 게시물 이미지 목록
 
     // 여러 Post는 하나의 User를 가리킴
     // Post.userId 외래키로 User를 참조
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId") // DB에 userId 컬럼 생성
-    private User user;
+    private User user;    // 게시물 작성자
 
     // 하나의 Post는 여러 Like 가리킴
     @ToString.Exclude
     @OneToMany(mappedBy = "post")
-    List<Likes> likes = new ArrayList<>();
+    List<Likes> likes = new ArrayList<>();    // 게시물 좋아요 목록
 }
