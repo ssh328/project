@@ -46,6 +46,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * 게시글 관련 API를 제공하는 컨트롤러
+ */
 @Tag(name = "게시글 API", description = "게시글 관련 API")
 @Controller
 @RequiredArgsConstructor
@@ -53,7 +56,9 @@ import java.util.UUID;
 public class PostController {
     private final PostService postService;
 
-    // 게시물 리스트
+    /**
+     * 게시물 리스트 조회
+     */
     @GetMapping("/list")
     String all_post(Model model,
                     Authentication auth,
@@ -92,7 +97,9 @@ public class PostController {
         return "post/list.html";
     }
 
-    // 게시물 검색
+    /**
+     * 게시물 검색 조회
+     */
     @GetMapping("/search")
     String search(Model model, Authentication auth,
             @RequestParam String searchText,
@@ -114,7 +121,9 @@ public class PostController {
         return "post/search.html";
     }
 
-    // 게시물 상세
+    /**
+     * 게시물 상세 조회
+     */
     @GetMapping("/detail/{id}")
     String show_post(Model model, @PathVariable Long id,  
                         Authentication auth,
@@ -141,7 +150,9 @@ public class PostController {
         return "post/detail.html";
     }
 
-    // 게시물 추가 페이지
+    /**
+     * 게시물 추가 페이지 조회
+     */
     @GetMapping("/new-post")
     @PreAuthorize("isAuthenticated()")
     String add_post(Model model) {
@@ -149,7 +160,9 @@ public class PostController {
         return "post/add.html";
     }
 
-    // 게시물 추가
+    /**
+     * 게시물 추가 처리
+     */
     @PostMapping("/add")
     @PreAuthorize("isAuthenticated()")
     String addPost(@Valid @ModelAttribute PostCreateDto dto,
@@ -157,12 +170,14 @@ public class PostController {
                    Authentication auth,
                    RedirectAttributes redirectAttributes) {
         
+        // 유효성 검사 실패 시 처리
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("errorMessage", 
                 bindingResult.getFieldErrors().get(0).getDefaultMessage());
             return "redirect:/post/new-post";
         }
         
+        // 게시물 추가 처리
         try {
             Long userId = getUserId(auth);
             postService.createPost(userId, dto);
@@ -177,7 +192,9 @@ public class PostController {
         }
     }
 
-    // 게시물 수정 페이지
+    /**
+     * 게시물 수정 페이지 조회
+     */
     @GetMapping("/edit/{id}")
     @PreAuthorize("isAuthenticated()")
     String edit(Model model, @PathVariable Long id, Authentication auth) {
@@ -191,7 +208,9 @@ public class PostController {
         return "post/edit.html";
     }
 
-    // 게시물 수정
+    /**
+     * 게시물 수정 처리
+     */
     @PostMapping("/edit")
     @PreAuthorize("isAuthenticated()")
     String editPost(@Valid @ModelAttribute PostUpdateDto dto,
@@ -199,12 +218,14 @@ public class PostController {
                     Authentication auth,
                     RedirectAttributes redirectAttributes) {
         
+        // 유효성 검사 실패 시 처리
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("errorMessage", 
                 bindingResult.getFieldErrors().get(0).getDefaultMessage());
             return "redirect:/post/edit/" + dto.getPostId();
         }
         
+        // 게시물 수정 처리
         try {
             Long userId = getUserId(auth);
             postService.updatePost(dto, userId);
@@ -222,7 +243,10 @@ public class PostController {
         }
     }
 
-    @Operation(summary = "게시글 삭제", description = "게시글을 삭제합니다")
+    /**
+     * 게시물 삭제 처리
+     */
+    @Operation(summary = "게시글 삭제", description = "게시글을 삭제합니다.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "삭제 성공"),
         @ApiResponse(responseCode = "403", description = "권한 없음")
@@ -232,6 +256,7 @@ public class PostController {
     @ResponseBody
     ResponseEntity<String> delete(@RequestParam Long id, Authentication auth) {
 
+        // 게시물 삭제 처리
         try {
             Long userId = getUserId(auth);
             postService.deletePost(id, userId);
@@ -241,6 +266,10 @@ public class PostController {
         }
     }
 
+    /**
+     * 게시물 상태 변경 처리
+     * 게시글의 판매 상태를 변경 (판매중/예약중/판매완료)
+     */
     @Operation(summary = "게시글 상태 변경", description = "게시글의 판매 상태를 변경합니다 (판매중/예약중/판매완료)")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "상태 변경 성공",
@@ -260,6 +289,7 @@ public class PostController {
         Authentication auth) {
         Map<String, Object> response = new HashMap<>();
         
+        // 유효성 검사 실패 시 처리
         if (bindingResult.hasErrors()) {
             response.put("success", false);
             response.put("message", bindingResult.getFieldErrors().get(0).getDefaultMessage());
@@ -280,6 +310,9 @@ public class PostController {
     // 헬퍼 메서드
     // ===========================
 
+    /**
+     * 유저 ID 조회
+     */
     private Long getUserId(Authentication auth) {
         if (auth != null && auth.isAuthenticated()) {
             CustomUser user = (CustomUser) auth.getPrincipal();
@@ -288,9 +321,12 @@ public class PostController {
         return null;
     }
 
-    // 쿠키에서 viewToken 가져오기 또는 생성
+    /**
+     * 쿠키에서 viewToken 가져오기 또는 생성
+     */
     private String getOrCreateViewToken(HttpServletRequest request, HttpServletResponse response) {
         
+        // 쿠키에서 viewToken 가져오기
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
