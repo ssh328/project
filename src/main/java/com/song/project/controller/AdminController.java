@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * 관리자 관련 API를 제공하는 컨트롤러
- * 대시보드, 사용자 목록, 게시글 목록, 리뷰 목록, 게시글 삭제, 리뷰 삭제
- * 관리자 권한 필요
  */
 @Controller
 @RequiredArgsConstructor
@@ -35,7 +33,9 @@ public class AdminController {
     private final PostService postService;
 
     /**
-     * 대시보드 통계 조회
+     * 관리자 대시보드 페이지를 조회
+     * 전체 통계 정보(사용자 수, 게시글 수, 리뷰 수 등)를 조회하여 표시
+     * @return 관리자 대시보드 템플릿 경로
      */
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
@@ -45,7 +45,11 @@ public class AdminController {
     }
 
     /**
-     * 사용자 목록 조회
+     * 사용자 목록을 페이지네이션과 함께 조회
+     * 키워드가 제공된 경우 사용자명 또는 이메일로 검색
+     * @param page 페이지 번호 (기본값: 1)
+     * @param keyword 검색 키워드 (사용자명 또는 이메일, 선택적)
+     * @return 사용자 목록 템플릿 경로
      */
     @GetMapping("/users")
     public String users(@RequestParam(defaultValue = "1") int page,
@@ -60,7 +64,13 @@ public class AdminController {
     }
 
     /**
-     * 게시물 목록 조회
+     * 게시물 목록을 페이지네이션과 함께 조회
+     * 키워드, 카테고리, 상태로 필터링
+     * @param page 페이지 번호 (기본값: 1)
+     * @param keyword 검색 키워드 (게시글 제목, 선택적)
+     * @param category 카테고리 필터 (선택적)
+     * @param status 게시글 상태 필터 (ON_SALE, RESERVED, SOLD, 선택적)
+     * @return 게시물 목록 템플릿 경로
      */
     @GetMapping("/posts")
     public String posts(@RequestParam(defaultValue = "1") int page,
@@ -70,11 +80,13 @@ public class AdminController {
                         Model model) {
         PostStatus postStatus = null;
 
-        // 상태 파싱
+        // 상태 문자열을 PostStatus enum으로 변환
+        // 잘못된 값이 입력된 경우 무시하고 null로 처리 (전체 조회)
         if (status != null && !status.isBlank()) {
             try {
                 postStatus = PostStatus.valueOf(status.toUpperCase());
             } catch (IllegalArgumentException ignored) {
+                // 잘못된 상태 값은 무시하고 전체 조회
             }
         }
 
@@ -93,7 +105,9 @@ public class AdminController {
     }
 
     /**
-     * 리뷰 목록 조회
+     * 리뷰 목록을 페이지네이션과 함께 조회
+     * @param page 페이지 번호 (기본값: 1)
+     * @return 리뷰 목록 템플릿 경로
      */
     @GetMapping("/reviews")
     public String reviews(@RequestParam(defaultValue = "1") int page,
@@ -106,7 +120,12 @@ public class AdminController {
     }
 
     /**
-     * 게시물 삭제 (관리자용)
+     * 관리자 권한으로 게시물을 삭제
+     * 삭제 후 게시물 목록 페이지로 리다이렉트, 이전 검색 조건을 유지
+     * @param id 삭제할 게시물의 ID
+     * @param page 삭제 후 이동할 페이지 번호 (기본값: 1)
+     * @param keyword 삭제 후 유지할 검색 키워드 (선택적)
+     * @return 게시물 목록 페이지로의 리다이렉트 URL
      */
     @PostMapping("/posts/{id}/delete")
     public String deletePost(@PathVariable Long id,
@@ -118,7 +137,11 @@ public class AdminController {
     }
 
     /**
-     * 리뷰 삭제 (관리자용)
+     * 관리자 권한으로 리뷰를 삭제
+     * 삭제 후 리뷰 목록 페이지로 리다이렉트, 이전 페이지 번호를 유지
+     * @param id 삭제할 리뷰의 ID
+     * @param page 삭제 후 이동할 페이지 번호 (기본값: 1)
+     * @return 리뷰 목록 페이지로의 리다이렉트 URL
      */
     @PostMapping("/reviews/{id}/delete")
     public String deleteReview(@PathVariable Long id,
