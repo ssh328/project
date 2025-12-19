@@ -11,21 +11,26 @@ import com.song.project.entity.Post;
 @Getter
 @Setter
 public class RecommendedPostDto {
-    private Long id;
-    private String title;
-    private Integer price;
-    private String firstImageUrl;
-    private String userId;
-    private LocalDateTime created;
+    private Long id;   // 게시물 ID
+    private String title;   // 게시물 제목
+    private Integer price;   // 게시물 가격
+    private String firstImageUrl;   // 게시물 첫 번째 이미지 URL
+    private String userId;   // 게시물 작성자 ID
+    private LocalDateTime created;   // 게시물 작성일시
 
-    // 정적 팩토리 메서드
+    /**
+     * Post 엔티티를 RecommendedPostDto로 변환하는 정적 메서드
+     * 추천 게시글 목록에 필요한 최소한의 정보만 포함하여 변환
+     * 이미지가 있는 경우 첫 번째 이미지 URL을 설정하고, 사용자 정보가 없는 경우 userId는 null로 설정
+     * @return RecommendedPostDto 객체 (게시물의 기본 정보와 이미지, 작성자 정보 포함)
+     */
     public static RecommendedPostDto from(Post post) {
         RecommendedPostDto dto = new RecommendedPostDto();
         dto.setId(post.getId());
         dto.setTitle(post.getTitle());
         dto.setPrice(post.getPrice());
 
-        // 이미지 처리
+        // 게시물 이미지 처리 -> 첫 번째 이미지 URL 설정
         if (post.getImages() != null && !post.getImages().isEmpty()) {
             dto.setFirstImageUrl(post.getImages().get(0).getImgUrl());
         } else {
@@ -38,6 +43,10 @@ public class RecommendedPostDto {
         return dto;
     }
 
+    /**
+     * 게시물 작성일시로부터 현재까지의 상대적인 시간을 문자열로 반환
+     * @return 상대적인 시간을 나타내는 문자열
+     */
     public String getRelativeTime() {
         LocalDateTime now = LocalDateTime.now();
         Duration duration = Duration.between(created, now);
