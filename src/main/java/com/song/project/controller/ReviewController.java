@@ -24,6 +24,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+/**
+ * 리뷰 관련 API를 제공하는 컨트롤러
+ */
 @Tag(name = "리뷰 API", description = "리뷰 관련 API")
 @Controller
 @RequiredArgsConstructor
@@ -31,7 +34,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class ReviewController {
     private final ReviewService reviewService;
 
-    // 리뷰 생성
+    /**
+     * 리뷰 생성 처리
+     */
     @PostMapping
     String Review(@RequestParam String content,
                         @RequestParam int rating,
@@ -39,6 +44,7 @@ public class ReviewController {
                         Authentication auth,
                         RedirectAttributes redirectAttributes) {
 
+        // 리뷰 생성 처리
         try {
             CustomUser user = getUserId(auth);
             Review review = reviewService.createReview(content, rating, targetUserId, user);
@@ -56,7 +62,10 @@ public class ReviewController {
         }
     }
 
-    @Operation(summary = "리뷰 삭제", description = "리뷰를 삭제합니다")
+    /**
+     * 리뷰 삭제 처리
+     */
+    @Operation(summary = "리뷰 삭제", description = "리뷰를 삭제합니다.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "삭제 성공"),
         @ApiResponse(responseCode = "400", description = "잘못된 요청"),
@@ -67,6 +76,8 @@ public class ReviewController {
     ResponseEntity<String> deleteReview(
         @PathVariable Long id, 
         Authentication auth) {
+
+        // 리뷰 삭제 처리
         try {
             CustomUser user = getUserId(auth);
             reviewService.deleteReview(id, user);
@@ -78,6 +89,13 @@ public class ReviewController {
         }
     }
 
+    // ===========================
+    // 헬퍼 메서드
+    // ===========================
+    
+    /**
+     * 유저 ID 조회
+     */
     private CustomUser getUserId(Authentication auth) {
         if (auth != null && auth.isAuthenticated()) {
             CustomUser user = (CustomUser) auth.getPrincipal();
