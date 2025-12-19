@@ -24,5 +24,5 @@ public class PostImage {
     @ManyToOne
     @JoinColumn(name = "post_id")
     @JsonBackReference
-    private Post post;
+    private Post post;    // 이미지가 속한 게시물
 }
