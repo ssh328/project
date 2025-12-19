@@ -12,18 +12,22 @@ import com.song.project.entity.PostStatus;
 @Getter
 @Setter
 public class PostListDto {
-    private Long id;
-    private String title;
-    private String body;
-    private Integer price;
-    private String category;
-    private LocalDateTime created;
-    private Integer like_cnt;
-    private PostStatus status;
-    private String firstImageUrl;
-    private String userId;
+    private Long id;   // 게시물 ID
+    private String title;   // 게시물 제목
+    private String body;   // 게시물 내용
+    private Integer price;   // 게시물 가격
+    private String category;   // 게시물 카테고리
+    private LocalDateTime created;   // 게시물 작성일시
+    private Integer like_cnt;   // 게시물 좋아요 수
+    private PostStatus status;   // 게시물 상태 (ON_SALE, RESERVED, SOLD)
+    private String firstImageUrl;   // 게시물 첫 번째 이미지 URL
+    private String userId;   // 게시물 작성자 ID
 
-    // Post 엔티티를 PostListDto로 변환하는 정적 메서드
+    /**
+     * Post 엔티티를 PostListDto로 변환하는 정적 메서드
+     * 이미지가 있는 경우 첫 번째 이미지 URL을 설정하고, 사용자 정보가 없는 경우 userId는 null로 설정
+     * @return PostListDto 객체 (엔티티의 모든 필드가 복사됨)
+     */
     public static PostListDto from(Post post) {
         PostListDto dto = new PostListDto();
         dto.setId(post.getId());
@@ -35,7 +39,7 @@ public class PostListDto {
         dto.setLike_cnt(post.getLikeCnt());
         dto.setStatus(post.getStatus());
 
-        // 이미지 처리
+        // 게시물 이미지 처리 -> 첫 번째 이미지 URL 설정
         if (post.getImages() != null && !post.getImages().isEmpty()) {
             dto.setFirstImageUrl(post.getImages().get(0).getImgUrl());
         } else {
@@ -46,6 +50,10 @@ public class PostListDto {
         return dto;
     }
 
+    /**
+     * 게시물 작성일시로부터 현재까지의 상대적인 시간을 문자열로 반환
+     * @return 상대적인 시간을 나타내는 문자열
+     */
     public String getRelativeTime() {
         LocalDateTime now = LocalDateTime.now();
         Duration duration = Duration.between(created, now);
@@ -66,6 +74,11 @@ public class PostListDto {
         return years + "년 전";
     }
 
+    /**
+     * 게시물 상태의 설명 문자열을 반환
+     * 상태가 null인 경우 빈 문자열을 반환
+     * @return 게시물 상태 설명 문자열 (예: "판매중", "예약중", "판매완료")
+     */
     public String getStatusDescription() {
         return status != null ? status.getDescription() : "";
     }
