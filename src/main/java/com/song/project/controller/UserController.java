@@ -21,20 +21,27 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.song.project.service.UserService;
 import com.song.project.service.UserService.ProfileResult;
 
+/**
+ * 유저 관련 API를 제공하는 컨트롤러
+ */
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/user")
 public class UserController {
     private final UserService userService;
 
-    // 마이페이지
+    /**
+     * 마이페이지 조회
+     */
     @GetMapping("/mypage")
     @PreAuthorize("isAuthenticated()")
     public String myPage() {
         return "user/mypage.html";
     }
 
-    // 내 게시물 목록
+    /**
+     * 내 게시물 목록 조회
+     */
     @GetMapping("/my/posts")
     @PreAuthorize("isAuthenticated()")
     public String getMyPosts(Model model, 
@@ -54,7 +61,9 @@ public class UserController {
         return "user/mypost.html";
     }
 
-    // 내 좋아요 목록
+    /**
+     * 내 좋아요 목록 조회
+     */
     @GetMapping("/my/likes")
     @PreAuthorize("isAuthenticated()")
     public String getMyLikes(Model model, 
@@ -74,7 +83,9 @@ public class UserController {
         return "user/mylike.html";
     }
 
-    // 설정 페이지
+    /**
+     * 설정 페이지 조회
+     */
     @GetMapping("/setting")
     @PreAuthorize("isAuthenticated()")
     public String setting(Model model, 
@@ -86,7 +97,9 @@ public class UserController {
         return "user/setting.html";
     }
 
-    // 프로필 이미지 업로드
+    /**
+     * 프로필 이미지 업로드
+     */
     @PostMapping("/my/{userId}/profile-image")
     @PreAuthorize("isAuthenticated()")
     public String uploadProfileImage(@PathVariable Long userId, 
@@ -96,7 +109,9 @@ public class UserController {
         return "redirect:/setting";
     }
 
-    // 프로필 페이지
+    /**
+     * 프로필 페이지 조회
+     */
     @GetMapping("/profile/{username}")
     String profileUser(Model model, @PathVariable String username, 
                        @RequestParam(defaultValue = "1") int postPage,
@@ -108,7 +123,6 @@ public class UserController {
 
         ProfileResult result = userService.getProfileResult(username, postPage, reviewPage, loginUserId);
 
-        // 모델 설정
         model.addAttribute("user", result.getUser());
         model.addAttribute("posts", result.getPosts());
         model.addAttribute("reviews", result.getReviews());
@@ -124,7 +138,9 @@ public class UserController {
         return "user/profile.html";
     }
 
-    // 이메일/비밀번호 확인 페이지
+    /**
+     * 이메일/비밀번호 확인 페이지 조회
+     */
     @GetMapping("/verify-password")
     @PreAuthorize("isAuthenticated()")
     public String verifyPasswordForm(Model model, 
@@ -133,7 +149,9 @@ public class UserController {
         return "user/verify-password.html";
     }
 
-    // 이메일/비밀번호 확인 -> HttpOnly cookie 발급 후 리다이렉트
+    /**
+     * 이메일/비밀번호 확인 -> HttpOnly cookie 발급 후 리다이렉트
+     */
     @PostMapping("/verify-password")
     @PreAuthorize("isAuthenticated()")
     public String verifyPassword(@RequestParam String email, 
@@ -144,6 +162,7 @@ public class UserController {
                                 RedirectAttributes redirectAttributes) {
         Long loginUserId = getUserId(auth);
 
+        // 이메일/비밀번호 확인 처리
         try {
             String verifiedToken = userService.verifyPassword(loginUserId, email, password);
 
@@ -165,14 +184,18 @@ public class UserController {
         }
     }
 
-    // 비밀번호 변경 페이지
+    /**
+     * 비밀번호 변경 페이지 조회
+     */
     @GetMapping("/change-password")
     @PreAuthorize("isAuthenticated()")
     public String changePasswordForm() {
         return "user/change-password.html";
     }
 
-    // 비밀번호 변경
+    /**
+     * 비밀번호 변경 처리
+     */
     @PostMapping("/change-password")
     @PreAuthorize("isAuthenticated()")
     public String changePassword(@CookieValue(value = "verified_token", required = false) String verifiedToken, 
@@ -180,6 +203,7 @@ public class UserController {
                                  Authentication auth, 
                                  RedirectAttributes redirectAttributes, 
                                  HttpServletResponse response) {
+        // 본인 인증 토큰 검증
         String validationError = validateVerifiedToken(verifiedToken);
         if (validationError != null) {
             redirectAttributes.addFlashAttribute("errorMessage", validationError);
@@ -188,6 +212,7 @@ public class UserController {
 
         Long loginUserId = getUserId(auth);
 
+        // 비밀번호 변경 처리
         try {
             userService.changePassword(loginUserId, newPassword);
             
@@ -203,20 +228,25 @@ public class UserController {
         }
     }
 
-    // 계정 삭제 페이지
+    /**
+     * 계정 삭제 페이지 조회
+     */
     @GetMapping("/delete-account")
     @PreAuthorize("isAuthenticated()")
     public String deleteAccountForm() {
         return "user/delete-account.html";
     }
 
-    // 계정 삭제
+    /**
+     * 계정 삭제 처리
+     */
     @PostMapping("/delete-account")
     @PreAuthorize("isAuthenticated()")
     public String deleteAccount(@CookieValue(value = "verified_token", required = false) String verifiedToken,
                                Authentication auth,
                                RedirectAttributes redirectAttributes,
                                HttpServletResponse response) {
+        // 본인 인증 토큰 검증
         String validationError = validateVerifiedToken(verifiedToken);
         if (validationError != null) {
             redirectAttributes.addFlashAttribute("errorMessage", validationError);
@@ -225,6 +255,7 @@ public class UserController {
 
         Long loginUserId = getUserId(auth);
 
+        // 계정 삭제 처리
         try {
             userService.deleteAccount(loginUserId);
             
@@ -244,6 +275,9 @@ public class UserController {
     // 헬퍼 메서드
     // ===========================
 
+    /**
+     * 유저 ID 조회
+     */
     private Long getUserId(Authentication auth) {
         if (auth != null && auth.isAuthenticated()) {
             CustomUser user = (CustomUser) auth.getPrincipal();
@@ -252,7 +286,9 @@ public class UserController {
         return null;
     }
 
-    // 본인 인증 토큰 쿠키를 설정
+    /**
+     * 본인 인증 토큰 쿠키를 설정
+     */
     private void setVerifiedTokenCookie(HttpServletResponse response, String verifiedToken) {
         ResponseCookie cookie = ResponseCookie.from("verified_token", verifiedToken)
                 .httpOnly(true)
@@ -264,13 +300,17 @@ public class UserController {
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
-    // 본인 인증 토큰 쿠키를 삭제
+    /**
+     * 본인 인증 토큰 쿠키를 삭제
+     */
     private void clearVerifiedTokenCookie(HttpServletResponse response) {
         ResponseCookie cookie = createResponseCookie("verified_token", "", 0);
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
-    // 모든 인증 관련 쿠키를 삭제 (JWT + verified_token)
+    /**
+     * 모든 인증 관련 쿠키를 삭제 (JWT + verified_token)
+     */
     private void clearAllAuthCookies(HttpServletResponse response) {
         ResponseCookie jwtCookie = createResponseCookie("jwt", "", 0);
         ResponseCookie verifiedCookie = createResponseCookie("verified_token", "", 0);
@@ -278,7 +318,9 @@ public class UserController {
         response.addHeader(HttpHeaders.SET_COOKIE, verifiedCookie.toString());
     }
 
-    // ResponseCookie를 생성
+    /**
+     * ResponseCookie를 생성
+     */
     private ResponseCookie createResponseCookie(String name, String value, int maxAge) {
         return ResponseCookie.from(name, value)
                 .httpOnly(true)
@@ -289,9 +331,11 @@ public class UserController {
                 .build();
     }
 
-    // 본인 인증 토큰을 검증
-    // @param verifiedToken 검증할 토큰
-    // @return 검증 실패 시 에러 메시지, 성공 시 null
+    /**
+     * 본인 인증 토큰을 검증
+     * @param verifiedToken 검증할 토큰
+     * @return 검증 실패 시 에러 메시지, 성공 시 null
+     */
     private String validateVerifiedToken(String verifiedToken) {
         if (verifiedToken == null) {
             return "본인 인증이 필요합니다.";
