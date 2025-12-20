@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <th:block th:replace="partial/header.html :: headerfrag"></th:block>
+    <th:block th:replace="~{partial/header.html :: headerfrag}"></th:block>
 </head>
 
 <body class="d-flex flex-column vh-100">
@@ -54,7 +54,7 @@
         </div>
     </main>
 
-    <th:block th:replace="partial/footer.html :: footerFragment"></th:block>
+    <th:block th:replace="~{partial/footer.html :: footerFragment}"></th:block>
 
     <!-- 부트스트랩 유효성 검사 -->
     <script>
