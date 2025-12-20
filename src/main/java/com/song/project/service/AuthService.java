@@ -11,6 +11,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 인증 관련 비즈니스 로직을 처리하는 서비스
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -19,7 +22,16 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // 회원가입 처리
+    /**
+     * 회원가입 처리
+     * 아이디와 비밀번호 유효성 검사 후 사용자 생성
+     * @param userId 사용자 ID (4-20자, 영문/숫자만)
+     * @param password 비밀번호 (8-20자, 영문/숫자 포함)
+     * @param username 사용자명
+     * @param email 이메일
+     * @return 회원가입 결과 (사용자 ID, 이름, 이메일)
+     * @throws BadRequestException 아이디 중복, 유효성 검사 실패 시
+     */
     public RegisterResult register(String userId, String password, String username, String email) {
 
         if (userRepository.findByUser_id(userId).isPresent()) {
@@ -56,7 +68,9 @@ public class AuthService {
         return new RegisterResult(savedUser);
     }
 
-    // DTO 클래스
+    /**
+     * 회원가입 결과를 담는 DTO
+     */
     @Getter
     public static class RegisterResult {
         private final Long id;

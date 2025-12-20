@@ -18,17 +18,32 @@ import com.song.project.security.CustomUser;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * 리뷰 관련 비즈니스 로직을 처리하는 서비스
+ */
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
 
+    /**
+     * 리뷰 생성
+     * @param content 리뷰 내용
+     * @param rating 평점
+     * @param targetUserId 리뷰 대상 사용자 ID
+     * @param customUser 리뷰 작성자 정보
+     * @return 생성된 리뷰
+     * @throws NotFoundException 사용자 또는 리뷰 대상을 찾을 수 없는 경우
+     * @throws BadRequestException 리뷰 생성 실패 시
+     */
     @Transactional
     public Review createReview(String content, int rating, Long targetUserId, CustomUser customUser) {
+
         User reviewer = userRepository.findByUsername(customUser.getUsername())
             .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
 
+        // 리뷰 대상 사용자 조회
         User targetUser = userRepository.findById(targetUserId)
             .orElseThrow(() -> new NotFoundException("리뷰 대상 사용자를 찾을 수 없습니다."));
 
@@ -45,11 +60,21 @@ public class ReviewService {
         }
     }
 
+    /**
+     * 리뷰 삭제
+     * 작성자만 삭제 가능
+     * @param reviewId 삭제할 리뷰 ID
+     * @param customUser 현재 로그인한 사용자 정보
+     * @throws NotFoundException 리뷰를 찾을 수 없는 경우
+     * @throws ForbiddenException 작성자가 아닌 경우
+     * @throws BadRequestException 리뷰 삭제 실패 시
+     */
     @Transactional
     public void deleteReview(Long reviewId, CustomUser customUser) {
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new NotFoundException("리뷰를 찾을 수 없습니다."));
 
+        // 작성자 권한 확인
         if (!review.getReviewer().getUsername().equals(customUser.getUsername())) {
             throw new ForbiddenException("본인이 작성한 리뷰만 삭제할 수 있습니다.");
         }
@@ -61,6 +86,12 @@ public class ReviewService {
         }
     }
 
+    /**
+     * 사용자명을 URL 인코딩
+     * URL 파라미터로 사용하기 위해 인코딩하며, 공백은 %20으로 변환
+     * @param username 인코딩할 사용자명
+     * @return URL 인코딩된 사용자명
+     */
     public String encodeUsername(String username) {
         return URLEncoder.encode(
             username,

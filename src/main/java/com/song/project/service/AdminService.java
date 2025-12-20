@@ -20,6 +20,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * 관리자 관련 비즈니스 로직을 처리하는 서비스
+ */
 @Service
 @RequiredArgsConstructor
 public class AdminService {
@@ -30,7 +33,10 @@ public class AdminService {
     private final LikeRepository likeRepository;
     private final S3Service s3Service;
 
-    // 대시보드 통계
+    /**
+     * 대시보드 통계 정보 조회
+     * @return 사용자 수, 게시글 수, 리뷰 수, 좋아요 수를 포함한 통계 정보
+     */
     public DashboardStats getDashboardStats() {
         long totalUsers = userRepository.count();
         long totalPosts = postRepository.count();
@@ -40,7 +46,13 @@ public class AdminService {
         return new DashboardStats(totalUsers, totalPosts, totalReviews, totalLikes);
     }
 
-    // 사용자 목록 (검색 + 페이징)
+    /**
+     * 사용자 목록을 검색 및 페이지네이션과 함께 조회
+     * @param keyword 검색 키워드 (사용자명 또는 이메일, 선택적)
+     * @param page 페이지 번호 (기본값: 1)
+     * @param size 페이지 크기
+     * @return 사용자 페이지
+     */
     public Page<User> getUsers(String keyword, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "id"));
 
@@ -51,7 +63,15 @@ public class AdminService {
         return userRepository.fullTextSearchUsernameOrEmail(keyword, pageRequest);
     }
 
-    // 게시글 목록 (검색 + 상태 필터 + 페이징)
+    /**
+     * 게시글 목록을 검색, 필터링 및 페이지네이션과 함께 조회
+     * @param keyword 검색 키워드 (게시글 제목, 선택적)
+     * @param category 카테고리 필터 (선택적)
+     * @param status 게시글 상태 필터 (선택적)
+     * @param page 페이지 번호 (기본값: 1)
+     * @param size 페이지 크기
+     * @return 게시글 페이지
+     */
     public Page<Post> getPosts(String keyword, String category, PostStatus status, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "created"));
 
@@ -64,13 +84,23 @@ public class AdminService {
         return postRepository.findWithFilter(category, null, null, status, pageRequest);
     }
 
-    // 리뷰 목록 (페이징)
+    /**
+     * 리뷰 목록을 페이지네이션과 함께 조회
+     * @param page 페이지 번호 (기본값: 1)
+     * @param size 페이지 크기
+     * @return 리뷰 페이지
+     */
     public Page<Review> getReviews(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         return reviewRepository.findAll(pageRequest);
     }
 
-    // 게시글 삭제 (관리자용 - 작성자와 무관하게 삭제 가능)
+    /**
+     * 관리자 권한으로 게시글 삭제
+     * 작성자와 무관하게 삭제 가능, S3에 저장된 이미지도 함께 삭제
+     * @param postId 삭제할 게시글 ID
+     * @throws IllegalArgumentException 게시글을 찾을 수 없는 경우
+     */
     public void deletePostAsAdmin(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
@@ -87,7 +117,11 @@ public class AdminService {
         postRepository.delete(post);
     }
 
-    // 리뷰 삭제 (관리자용)
+    /**
+     * 관리자 권한으로 리뷰 삭제
+     * @param reviewId 삭제할 리뷰 ID
+     * @throws IllegalArgumentException 리뷰를 찾을 수 없는 경우
+     */
     public void deleteReviewAsAdmin(Long reviewId) {
         if (!reviewRepository.existsById(reviewId)) {
             throw new IllegalArgumentException("리뷰를 찾을 수 없습니다.");
@@ -95,7 +129,9 @@ public class AdminService {
         reviewRepository.deleteById(reviewId);
     }
 
-    // DTO
+    /**
+     * 대시보드 통계 정보를 담는 DTO
+     */
     @Getter
     public static class DashboardStats {
         private final long totalUsers;

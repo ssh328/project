@@ -32,6 +32,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 게시글 관련 비즈니스 로직을 처리하는 서비스
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -45,7 +48,16 @@ public class PostService {
     private final RecommendedPostService recommendedPostService;
     private final S3Service s3Service;
 
-    // 게시물 목록 조회
+    /**
+     * 게시물 목록을 필터링 및 페이지네이션과 함께 조회
+     * @param category 카테고리 필터 (선택적)
+     * @param startPrice 최소 가격 필터 (선택적)
+     * @param endPrice 최대 가격 필터 (선택적)
+     * @param status 게시글 상태 필터 (선택적)
+     * @param page 페이지 번호 (기본값: 1)
+     * @param sortBy 정렬 기준 ("hottest": 인기순, 그 외: 최신순)
+     * @return 게시물 목록 페이지
+     */
     public Page<PostListDto> getPosts(String category,
                                       Integer startPrice,
                                       Integer endPrice,
@@ -63,14 +75,24 @@ public class PostService {
         return data.map(PostListDto::from);
     }
 
-    // 게시물 검색 조회
+    /**
+     * 게시물을 검색어로 조회
+     * @param searchText 검색어
+     * @param page 페이지 번호 (기본값: 1)
+     * @return 검색 결과 페이지
+     */
     public Page<PostListDto> searchPosts(String searchText, int page) {
         PageRequest pageRequest = PageRequest.of(page - 1, 20);
         Page<Post> data = postRepository.fullTextSearchWithPaging(searchText, pageRequest);
         return data.map(PostListDto::from);
     }
 
-    // 게시물 목록 결과
+    /**
+     * 게시물 목록 결과 생성 (좋아요 여부, 조회수 포함)
+     * @param postDtos 게시물 목록 페이지
+     * @param userId 현재 로그인한 사용자 ID (선택적)
+     * @return 게시물 목록 결과
+     */
     public PostListResult getPostListResult(Page<PostListDto> postDtos, Long userId) {
         List<Long> likedPostIds = getLikedPostIds(userId);
         List<Long> postIds = postDtos.stream()
@@ -81,13 +103,22 @@ public class PostService {
         return new PostListResult(postDtos, likedPostIds, viewCounts);
     }
 
-    // 검색 결과
+    /**
+     * 검색 결과 생성 (좋아요 여부 포함)
+     * @param postDtos 검색 결과 페이지
+     * @param userId 현재 로그인한 사용자 ID (선택적)
+     * @return 검색 결과
+     */
     public SearchResult getSearchResult(Page<PostListDto> postDtos, Long userId) {
         List<Long> likedPostIds = getLikedPostIds(userId);
         return new SearchResult(postDtos, likedPostIds);
     }
 
-    // 상태 파라미터 파싱
+    /**
+     * 상태 문자열을 PostStatus enum으로 파싱
+     * @param status 상태 문자열 (선택적)
+     * @return 파싱 결과 (PostStatus, 선택된 상태 문자열)
+     */
     public PostStatusParseResult getPostStatusParseResult(String status) {
         PostStatus postStatus = null;
         String selectedStatus = null;
@@ -102,7 +133,11 @@ public class PostService {
         return new PostStatusParseResult(postStatus, selectedStatus);
     }
 
-    // 현재 로그인 사용자가 좋아요한 게시물 ID 목록
+    /**
+     * 현재 로그인 사용자가 좋아요한 게시물 ID 목록 조회
+     * @param userId 사용자 ID (null이면 빈 리스트 반환)
+     * @return 좋아요한 게시물 ID 목록
+     */
     public List<Long> getLikedPostIds(Long userId) {
         if (userId == null) {
             return List.of();
@@ -113,18 +148,35 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    // 여러 게시물에 대한 Redis 조회수 조회
+    /**
+     * 여러 게시물에 대한 조회수 조회
+     * @param postIds 게시물 ID 목록
+     * @return 게시물 ID와 조회수를 담은 Map
+     */
     public Map<Long, Long> getViewCountsForPosts(List<Long> postIds) {
         return postViewCountService.getViewCountsForPosts(postIds);
     }
 
-    // 게시물 단건 조회 (없으면 예외)
+    /**
+     * 게시물 단건 조회 (없으면 예외 발생)
+     * @param postId 게시물 ID
+     * @return 게시물 엔티티
+     * @throws NotFoundException 게시물을 찾을 수 없는 경우
+     */
     public Post getPostOrThrow(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("게시글을 찾을 수 없습니다."));
     }
 
-    // 상세 페이지 결과 조회
+    /**
+     * 게시물 상세 페이지 결과 조회
+     * 조회수 증가 및 추천 게시글 포함
+     * @param postId 게시물 ID
+     * @param loginUserId 로그인한 사용자 ID (선택적)
+     * @param viewToken 비로그인 사용자용 조회 토큰 (선택적)
+     * @return 게시물 상세 결과
+     * @throws NotFoundException 게시물을 찾을 수 없는 경우
+     */
     public PostDetailResult getPostDetailResult(Long postId, Long loginUserId, String viewToken) {
         Post post = getPostOrThrow(postId);
         Long viewCount = incrementViewCount(postId, loginUserId, viewToken);
@@ -134,12 +186,22 @@ public class PostService {
         return new PostDetailResult(post, post.getUser().getId(), loginUserId, viewCount, recommendedPosts);
     }
 
-    // 조회수 증가 및 현재 조회수 반환
+    /**
+     * 조회수 증가 및 현재 조회수 반환
+     * @param postId 게시물 ID
+     * @param loginUserId 로그인한 사용자 ID (선택적)
+     * @param viewToken 비로그인 사용자용 조회 토큰 (선택적)
+     * @return 증가된 조회수
+     */
     public Long incrementViewCount(Long postId, Long loginUserId, String viewToken) {
         return postViewCountService.incrementAndGetViewCount(postId, loginUserId, viewToken);
     }
 
-    // 카테고리 기반 추천 게시물 목록
+    /**
+     * 카테고리 기반 추천 게시물 목록 조회
+     * @param currentPost 현재 게시물
+     * @return 추천 게시물 목록
+     */
     @Transactional(readOnly = true)
     public List<RecommendedPostDto> getRecommendedPostsByCategory(Post currentPost) {
         // RecommendedPostService에서 이미 EntityGraph로 조회한 Post 객체를 재사용
@@ -150,7 +212,14 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    // 게시글 생성
+    /**
+     * 게시글 생성
+     * @param userId 작성자 ID
+     * @param dto 게시글 생성 정보
+     * @return 생성된 게시글
+     * @throws NotFoundException 사용자를 찾을 수 없는 경우
+     * @throws BadRequestException 게시글 생성 실패 시
+     */
     @Transactional
     public Post createPost(Long userId, PostCreateDto dto) {
         var user = userRepository.findById(userId)
@@ -196,7 +265,16 @@ public class PostService {
         return saved;
     }
 
-    // 게시글 수정
+    /**
+     * 게시글 수정
+     * 작성자만 수정 가능
+     * @param dto 게시글 수정 정보
+     * @param userId 현재 로그인한 사용자 ID
+     * @return 수정된 게시글
+     * @throws NotFoundException 게시글을 찾을 수 없는 경우
+     * @throws UnauthorizedException 작성자가 아닌 경우
+     * @throws BadRequestException 게시글 수정 실패 시
+     */
     @Transactional
     public Post updatePost(PostUpdateDto dto, Long userId) {
         Post post = postRepository.findById(dto.getPostId())
@@ -242,7 +320,15 @@ public class PostService {
         return updated;
     }
 
-    // 게시글 삭제
+    /**
+     * 게시글 삭제
+     * 작성자만 삭제 가능, S3 이미지도 함께 삭제
+     * @param postId 삭제할 게시글 ID
+     * @param userId 현재 로그인한 사용자 ID
+     * @throws NotFoundException 게시글을 찾을 수 없는 경우
+     * @throws ForbiddenException 작성자가 아닌 경우
+     * @throws BadRequestException 게시글 삭제 실패 시
+     */
     @Transactional
     public void deletePost(Long postId, Long userId) {
         Post post = postRepository.findById(postId)
@@ -270,7 +356,14 @@ public class PostService {
 
     }
 
-    // 게시글 이미지 단건 삭제
+    /**
+     * 게시글 이미지 단건 삭제
+     * 작성자만 삭제 가능, S3 이미지도 함께 삭제
+     * @param imageId 삭제할 이미지 ID
+     * @param userId 현재 로그인한 사용자 ID
+     * @throws NotFoundException 이미지 또는 게시글을 찾을 수 없는 경우
+     * @throws ForbiddenException 작성자가 아닌 경우
+     */
     public void deleteImage(Long imageId, Long userId) {
         PostImage img = postImageRepository.findById(imageId)
                 .orElseThrow(() -> new NotFoundException("이미지를 찾을 수 없습니다."));
@@ -290,7 +383,16 @@ public class PostService {
         postImageRepository.delete(img);
     }
 
-    // 게시글 상태 변경
+    /**
+     * 게시글 상태 변경
+     * 작성자만 변경 가능
+     * @param postId 게시글 ID
+     * @param dto 상태 변경 정보
+     * @param userId 현재 로그인한 사용자 ID
+     * @return 변경된 게시글 상태
+     * @throws NotFoundException 게시글을 찾을 수 없는 경우
+     * @throws ForbiddenException 작성자가 아닌 경우
+     */
     public PostStatus updateStatus(Long postId, PostStatusUpdateDto dto, Long userId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("게시글을 찾을 수 없습니다."));
@@ -313,7 +415,10 @@ public class PostService {
     // 유틸리티
     // ===========================
 
-    // 카테고리 목록 반환
+    /**
+     * 카테고리 목록 반환
+     * @return 카테고리 목록
+     */
     public List<String> getCategories() {
         return List.of(
             "디지털기기", "생활가전", "가구/인테리어", "생활/주방",
@@ -325,7 +430,15 @@ public class PostService {
         );
     }
 
-    // 수정용 게시글 조회 (권한 체크 포함)
+    /**
+     * 수정용 게시글 조회 (권한 체크 포함)
+     * 작성자만 조회 가능
+     * @param postId 게시글 ID
+     * @param userId 현재 로그인한 사용자 ID
+     * @return 게시글 엔티티
+     * @throws NotFoundException 게시글을 찾을 수 없는 경우
+     * @throws UnauthorizedException 작성자가 아닌 경우
+     */
     public Post getPostForEdit(Long postId, Long userId) {
         Post post = getPostOrThrow(postId);
         if (!post.getUser().getId().equals(userId)) {
@@ -334,13 +447,20 @@ public class PostService {
         return post;
     }
 
-    // 사용자명으로 게시글 목록 조회
+    /**
+     * 사용자명으로 게시글 목록 조회
+     * @param username 사용자명
+     * @param page 페이지 번호 (기본값: 1)
+     * @return 게시글 페이지
+     */
     public Page<Post> getPostsByUsername(String username, int page) {
         PageRequest pageRequest = PageRequest.of(page - 1, 20);
         return postRepository.findByUser_Username(username, pageRequest);
     }
 
-    // DTO 클래스
+    /**
+     * 게시물 목록 결과를 담는 DTO
+     */
     @Getter
     public static class PostListResult {
         private Page<PostListDto> posts;
@@ -354,6 +474,9 @@ public class PostService {
         }
     }
 
+    /**
+     * 검색 결과를 담는 DTO
+     */
     @Getter
     public static class SearchResult {
         private Page<PostListDto> posts;
@@ -365,6 +488,9 @@ public class PostService {
         }
     }
 
+    /**
+     * 상태 파싱 결과를 담는 DTO
+     */
     @Getter
     public static class PostStatusParseResult {
         private PostStatus postStatus;
@@ -376,6 +502,9 @@ public class PostService {
         }
     }
 
+    /**
+     * 게시물 상세 결과를 담는 DTO
+     */
     @Getter
     public static class PostDetailResult {
         private Post post;
