@@ -321,6 +321,36 @@ public class PostService {
     }
 
     /**
+     * 게시글 삭제 공통 로직
+     * S3 이미지 삭제, 좋아요 삭제, DB 삭제를 수행하는 공통 메서드
+     * 일반 사용자용 deletePost()와 관리자용 AdminService.deletePostAsAdmin()에서 공통으로 사용
+     * @param post 삭제할 Post 엔티티 (이미 조회된 상태여야 함)
+     * @throws BadRequestException 게시물 삭제 실패 시
+     */
+    @Transactional
+    public void deletePostInternal(Post post) {
+        // S3에 저장된 게시글 이미지 삭제
+        for (PostImage img : post.getImages()) {
+            String key = s3Service.extractS3Key(img.getImgUrl());
+            s3Service.deleteFile(key);
+        }
+
+        try {
+            // 게시글에 달린 좋아요 삭제
+            likeRepository.deleteAllByPostId(post.getId());
+            
+            // 게시글 엔티티 삭제
+            postRepository.delete(post);
+            
+            log.info("게시글 삭제 성공: postId={}, title={}", 
+                post.getId(), post.getTitle());
+        } catch (Exception e) {
+            log.error("게시물 삭제 실패: postId={}, title={}", post.getId(), post.getTitle(), e);
+            throw new BadRequestException("게시물 삭제에 실패했습니다.");
+        }
+    }
+
+    /**
      * 게시글 삭제
      * 작성자만 삭제 가능, S3 이미지도 함께 삭제
      * @param postId 삭제할 게시글 ID
@@ -338,21 +368,7 @@ public class PostService {
             throw new ForbiddenException("본인이 작성한 게시글만 삭제할 수 있습니다.");
         }
 
-        // S3 이미지 삭제
-        for (PostImage img : post.getImages()) {
-            String key = s3Service.extractS3Key(img.getImgUrl());
-            s3Service.deleteFile(key);
-        }
-        
-        try {    
-            likeRepository.deleteAllByPostId(postId);
-            postRepository.delete(post);
-            log.info("게시글 삭제 성공: postId={}, title={}, userId={}", 
-                postId, post.getTitle(), userId);
-        } catch (Exception e) {
-            log.error("게시물 삭제 실패: postId={}, userId={}", postId, userId, e);
-            throw new BadRequestException("게시물 삭제에 실패했습니다.");
-        }
+        deletePostInternal(post);
 
     }
 

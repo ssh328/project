@@ -1,10 +1,10 @@
 package com.song.project.service;
 
 import com.song.project.entity.Post;
-import com.song.project.entity.PostImage;
 import com.song.project.entity.PostStatus;
 import com.song.project.entity.Review;
 import com.song.project.entity.User;
+import com.song.project.exception.NotFoundException;
 import com.song.project.repository.LikeRepository;
 import com.song.project.repository.PostRepository;
 import com.song.project.repository.ReviewRepository;
@@ -18,8 +18,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 /**
  * 관리자 관련 비즈니스 로직을 처리하는 서비스
  */
@@ -31,7 +29,7 @@ public class AdminService {
     private final PostRepository postRepository;
     private final ReviewRepository reviewRepository;
     private final LikeRepository likeRepository;
-    private final S3Service s3Service;
+    private final PostService postService;
 
     /**
      * 대시보드 통계 정보 조회
@@ -99,22 +97,13 @@ public class AdminService {
      * 관리자 권한으로 게시글 삭제
      * 작성자와 무관하게 삭제 가능, S3에 저장된 이미지도 함께 삭제
      * @param postId 삭제할 게시글 ID
-     * @throws IllegalArgumentException 게시글을 찾을 수 없는 경우
+     * @throws NotFoundException 게시글을 찾을 수 없는 경우
      */
     public void deletePostAsAdmin(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("게시글을 찾을 수 없습니다."));
 
-        // S3 이미지 삭제
-        List<PostImage> images = post.getImages();
-        if (images != null) {
-            for (PostImage img : images) {
-                String key = s3Service.extractS3Key(img.getImgUrl());
-                s3Service.deleteFile(key);
-            }
-        }
-
-        postRepository.delete(post);
+        postService.deletePostInternal(post);
     }
 
     /**
