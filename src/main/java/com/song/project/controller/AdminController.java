@@ -4,6 +4,7 @@ import com.song.project.entity.Post;
 import com.song.project.entity.PostStatus;
 import com.song.project.entity.Review;
 import com.song.project.entity.User;
+import com.song.project.exception.NotFoundException;
 import com.song.project.service.AdminService;
 import com.song.project.service.AdminService.DashboardStats;
 import com.song.project.service.PostService;
@@ -11,14 +12,17 @@ import com.song.project.service.PostService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 관리자 관련 API를 제공하는 컨트롤러
@@ -127,13 +131,17 @@ public class AdminController {
      * @param keyword 삭제 후 유지할 검색 키워드 (선택적)
      * @return 게시물 목록 페이지로의 리다이렉트 URL
      */
-    @PostMapping("/posts/{id}/delete")
-    public String deletePost(@PathVariable Long id,
+    @DeleteMapping("/posts/{id}/delete")
+    @ResponseBody
+    ResponseEntity<String> deletePost(@PathVariable Long id,
                              @RequestParam(defaultValue = "1") int page,
                              @RequestParam(required = false) String keyword) {
-        adminService.deletePostAsAdmin(id);
-        return "redirect:/admin/posts?page=" + page +
-                (keyword != null ? "&keyword=" + keyword : "");
+        try {
+            adminService.deletePostAsAdmin(id);
+            return ResponseEntity.ok("삭제완료");
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
     }
 
     /**
