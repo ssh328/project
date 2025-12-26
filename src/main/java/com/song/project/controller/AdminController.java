@@ -19,7 +19,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -151,10 +150,15 @@ public class AdminController {
      * @param page 삭제 후 이동할 페이지 번호 (기본값: 1)
      * @return 리뷰 목록 페이지로의 리다이렉트 URL
      */
-    @PostMapping("/reviews/{id}/delete")
-    public String deleteReview(@PathVariable Long id,
-                               @RequestParam(defaultValue = "1") int page) {
-        adminService.deleteReviewAsAdmin(id);
-        return "redirect:/admin/reviews?page=" + page;
+    @DeleteMapping("/reviews/{id}/delete")
+    @ResponseBody
+    public ResponseEntity<String> deleteReview(@PathVariable Long id,
+                                                @RequestParam(defaultValue = "1") int page) {
+        try {
+            adminService.deleteReviewAsAdmin(id);
+            return ResponseEntity.ok("삭제완료");
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
     }
 }
