@@ -61,6 +61,22 @@ public class ReviewService {
     }
 
     /**
+     * 리뷰 삭제 공통 로직
+     * DB 삭제를 수행하는 공통 메서드
+     * 일반 사용자용 deleteReview()와 관리자용 AdminService.deleteReviewAsAdmin()에서 공통으로 사용
+     * @param review 삭제할 Review 엔티티 (이미 조회된 상태여야 함)
+     * @throws BadRequestException 리뷰 삭제 실패 시
+     */
+    @Transactional
+    public void deleteReviewInternal(Review review) {
+        try {
+            reviewRepository.delete(review);
+        } catch (Exception e) {
+            throw new BadRequestException("리뷰 삭제에 실패했습니다.");
+        }
+    }
+
+    /**
      * 리뷰 삭제
      * 작성자만 삭제 가능
      * @param reviewId 삭제할 리뷰 ID
@@ -79,11 +95,7 @@ public class ReviewService {
             throw new ForbiddenException("본인이 작성한 리뷰만 삭제할 수 있습니다.");
         }
         
-        try {
-            reviewRepository.delete(review);
-        } catch (Exception e) {
-            throw new BadRequestException("리뷰 삭제에 실패했습니다.");
-        }
+        deleteReviewInternal(review);
     }
 
     /**

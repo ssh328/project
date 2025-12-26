@@ -30,6 +30,7 @@ public class AdminService {
     private final ReviewRepository reviewRepository;
     private final LikeRepository likeRepository;
     private final PostService postService;
+    private final ReviewService reviewService;
 
     /**
      * 대시보드 통계 정보 조회
@@ -109,13 +110,13 @@ public class AdminService {
     /**
      * 관리자 권한으로 리뷰 삭제
      * @param reviewId 삭제할 리뷰 ID
-     * @throws IllegalArgumentException 리뷰를 찾을 수 없는 경우
+     * @throws NotFoundException 리뷰를 찾을 수 없는 경우
      */
     public void deleteReviewAsAdmin(Long reviewId) {
-        if (!reviewRepository.existsById(reviewId)) {
-            throw new IllegalArgumentException("리뷰를 찾을 수 없습니다.");
-        }
-        reviewRepository.deleteById(reviewId);
+        Review review = reviewRepository.findById(reviewId)
+            .orElseThrow(() -> new NotFoundException("리뷰를 찾을 수 없습니다."));
+
+        reviewService.deleteReviewInternal(review);
     }
 
     /**
