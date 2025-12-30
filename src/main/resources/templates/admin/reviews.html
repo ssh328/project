@@ -56,43 +56,25 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+        
+<script src="/js/review/reviewDelete.js"></script>
 <script th:inline="javascript">
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-    const csrfHeader = document.querySelector('meta[name="csrf-header"]')?.getAttribute('content');
-
-    document.querySelectorAll('.admin-delete-review-btn').forEach(btn => {
-        btn.addEventListener('click', async function() {
-            if (!confirm('정말 이 리뷰를 삭제하시겠습니까?')) {
-                return;
-            }
-
-            const reviewId = this.getAttribute('data-review-id');
-            const page = this.getAttribute('data-page');
-            
-            try {
-                const response = await fetch(`/admin/reviews/${reviewId}/delete?page=${page}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        [csrfHeader]: csrfToken
-                    }
-                });
-
-                if (response.ok) {
-                    const message = await response.text();
-                    // 삭제 성공 시 페이지 리다이렉트
-                    const redirectUrl = `/admin/reviews?page=${page}`;
-                    window.location.href = redirectUrl;
-                    alert(message);
-                } else {
-                    alert(message);
-                }
-
-            } catch (err) {
-                console.error('삭제 실패:', err);
-                alert('삭제 중 오류가 발생했습니다.');
-            }
-        });
+    // 관리자 페이지용 리뷰 삭제
+    initReviewDelete({
+        selector: '.admin-delete-review-btn',
+        endpoint: (reviewId, btn) => {
+            const page = btn.getAttribute('data-page');
+            return `/admin/reviews/${reviewId}/delete?page=${page}`;
+        },
+        dataAttribute: 'data-review-id',
+        confirmMessage: '정말 이 리뷰를 삭제하시겠습니까?',
+        onSuccess: (reviewId, message, btn) => {
+            const page = btn.getAttribute('data-page');
+            const redirectUrl = `/admin/reviews?page=${page}`;
+            window.location.href = redirectUrl;
+            alert(message);
+        },
+        errorMessage: '삭제 중 오류가 발생했습니다.'
     });
 </script>
 </body>
