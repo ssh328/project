@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
          * 성공 시 게시글 목록 페이지로 이동
          * 실패 시 에러 메시지 표시 및 버튼 복원
          */
-        deleteButton.addEventListener('click', function() {
+        deleteButton.addEventListener('click', async function() {
             // data 속성에서 게시글 ID 추출
             const postId = deleteButton.getAttribute('data-post-id');
             if (!postId) {
@@ -46,32 +46,30 @@ document.addEventListener('DOMContentLoaded', function() {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             const csrfHeader = document.querySelector('meta[name="csrf-header"]')?.getAttribute('content');
             
-            // 게시글 삭제 API 요청
-            fetch(`/post/delete?id=${postId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    [csrfHeader]: csrfToken  // CSRF 토큰을 동적 헤더 이름으로 설정
-                }
-            })
-            .then(r => {
+            try {
+                // 게시글 삭제 API 요청
+                const response = await fetch(`/post/delete?id=${postId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken  // CSRF 토큰을 동적 헤더 이름으로 설정
+                    }
+                });
+
                 // HTTP 응답 상태 확인
-                if (!r.ok) {
+                if (!response.ok) {
                     throw new Error('삭제 요청 실패');
                 }
-                return r.text();
-            })
-            .then(() => {
+
                 // 삭제 성공 시 게시글 목록 페이지로 이동
                 location.href = '/post/list';
-            })
-            .catch(err => {
+            } catch (err) {
                 console.error('삭제 실패:', err);
                 alert('삭제 중 오류가 발생했습니다.');
                 // 에러 발생 시 버튼 상태 복원
                 deleteButton.innerHTML = '삭제하기';
                 deleteButton.disabled = false;
-            });
+            }
         });
     }
 });
