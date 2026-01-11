@@ -152,6 +152,13 @@
                                 채팅하기
                             </button>
                             
+                            <!-- 구매자 결제(에스크로) 버튼: 로그인 + 작성자 아님 + 판매중 -->
+                            <a class="btn btn-primary w-100 mb-3"
+                               th:if="${loginUserId != null and loginUserId != postWriterId and data.status == T(com.song.project.entity.PostStatus).ON_SALE}"
+                               th:href="@{/pay/checkout(postId=${data.id})}">
+                                결제하기(에스크로)
+                            </a>
+                            
                             <form th:action="@{/post/edit/{id}(id=${data.id})}" th:if="${loginUserId == postWriterId}">
                                 <button type="submit" name="edit_btn" class="btn btn-outline-info w-100 mb-2">수정하기</button>
                             </form>

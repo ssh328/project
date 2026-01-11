@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <th:block th:replace="~{ partial/header.html :: headerfrag }"></th:block>
+</head>
+<body class="d-flex flex-column vh-100" style="background-color: #ffffffed;">
+<div th:replace="~{ partial/nav.html::navbar }"></div>
+
+<main class="container mt-5 pt-5">
+    <div class="container pb-5">
+        <div class="row justify-content-center mt-5">
+            <div class="col-lg-8">
+                <div class="shadow p-4 rounded-4 bg-white">
+                    <h3 class="fw-bold mb-2">에스크로 결제(포트폴리오)</h3>
+                    <p class="text-muted mb-4">
+                        결제 승인 후 금액은 <b>에스크로 보관</b> 상태로 표시되고,
+                        판매자의 배송완료 처리 → 구매자의 구매확정 이후에 <b>가상 정산</b>이 반영됩니다.
+                    </p>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <div class="fw-semibold" th:text="${postTitle}">상품명</div>
+                            <div class="text-muted small">주문번호는 결제 버튼 클릭 시 생성됩니다.</div>
+                        </div>
+                        <div class="fs-4 fw-bold" th:text="${#numbers.formatInteger(amount, 0, 'COMMA')} + '원'">0원</div>
+                    </div>
+
+                    <hr class="mb-4" style="width: 100%; margin: 0 auto; border-top: 2px dashed;">
+
+                    <div id="payment-method" class="mb-3"></div>
+                    <div id="agreement" class="mb-4"></div>
+
+                    <button id="payButton" class="btn btn-primary w-100">
+                        결제하기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block th:replace="~{ partial/footer.html :: footerFragment }"></th:block>
+
+<script th:inline="javascript">
+    window.tossClientKey = /*[[${tossClientKey}]]*/ "";
+    window.customerKey = /*[[${customerKey}]]*/ "";
+    window.postId = /*[[${postId}]]*/ 0;
+    window.postTitle = /*[[${postTitle}]]*/ "";
+    window.amount = /*[[${amount}]]*/ 0;
+    window.customerName = /*[[${customerName}]]*/ "";
+</script>
+
+<!-- Toss Payments Payment Widget (v2 standard) -->
+<script src="https://js.tosspayments.com/v2/standard"></script>
+<script src="/js/pay/checkout.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+</body>
+</html>

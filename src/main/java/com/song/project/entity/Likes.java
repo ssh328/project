@@ -9,6 +9,11 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@Table(indexes = {
+        @Index(columnList = "userId", name = "idx_likes_user_id"),
+        @Index(columnList = "postId", name = "idx_likes_post_id"),
+        @Index(columnList = "userId,postId", name = "idx_likes_user_post")
+})
 public class Likes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -107,11 +107,12 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(auth);
     
             // JWT 쿠키 설정
+            String token = JwtUtil.createToken(auth);
             setJwtCookie(response);
             
             String username = data.get("username");
             log.info("로그인 성공: username={}", username);
-            return Map.of("success", true);
+            return Map.of("success", true, "accessToken", token);
         } catch (BadCredentialsException e) {
             String username = data.get("username");
             log.warn("로그인 실패: username={}, reason=인증 정보 불일치", username);

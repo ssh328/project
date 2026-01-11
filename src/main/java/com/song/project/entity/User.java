@@ -12,6 +12,11 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@Table(indexes = {
+        @Index(columnList = "username", name = "idx_user_username"),
+        @Index(columnList = "user_id", name = "idx_user_user_id"),
+        @Index(columnList = "email", name = "idx_user_email")
+})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

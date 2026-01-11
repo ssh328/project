@@ -5,8 +5,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.info.Contact;
 
 @Configuration
@@ -29,6 +32,19 @@ public class SwaggerConfig {
                         .description("중고 거래 플랫폼 API 문서")
                         .contact(new Contact()
                                 .name("API Support")
-                                .email("support@example.com")));
+                                .email("support@example.com")
+                            )
+                        )
+                        // 🔐 Security 설정 추가
+                .components(new Components()
+                .addSecuritySchemes("bearerAuth",
+                        new SecurityScheme()
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("JWT")
+                )
+        )
+        // 전역 Security Requirement
+        .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
     }
 }

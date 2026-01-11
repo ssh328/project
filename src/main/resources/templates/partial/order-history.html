@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- 주문 내역 페이지 공통 레이아웃 -->
+    <th:block th:fragment="orderHistoryLayout(title, emptyMessage, buttonText)">
+        <!doctype html>
+        <html lang="en">
+        <head>
+            <th:block th:replace="~{ partial/header.html :: headerfrag }"></th:block>
+        </head>
+        <body class="d-flex flex-column vh-100" style="background-color: #ffffffed;">
+        <div th:replace="~{ partial/nav.html::navbar }"></div>
+
+        <main class="container mt-5 pt-5">
+            <div class="container pb-5">
+                <div class="row justify-content-center mt-5">
+                    <div class="col-lg-9">
+                        <div class="shadow p-4 rounded-4 bg-white">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h3 class="fw-bold mb-1" th:text="${title}">내역</h3>
+                                </div>
+                            </div>
+
+                            <hr class="mb-4" style="width: 100%; margin: 0 auto; border-top: 2px dashed;">
+
+                            <div th:if="${orders.size() == 0}" class="text-muted" th:text="${emptyMessage}">내역이 없습니다.</div>
+                            <div th:each="o : ${orders}" class="border rounded-3 p-3 mb-2">
+                                <div class="d-flex align-items-center gap-3">
+                                    <img th:if="${o.post.images != null and !o.post.images.isEmpty()}" 
+                                         th:src="${o.post.images[0].imgUrl}" 
+                                         class="rounded" 
+                                         style="width: 80px; height: 80px; object-fit: cover; flex-shrink: 0;" 
+                                         alt="상품 이미지">
+                                    <img th:unless="${o.post.images != null and !o.post.images.isEmpty()}" 
+                                         src="https://placehold.co/300" 
+                                         class="rounded" 
+                                         style="width: 80px; height: 80px; object-fit: cover; flex-shrink: 0;" 
+                                         alt="기본 이미지">
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold mb-1" th:text="|상품명: ${o.orderName}|"></div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="fw-bold" th:text="${#numbers.formatInteger(o.amount, 0, 'COMMA')} + '원'">0원</div>
+                                            <span class="badge rounded-pill bg-primary" th:text="${o.status.description}">상태</span>
+                                        </div>
+                                    </div>
+                                    <a class="btn btn-sm btn-outline-secondary" th:href="@{'/escrow/orders/' + ${o.orderId}}" th:text="${buttonText}">처리</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <th:block th:replace="~{ partial/footer.html :: footerFragment }"></th:block>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+        </body>
+        </html>
+    </th:block>
+</body>
+</html>

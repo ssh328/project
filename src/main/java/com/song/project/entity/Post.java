@@ -18,7 +18,16 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-@Table(indexes = @Index(columnList = "title", name = "제목"))
+@Table(
+    indexes = {
+        @Index(columnList = "title", name = "idx_post_title"),
+        @Index(columnList = "userId", name = "idx_post_userId"),
+        @Index(columnList = "category", name = "idx_post_category"),
+        @Index(columnList = "status", name = "idx_post_status"),
+        @Index(columnList = "created", name = "idx_post_created"),
+        @Index(columnList = "likeCnt", name = "idx_post_likeCnt")
+    }
+)
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -10,6 +10,11 @@ import org.hibernate.annotations.CreationTimestamp;
 @Entity
 @Getter
 @Setter
+@Table(indexes = {
+        @Index(columnList = "target_user_id", name = "idx_review_target_user_id"),
+        @Index(columnList = "createdAt", name = "idx_review_created_at"),
+        @Index(columnList = "target_user_id,createdAt", name = "idx_review_target_user_created")
+})
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
