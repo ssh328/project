@@ -7,6 +7,12 @@ import com.song.project.entity.User;
 import com.song.project.exception.NotFoundException;
 import com.song.project.service.AdminService;
 import com.song.project.service.AdminService.DashboardStats;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import com.song.project.service.PostService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +32,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 /**
  * 관리자 관련 API를 제공하는 컨트롤러
  */
+@Tag(name = "관리자 API", description = "관리자 관련 API")
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/admin")
@@ -130,6 +137,11 @@ public class AdminController {
      * @param keyword 삭제 후 유지할 검색 키워드 (선택적)
      * @return 게시물 목록 페이지로의 리다이렉트 URL
      */
+    @Operation(summary = "관리자 권한으로 게시물을 삭제", description = "관리자 권한으로 게시물을 삭제합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "삭제 성공"),
+        @ApiResponse(responseCode = "404", description = "게시물 없음")
+    })
     @DeleteMapping("/posts/{id}/delete")
     @ResponseBody
     ResponseEntity<String> deletePost(@PathVariable Long id,
@@ -150,6 +162,11 @@ public class AdminController {
      * @param page 삭제 후 이동할 페이지 번호 (기본값: 1)
      * @return 리뷰 목록 페이지로의 리다이렉트 URL
      */
+    @Operation(summary = "관리자 권한으로 리뷰를 삭제", description = "관리자 권한으로 리뷰를 삭제합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "삭제 성공"),
+        @ApiResponse(responseCode = "404", description = "리뷰 없음")
+    })
     @DeleteMapping("/reviews/{id}/delete")
     @ResponseBody
     public ResponseEntity<String> deleteReview(@PathVariable Long id,

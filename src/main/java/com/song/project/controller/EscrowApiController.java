@@ -3,6 +3,11 @@ package com.song.project.controller;
 import com.song.project.entity.EscrowOrder;
 import com.song.project.security.CustomUser;
 import com.song.project.service.EscrowService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +22,7 @@ import java.util.Map;
  * 
  * 에스크로 주문 조회, 배송 완료 처리, 구매 확정 등 제공
  */
+@Tag(name = "에스크로 API", description = "에스크로 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/escrow")
@@ -30,6 +36,11 @@ public class EscrowApiController {
      * @param orderId 조회할 주문 ID
      * @return 주문 정보를 담은 ResponseEntity
      */
+    @Operation(summary = "에스크로 주문 정보 조회", description = "에스크로 주문 정보를 조회합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "조회 성공"),
+        @ApiResponse(responseCode = "401", description = "인증 필요")
+    })
     @GetMapping("/orders/{orderId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> get(@PathVariable String orderId, Authentication auth) {
@@ -44,6 +55,11 @@ public class EscrowApiController {
      * @param orderId 배송 완료 처리할 주문 ID
      * @return 업데이트된 주문 정보를 담은 ResponseEntity
      */
+    @Operation(summary = "에스크로 주문의 배송 완료 상태로 변경", description = "에스크로 주문의 배송 완료 상태로 변경합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "변경 성공"),
+        @ApiResponse(responseCode = "401", description = "인증 필요")
+    })
     @PostMapping("/orders/{orderId}/deliver")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deliver(@PathVariable String orderId, Authentication auth) {
@@ -58,6 +74,11 @@ public class EscrowApiController {
      * @param orderId 구매 확정할 주문 ID
      * @return 업데이트된 주문 정보를 담은 ResponseEntity
      */
+    @Operation(summary = "에스크로 주문의 구매 확정을 처리", description = "에스크로 주문의 구매 확정을 처리합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "처리 성공"),
+        @ApiResponse(responseCode = "401", description = "인증 필요")
+    })
     @PostMapping("/orders/{orderId}/confirm")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> confirm(@PathVariable String orderId, Authentication auth) {
