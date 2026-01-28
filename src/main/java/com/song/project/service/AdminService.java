@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 관리자 관련 비즈니스 로직을 처리하는 서비스
@@ -117,6 +118,21 @@ public class AdminService {
             .orElseThrow(() -> new NotFoundException("리뷰를 찾을 수 없습니다."));
 
         reviewService.deleteReviewInternal(review);
+    }
+
+        /**
+     * 관리자 권한으로 게시물의 모든 좋아요 삭제
+     * @param postId 삭제할 좋아요가 달린 게시물 ID
+     * @throws NotFoundException 게시물을 찾을 수 없는 경우
+     */
+    @Transactional
+    public void deleteLikeAsAdmin(Long postId) {
+        // 게시물 존재 여부 확인
+        postRepository.findById(postId)
+            .orElseThrow(() -> new NotFoundException("게시물을 찾을 수 없습니다."));
+        
+        // 해당 게시물의 모든 좋아요 삭제
+        likeRepository.deleteAllByPostId(postId);
     }
 
     /**

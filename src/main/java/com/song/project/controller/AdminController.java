@@ -149,6 +149,7 @@ public class AdminController {
                              @RequestParam(required = false) String keyword) {
         try {
             adminService.deletePostAsAdmin(id);
+            adminService.deleteLikeAsAdmin(id);
             return ResponseEntity.ok("삭제완료");
         } catch (NotFoundException e) {
             return ResponseEntity.status(404).body(e.getMessage());
