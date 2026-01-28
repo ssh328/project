@@ -144,7 +144,7 @@ public class AdminController {
     })
     @DeleteMapping("/posts/{id}/delete")
     @ResponseBody
-    ResponseEntity<String> deletePost(@PathVariable Long id,
+    public ResponseEntity<String> deletePost(@PathVariable Long id,
                              @RequestParam(defaultValue = "1") int page,
                              @RequestParam(required = false) String keyword) {
         try {
