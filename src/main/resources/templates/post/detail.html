@@ -198,6 +198,31 @@
         </div>
     </div>
 
+    <!-- 직거래 판매완료(구매자 선택) 모달 -->
+    <div class="modal fade" id="directDealModal" tabindex="-1" aria-labelledby="directDealModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5 fw-bold" id="directDealModalLabel">구매자 선택</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-muted small mb-2">
+                        이 게시글로 <span class="fw-semibold">채팅을 시작한 사용자</span>만 후보로 표시됩니다.
+                    </div>
+                    <div id="directDealEmpty" class="alert alert-light border d-none mb-0">
+                        아직 채팅을 시작한 사용자가 없습니다. 채팅 후 판매완료 처리를 진행해 주세요.
+                    </div>
+                    <div id="directDealCandidateList" class="list-group"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    <button type="button" id="directDealConfirmBtn" class="btn btn-dark" disabled>판매완료 확정</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 이미지 모달 -->
     <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">

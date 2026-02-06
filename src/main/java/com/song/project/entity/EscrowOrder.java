@@ -20,6 +20,8 @@ import java.time.LocalDateTime;
                 @Index(name = "idx_escrow_order_seller", columnList = "sellerId")
         }
 )
+// 주문/거래 자체에 대한 기록
+// “이 거래가 지금 어디까지 진행됐는지(결제→배송→구매확정→정산완료)”를 추적하는 테이블
 public class EscrowOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,6 +39,10 @@ public class EscrowOrder {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private EscrowStatus status = EscrowStatus.CREATED; // 에스크로 상태
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private OrderType orderType = OrderType.ESCROW; // 거래 유형 (기본값: 에스크로)
 
     // 결제 승인 후 Toss에서 내려주는 값들(최소만 저장)
     @Column(length = 200)

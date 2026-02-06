@@ -24,6 +24,7 @@
 
                             <hr class="mb-4" style="width: 100%; margin: 0 auto; border-top: 2px dashed;">
 
+                            <!-- 주문 내역 목록 -->
                             <div th:if="${orders.size() == 0}" class="text-muted" th:text="${emptyMessage}">내역이 없습니다.</div>
                             <div th:each="o : ${orders}" class="border rounded-3 p-3 mb-2">
                                 <div class="d-flex align-items-center gap-3">
@@ -41,10 +42,26 @@
                                         <div class="fw-semibold mb-1" th:text="|상품명: ${o.orderName}|"></div>
                                         <div class="d-flex align-items-center gap-2">
                                             <div class="fw-bold" th:text="${#numbers.formatInteger(o.amount, 0, 'COMMA')} + '원'">0원</div>
-                                            <span class="badge rounded-pill bg-primary" th:text="${o.status.description}">상태</span>
+                                            
+                                            <!-- 거래 유형 배지 -->
+                                            <span class="badge rounded-pill" 
+                                                  th:classappend="${o.orderType != null && o.orderType.name() == 'DIRECT'} ? 'bg-secondary' : 'bg-info'"
+                                                  th:text="${o.orderType != null ? o.orderType.description : '안전결제'}"></span>
+                                            
+                                            <span th:if="${o.orderType != null && o.orderType.name() != 'DIRECT'}"
+                                            class="badge rounded-pill bg-primary" th:text="${o.status.description}">상태</span>
                                         </div>
                                     </div>
-                                    <a class="btn btn-sm btn-outline-secondary" th:href="@{'/escrow/orders/' + ${o.orderId}}" th:text="${buttonText}">처리</a>
+                                    
+                                    <!-- 상세 버튼: 직거래는 게시글로, 에스크로는 주문상세로 이동 -->
+                                    <a th:if="${o.orderType != null && o.orderType.name() == 'DIRECT'}" 
+                                       class="btn btn-sm btn-outline-secondary" 
+                                       th:href="@{'/post/detail/' + ${o.post.id}}">게시글 보기</a>
+                                       
+                                    <a th:unless="${o.orderType != null && o.orderType.name() == 'DIRECT'}" 
+                                       class="btn btn-sm btn-outline-secondary" 
+                                       th:href="@{'/escrow/orders/' + ${o.orderId}}" 
+                                       th:text="${buttonText}">처리</a>
                                 </div>
                             </div>
                         </div>

@@ -12,6 +12,7 @@ import com.song.project.exception.ForbiddenException;
 import com.song.project.exception.NotFoundException;
 import com.song.project.exception.UnauthorizedException;
 import com.song.project.security.CustomUser;
+import com.song.project.service.DirectDealService;
 import com.song.project.service.PostService;
 import com.song.project.service.PostService.PostDetailResult;
 import com.song.project.service.PostService.PostListResult;
@@ -56,6 +57,7 @@ import java.util.UUID;
 @RequestMapping("/post")
 public class PostController {
     private final PostService postService;
+    private final DirectDealService directDealService;
 
     /**
      * 게시물 목록을 페이지네이션과 함께 조회
@@ -350,6 +352,55 @@ public class PostController {
         response.put("status", postStatus.name());
         response.put("statusDescription", postStatus.getDescription());
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * (직거래) 해당 게시글에 대해 채팅을 시작한 사용자 후보 목록 조회
+     * - 판매자(작성자)만 조회 가능
+     */
+    @GetMapping("/{id}/chat-candidates")
+    @PreAuthorize("isAuthenticated()")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getChatCandidates(@PathVariable Long id, Authentication auth) {
+        Map<String, Object> response = new HashMap<>();
+        Long userId = getUserId(auth);
+        try {
+            var candidates = directDealService.getChatCandidates(id, userId);
+            response.put("success", true);
+            response.put("candidates", candidates);
+            return ResponseEntity.ok(response);
+        } catch (NotFoundException | ForbiddenException | BadRequestException e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(400).body(response);
+        }
+    }
+
+    /**
+     * (직거래) 판매완료 확정: 구매자 선택 후 게시글을 SOLD로 변경하고 구매자를 저장
+     */
+    @PostMapping("/{id}/direct-deal/complete")
+    @PreAuthorize("isAuthenticated()")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> completeDirectDeal(
+        @PathVariable Long id,
+        @RequestParam Long buyerId,
+        Authentication auth) {
+
+        Map<String, Object> response = new HashMap<>();
+        Long userId = getUserId(auth);
+        try {
+            directDealService.completeDirectDeal(id, userId, buyerId);
+            response.put("success", true);
+            response.put("message", "판매완료 처리되었습니다.");
+            response.put("status", PostStatus.SOLD.name());
+            response.put("statusDescription", PostStatus.SOLD.getDescription());
+            return ResponseEntity.ok(response);
+        } catch (NotFoundException | ForbiddenException | BadRequestException e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(400).body(response);
+        }
     }
 
     // ===========================

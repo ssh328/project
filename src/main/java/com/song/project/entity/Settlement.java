@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
                 @Index(name = "idx_settlement_seller", columnList = "sellerId")
         }
 )
+// 판매자에게 얼마나 정산됐는지에 대한 기록
+// “이 주문 기준으로 판매자 지갑에 얼마가 언제 정산되었는지”를 표현하는 테이블
 public class Settlement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -2,6 +2,7 @@ package com.song.project.controller;
 import com.song.project.entity.User;
 import com.song.project.repository.UserRepository;
 import com.song.project.security.CustomUser;
+import com.song.project.service.DirectDealService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,6 +31,9 @@ public class ChatController {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    DirectDealService directDealService;
+
     @Value("${talkjs.appId}")
     private String talkjsAppId;
 
@@ -37,7 +41,10 @@ public class ChatController {
      * 채팅 페이지 조회
      */
     @GetMapping("/chat")
-    String chat(Model model, @RequestParam(required = false) Long postWriterId, Authentication auth) {
+    String chat(Model model,
+                @RequestParam(required = false) Long postWriterId,
+                @RequestParam(required = false) Long postId,
+                Authentication auth) {
 
         if (auth != null && auth.isAuthenticated()) {
             CustomUser user = (CustomUser) auth.getPrincipal();
@@ -48,6 +55,13 @@ public class ChatController {
                 model.addAttribute("postWriterId", postWriterId);
             } else {
                 model.addAttribute("postWriterId", null);
+            }
+
+            // "채팅 시작"을 직거래 구매자 후보로 기록 (postId가 전달된 경우에만)
+            try {
+                directDealService.recordChatCandidate(postId, user.id, postWriterId);
+            } catch (Exception ignored) {
+                // 채팅 페이지 진입은 항상 허용하되, 후보 기록만 실패할 수 있음
             }
         }
 
