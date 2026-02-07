@@ -58,18 +58,21 @@ const getUser = async () => {
 
   if (agent) {
     // agent가 존재하는 경우: 1:1 대화 생성
-    // 사용자와 게시글 작성자 간의 고유 대화 ID 생성
-    const conversation = session.getOrCreateConversation(
-      Talk.oneOnOneId(user, agent)
-    );
+    
+    // Conversation ID 생성 로직
+    // 1. postId가 있는 경우 (상품 문의): 상품별 고유 ID 생성
+    // 2. postId가 없는 경우 (일반 문의): 기존 방식(oneOnOneId) 사용
+    let conversationId;
+    if (window.postId) {
+        // 상품별 채팅방 ID: post_{postId}_buyer_{me}_seller_{agent}
+        conversationId = `post_${window.postId}_buyer_${user.id}_seller_${agent.id}`;
+    } else {
+        alert('상품 페이지에서 "채팅하기"를 눌러 주세요.');
+        window.history.back();
+        return;
+    }
 
-    // 대화 시작 시 표시할 환영 메시지 설정
-    conversation.setAttributes({
-      welcomeMessages: [
-        "You can start typing your message here and one of our agents will be with you shortly.",
-        "Please do not divulge any of your personal information.",
-      ]
-    });
+    const conversation = session.getOrCreateConversation(conversationId);
 
     // 대화 참여자 설정
     conversation.setParticipant(user);

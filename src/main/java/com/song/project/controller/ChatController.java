@@ -1,6 +1,7 @@
 package com.song.project.controller;
 import com.song.project.entity.User;
 import com.song.project.repository.UserRepository;
+import com.song.project.repository.PostRepository;
 import com.song.project.security.CustomUser;
 import com.song.project.service.DirectDealService;
 
@@ -32,6 +33,9 @@ public class ChatController {
     UserRepository userRepository;
 
     @Autowired
+    PostRepository postRepository;
+
+    @Autowired
     DirectDealService directDealService;
 
     @Value("${talkjs.appId}")
@@ -55,6 +59,12 @@ public class ChatController {
                 model.addAttribute("postWriterId", postWriterId);
             } else {
                 model.addAttribute("postWriterId", null);
+            }
+
+            if (postId != null) {
+                model.addAttribute("postId", postId);
+            } else {
+                model.addAttribute("postId", null);
             }
 
             // "채팅 시작"을 직거래 구매자 후보로 기록 (postId가 전달된 경우에만)
