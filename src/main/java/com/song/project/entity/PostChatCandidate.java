@@ -9,9 +9,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 /**
- * 특정 게시글에 대해 "채팅을 시작한 사용자"를 후보로 기록하는 테이블
- * - TalkJS를 사용하므로 실제 메시지를 DB에 저장하지 않지만,
- *   최소한의 "관심 표현(채팅 진입)"을 서버에 남겨 판매완료 시 구매자 후보로 활용한다.
+ * 특정 게시물에 대해 "채팅을 시작한 사용자"를 기록하는 테이블
+ * TalkJS를 사용하므로 실제 메시지를 DB에 저장하지 않지만,
+ * 최소한의 채팅 진입을 서버에 남겨 판매완료 시 구매자 후보로 활용
  */
 @Entity
 @Getter

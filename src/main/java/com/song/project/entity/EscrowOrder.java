@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
                 @Index(name = "idx_escrow_order_seller", columnList = "sellerId")
         }
 )
-// 주문/거래 자체에 대한 기록
+// 주문 자체에 대한 기록
 // “이 거래가 지금 어디까지 진행됐는지(결제→배송→구매확정→정산완료)”를 추적하는 테이블
 public class EscrowOrder {
     @Id
