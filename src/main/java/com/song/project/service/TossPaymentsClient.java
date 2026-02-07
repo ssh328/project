@@ -15,7 +15,6 @@ import java.util.Map;
 
 /**
  * Toss Payments 결제 승인 클라이언트
- * 
  * 결제 승인 API 호출 제공
  */
 @Component
@@ -30,7 +29,6 @@ public class TossPaymentsClient {
 
     /**
      * Toss Payments 결제 승인 요청
-     * 
      * @param paymentKey 결제 키
      * @param orderId 주문 ID
      * @param amount 결제 금액

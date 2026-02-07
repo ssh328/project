@@ -36,8 +36,13 @@ public class DirectDealService {
     private final EscrowOrderRepository escrowOrderRepository;
 
     /**
-     * 사용자가 특정 게시글의 판매자와 채팅을 "시작"한 사실을 후보로 기록한다.
-     * - TalkJS를 쓰므로 메시지 저장 대신 "채팅 진입"을 서버에 남긴다.
+     * 사용자가 특정 게시글의 판매자와 채팅을 시작한 사실을 후보로 기록
+     * TalkJS 사용으로 메시지는 저장하지 않고, 채팅 진입 시점만 서버에 남김
+     * @param postId 게시글 ID
+     * @param loginUserId 채팅을 시작한 사용자 ID
+     * @param postWriterId 게시글 작성자 ID (URL 위조 방지 검증용)
+     * @throws NotFoundException 게시글을 찾을 수 없는 경우
+     * @throws BadRequestException postWriterId가 해당 게시글 작성자와 일치하지 않는 경우
      */
     @Transactional
     public void recordChatCandidate(Long postId, Long loginUserId, Long postWriterId) {
@@ -76,7 +81,13 @@ public class DirectDealService {
     }
 
     /**
-     * 판매자(작성자)에게만 해당 게시글의 채팅 후보자 목록을 반환한다.
+     * 해당 게시글에 대해 채팅을 시작한 사용자 목록을 반환
+     * 판매자(작성자)만 조회 가능
+     * @param postId 게시글 ID
+     * @param sellerId 요청한 사용자 ID (작성자와 일치해야 함)
+     * @return 채팅 후보 사용자 요약 목록 (최신순)
+     * @throws NotFoundException 게시글을 찾을 수 없는 경우
+     * @throws ForbiddenException 작성자가 아닌 경우
      */
     @Transactional(readOnly = true)
     public List<UserSummary> getChatCandidates(Long postId, Long sellerId) {
@@ -93,7 +104,14 @@ public class DirectDealService {
     }
 
     /**
-     * 직거래 판매완료 확정: 구매자를 선택해 Post에 저장하고 status를 SOLD로 변경한다.
+     * 직거래 판매완료 확정: 구매자를 선택하고 게시글 상태를 SOLD로 변경하며, 
+     * 통합 주문(Order) 테이블에 DIRECT 타입으로 기록
+     * @param postId 게시글 ID
+     * @param sellerId 판매자(작성자) ID
+     * @param buyerId 선택한 구매자 ID (채팅 후보에 등록된 사용자만 가능)
+     * @throws NotFoundException 게시글 또는 구매자를 찾을 수 없는 경우
+     * @throws ForbiddenException 작성자가 아닌 경우
+     * @throws BadRequestException 구매자 미선택, 본인 선택, 또는 후보가 아닌 사용자 선택 시
      */
     @Transactional
     public void completeDirectDeal(Long postId, Long sellerId, Long buyerId) {
@@ -112,7 +130,7 @@ public class DirectDealService {
             throw new BadRequestException("본인을 구매자로 선택할 수 없습니다.");
         }
 
-        // 후보자(채팅 진입)로 기록된 유저만 선택 가능
+        // 후보자로 기록된 유저만 선택 가능
         if (!postChatCandidateRepository.existsByPost_IdAndUser_Id(postId, buyerId)) {
             throw new BadRequestException("해당 사용자는 이 게시글에 대해 채팅한 구매자 후보가 아닙니다.");
         }
@@ -124,7 +142,7 @@ public class DirectDealService {
         postRepository.save(post);
 
         // 직거래 완료 시 통합 주문(Order) 테이블에도 기록 생성 (OrderType.DIRECT)
-        // -> 구매내역/판매내역에서 한 번에 조회하기 위함
+        // 구매내역/판매내역에서 한 번에 조회하기 위함
         EscrowOrder order = new EscrowOrder();
         order.setOrderType(OrderType.DIRECT);
         order.setOrderId("DIRECT-" + UUID.randomUUID().toString()); // 직거래용 고유 ID
@@ -145,6 +163,9 @@ public class DirectDealService {
         escrowOrderRepository.save(order);
     }
 
+    /**
+     * 채팅 후보 사용자 노출용 DTO
+     */
     @Getter
     public static class UserSummary {
         private final Long id;
