@@ -3,7 +3,7 @@
 * 핵심 포인트: JWT(쿠키) 인증 + Spring Security, JPA 기반 데이터 처리, Redis(조회수/최근 본 글), S3 Presigned URL 업로드, Toss Payments 연동
 
 ## 1. ERD
-<img width="700" height="600" alt="Untitled" src="https://github.com/user-attachments/assets/a24d18e3-152b-450c-9431-2a73f6983205" />
+<img width="700" height="600" alt="Untitled (1)" src="https://github.com/user-attachments/assets/683219a6-d5ac-42ea-b598-c8eae277098d" />
 
 ## 2. 주요 기능
 ### 회원/인증 기능
@@ -55,6 +55,9 @@
 * 단계별 에스크로 거래
   * 결제 완료 → 배송 중 → 구매 확정 → 정산의 안전 거래 라이프사이클 관리
   * 거래 단계별 판매자/구매자 권한 분리 및 검증
+* 직거래 지원
+  * 구매자 선택 판매: 채팅을 통해 대화한 사용자 중 실제 구매자를 선택하여 판매 완료 처리
+  * 간편 주문 생성: 결제 과정 없이 즉시 '직거래 주문(DIRECT)' 생성 및 이력 관리
 * 게시글 상태 자동화
   * 결제 승인 시 게시글 예약중(Reserved) 자동 전환
   * 구매 확정 시 게시글 판매완료(Sold) 자동 처리
@@ -109,7 +112,10 @@
 ## 4. API 명세서
 [API 명세서](https://thinkable-earthquake-735.notion.site/Resale-Store-API-2e7a5166124c800c861dfa772bbac7c0?source=copy_link)
 
-## 5. 기술스택
+## 5. 트러블 슈팅
+[트러블 슈팅](https://thinkable-earthquake-735.notion.site/2eea5166124c80f88b1bcf93f60225f0?source=copy_link)
+
+## 6. 기술스택
 ### 백엔드
 ![Java](https://img.shields.io/badge/Java%2021-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Gradle](https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white)
