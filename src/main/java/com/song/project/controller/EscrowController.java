@@ -6,6 +6,9 @@ import com.song.project.entity.Wallet;
 import com.song.project.security.CustomUser;
 import com.song.project.service.EscrowService;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -82,7 +85,7 @@ public class EscrowController {
     public String settlementHistory(Authentication auth, Model model) {
         Long userId = getUserId(auth);
         Wallet wallet = escrowService.getMyWallet(userId);
-        java.util.List<Settlement> settlements = escrowService.getMySettlementHistory(userId);
+        List<Settlement> settlements = escrowService.getMySettlementHistory(userId);
         model.addAttribute("wallet", wallet);
         model.addAttribute("settlements", settlements);
         return "pay/settlement-history.html";
