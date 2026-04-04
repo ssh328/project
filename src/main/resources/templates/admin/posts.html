@@ -59,24 +59,36 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="post : ${posts.content}">
+            <tr th:each="post : ${posts.content}"
+                th:classappend="${post.deleted} ? 'table-secondary text-muted'">
                 <td th:text="${post.id}">1</td>
                 <td>
-                    <a th:href="@{|/post/detail/${post.id}|}" th:text="${post.title}" target="_blank">title</a>
+                    <a th:if="${!post.deleted}" th:href="@{|/post/detail/${post.id}|}" th:text="${post.title}" target="_blank">title</a>
+                    <span th:if="${post.deleted}" th:text="${post.title}">title</span>
                 </td>
                 <td th:text="${#numbers.formatInteger(post.price, 0, 'COMMA')} + '원'">0원</td>
                 <td th:text="${post.category}">카테고리</td>
-                <td th:text="${post.status}">ON_SALE</td>
+                <td>
+                    <span th:text="${post.status}">ON_SALE</span>
+                    <span th:if="${post.deleted}" class="badge text-bg-secondary ms-2">삭제됨</span>
+                </td>
                 <td th:text="${post.user != null ? post.user.username : '알 수 없음'}">user</td>
                 <td th:text="${post.viewCount}">0</td>
                 <td th:text="${post.likeCnt}">0</td>
                 <td>
-                    <button type="button" 
+                    <button th:if="${!post.deleted}" type="button" 
                             class="btn btn-sm btn-outline-danger admin-delete-btn"
                             th:data-post-id="${post.id}"
                             th:data-page="${currentPage}"
                             th:data-keyword="${keyword ?: ''}">
                         삭제
+                    </button>
+                    <button th:if="${post.deleted}" type="button"
+                            class="btn btn-sm btn-outline-success admin-restore-btn"
+                            th:data-post-id="${post.id}"
+                            th:data-page="${currentPage}"
+                            th:data-keyword="${keyword ?: ''}">
+                        복구
                     </button>
                 </td>
             </tr>

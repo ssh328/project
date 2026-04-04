@@ -52,20 +52,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
                         [csrfHeader]: csrfToken  // CSRF 토큰을 동적 헤더 이름으로 설정
                     }
                 });
 
                 // HTTP 응답 상태 확인
                 if (!response.ok) {
-                    throw new Error('삭제 요청 실패');
+                    const message = await response.text();
+                    throw new Error(message || '삭제 요청 실패');
                 }
 
                 // 삭제 성공 시 게시글 목록 페이지로 이동
                 location.href = '/post/list';
             } catch (err) {
                 console.error('삭제 실패:', err);
-                alert('삭제 중 오류가 발생했습니다.');
+                alert(err.message || '삭제 중 오류가 발생했습니다.');
                 // 에러 발생 시 버튼 상태 복원
                 deleteButton.innerHTML = '삭제하기';
                 deleteButton.disabled = false;

@@ -66,7 +66,7 @@ public class RecentPostService {
         List<Long> ids = getRecentPosts(userId);
 
         // DB에서 해당 게시글 조회 (N+1 문제 방지를 위해 한 번에 조회)
-        Map<Long, PostListDto> postMap = postRepository.findAllById(ids).stream()
+        Map<Long, PostListDto> postMap = postRepository.findAllActiveByIdIn(ids).stream()
                 .map(PostListDto::from)
                 .collect(Collectors.toMap(PostListDto::getId, dto -> dto));
 
@@ -86,6 +86,7 @@ public class RecentPostService {
 
         // 사용자가 좋아요한 게시글 ID 목록
         List<Long> likedPostIds = likeRepository.findByUserId(userId).stream()
+                .filter(like -> like.getPost() != null && !like.getPost().isDeleted())
                 .map(like -> like.getPost().getId())
                 .collect(Collectors.toList());
 

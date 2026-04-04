@@ -39,7 +39,7 @@ public class LikeService {
         User userRef = new User();
         userRef.setId(user.id);
 
-        Post post = postRepository.findById(postId)
+        Post post = postRepository.findActiveById(postId)
             .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다."));
 
         // 기존 좋아요 여부 확인

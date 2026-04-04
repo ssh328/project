@@ -110,7 +110,7 @@ public class RecommendedPostService {
         if (allPostIds.isEmpty()) return Collections.emptyList();
 
         // N+1 문제 방지: 모든 게시글을 한 번에 조회
-        List<Post> posts = postRepository.findAllById(allPostIds);
+        List<Post> posts = postRepository.findAllActiveByIdIn(allPostIds);
 
         Map<Long, Post> postMap = posts.stream()
         .collect(Collectors.toMap(Post::getId, post -> post));

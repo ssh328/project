@@ -58,6 +58,12 @@ public class Post {
     @Column(nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'ON_SALE'")
     private PostStatus status = PostStatus.ON_SALE;    // 게시물 상태
 
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+    private boolean deleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     // 하나의 Post는 여러 이미지 소유
     @ToString.Exclude
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)

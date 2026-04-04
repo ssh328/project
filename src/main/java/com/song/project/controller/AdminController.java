@@ -4,6 +4,7 @@ import com.song.project.entity.Post;
 import com.song.project.entity.PostStatus;
 import com.song.project.entity.Review;
 import com.song.project.entity.User;
+import com.song.project.exception.BadRequestException;
 import com.song.project.exception.NotFoundException;
 import com.song.project.service.AdminService;
 import com.song.project.service.AdminService.DashboardStats;
@@ -25,6 +26,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -149,10 +151,24 @@ public class AdminController {
                              @RequestParam(required = false) String keyword) {
         try {
             adminService.deletePostAsAdmin(id);
-            adminService.deleteLikeAsAdmin(id);
             return ResponseEntity.ok("삭제완료");
         } catch (NotFoundException e) {
             return ResponseEntity.status(404).body(e.getMessage());
+        } catch (BadRequestException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/posts/{id}/restore")
+    @ResponseBody
+    public ResponseEntity<String> restorePost(@PathVariable Long id) {
+        try {
+            adminService.restorePostAsAdmin(id);
+            return ResponseEntity.ok("복구완료");
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch (BadRequestException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 

@@ -17,7 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 관리자 관련 비즈니스 로직을 처리하는 서비스
@@ -80,8 +79,8 @@ public class AdminService {
             return postRepository.findByTitleContainingIgnoreCase(keyword, pageRequest);
         }
 
-        // 기존 필터 메서드를 활용 (가격 조건은 사용하지 않으므로 null)
-        return postRepository.findWithFilter(category, null, null, status, pageRequest);
+        // 관리자 목록은 soft delete된 게시글도 함께 조회한다.
+        return postRepository.findAdminWithFilter(category, null, null, status, pageRequest);
     }
 
     /**
@@ -97,7 +96,7 @@ public class AdminService {
 
     /**
      * 관리자 권한으로 게시글 삭제
-     * 작성자와 무관하게 삭제 가능, S3에 저장된 이미지도 함께 삭제
+     * 작성자와 무관하게 삭제 가능, soft delete로 숨김 처리한다.
      * @param postId 삭제할 게시글 ID
      * @throws NotFoundException 게시글을 찾을 수 없는 경우
      */
@@ -106,6 +105,13 @@ public class AdminService {
                 .orElseThrow(() -> new NotFoundException("게시글을 찾을 수 없습니다."));
 
         postService.deletePostInternal(post);
+    }
+
+    public void restorePostAsAdmin(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("게시글을 찾을 수 없습니다."));
+
+        postService.restorePostInternal(post);
     }
 
     /**
@@ -118,21 +124,6 @@ public class AdminService {
             .orElseThrow(() -> new NotFoundException("리뷰를 찾을 수 없습니다."));
 
         reviewService.deleteReviewInternal(review);
-    }
-
-        /**
-     * 관리자 권한으로 게시물의 모든 좋아요 삭제
-     * @param postId 삭제할 좋아요가 달린 게시물 ID
-     * @throws NotFoundException 게시물을 찾을 수 없는 경우
-     */
-    @Transactional
-    public void deleteLikeAsAdmin(Long postId) {
-        // 게시물 존재 여부 확인
-        postRepository.findById(postId)
-            .orElseThrow(() -> new NotFoundException("게시물을 찾을 수 없습니다."));
-        
-        // 해당 게시물의 모든 좋아요 삭제
-        likeRepository.deleteAllByPostId(postId);
     }
 
     /**

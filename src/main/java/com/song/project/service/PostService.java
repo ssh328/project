@@ -2,6 +2,7 @@ package com.song.project.service;
 
 import java.util.List;
 import java.util.Map;
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -24,6 +25,7 @@ import com.song.project.exception.ForbiddenException;
 import com.song.project.exception.NotFoundException;
 import com.song.project.exception.UnauthorizedException;
 import com.song.project.repository.LikeRepository;
+import com.song.project.repository.PostChatCandidateRepository;
 import com.song.project.repository.PostImageRepository;
 import com.song.project.repository.PostRepository;
 import com.song.project.repository.UserRepository;
@@ -44,6 +46,7 @@ public class PostService {
     private final PostImageRepository postImageRepository;
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
+    private final PostChatCandidateRepository postChatCandidateRepository;
     private final PostViewCountService postViewCountService;
     private final RecommendedPostService recommendedPostService;
     private final S3Service s3Service;
@@ -83,7 +86,7 @@ public class PostService {
      */
     public Page<PostListDto> searchPosts(String searchText, int page) {
         PageRequest pageRequest = PageRequest.of(page - 1, 20);
-        Page<Post> data = postRepository.fullTextSearchWithPaging(searchText, pageRequest);
+        Page<Post> data = postRepository.fullTextSearchActiveWithPaging(searchText, pageRequest);
         return data.map(PostListDto::from);
     }
 
@@ -144,6 +147,7 @@ public class PostService {
         }
 
         return likeRepository.findByUserId(userId).stream()
+                .filter(like -> like.getPost() != null && !like.getPost().isDeleted())
                 .map(like -> like.getPost().getId())
                 .collect(Collectors.toList());
     }
@@ -164,7 +168,7 @@ public class PostService {
      * @throws NotFoundException 게시물을 찾을 수 없는 경우
      */
     public Post getPostOrThrow(Long postId) {
-        return postRepository.findById(postId)
+        return postRepository.findActiveById(postId)
                 .orElseThrow(() -> new NotFoundException("게시글을 찾을 수 없습니다."));
     }
 
@@ -277,7 +281,7 @@ public class PostService {
      */
     @Transactional
     public Post updatePost(PostUpdateDto dto, Long userId) {
-        Post post = postRepository.findById(dto.getPostId())
+        Post post = postRepository.findActiveById(dto.getPostId())
                 .orElseThrow(() -> new NotFoundException("게시글을 찾을 수 없습니다."));
 
         if (!post.getUser().getId().equals(userId)) {
@@ -322,31 +326,50 @@ public class PostService {
 
     /**
      * 게시글 삭제 공통 로직
-     * S3 이미지 삭제, 좋아요 삭제, DB 삭제를 수행하는 공통 메서드
+     * 주문 이력은 유지하고 게시글만 soft delete 처리한다.
      * 일반 사용자용 deletePost()와 관리자용 AdminService.deletePostAsAdmin()에서 공통으로 사용
      * @param post 삭제할 Post 엔티티 (이미 조회된 상태여야 함)
      * @throws BadRequestException 게시물 삭제 실패 시
      */
     @Transactional
     public void deletePostInternal(Post post) {
-        // S3에 저장된 게시글 이미지 삭제
-        for (PostImage img : post.getImages()) {
-            String key = s3Service.extractS3Key(img.getImgUrl());
-            s3Service.deleteFile(key);
+        if (post.isDeleted()) {
+            throw new BadRequestException("이미 삭제된 게시글입니다.");
         }
 
         try {
-            // 게시글에 달린 좋아요 삭제
+            post.setDeleted(true);
+            post.setDeletedAt(LocalDateTime.now());
+
+            // 일반 사용자 화면에서만 숨기고, 연관 후보/좋아요 데이터는 정리한다.
+            postChatCandidateRepository.deleteAllByPostId(post.getId());
             likeRepository.deleteAllByPostId(post.getId());
+            postRepository.save(post);
             
-            // 게시글 엔티티 삭제
-            postRepository.delete(post);
-            
-            log.info("게시글 삭제 성공: postId={}, title={}", 
+            log.info("게시글 soft delete 성공: postId={}, title={}", 
                 post.getId(), post.getTitle());
         } catch (Exception e) {
-            log.error("게시물 삭제 실패: postId={}, title={}", post.getId(), post.getTitle(), e);
+            log.error("게시물 soft delete 실패: postId={}, title={}", post.getId(), post.getTitle(), e);
             throw new BadRequestException("게시물 삭제에 실패했습니다.");
+        }
+    }
+
+    @Transactional
+    public void restorePostInternal(Post post) {
+        if (!post.isDeleted()) {
+            throw new BadRequestException("이미 활성 상태인 게시글입니다.");
+        }
+
+        try {
+            post.setDeleted(false);
+            post.setDeletedAt(null);
+            postRepository.save(post);
+
+            log.info("게시글 복구 성공: postId={}, title={}",
+                post.getId(), post.getTitle());
+        } catch (Exception e) {
+            log.error("게시글 복구 실패: postId={}, title={}", post.getId(), post.getTitle(), e);
+            throw new BadRequestException("게시글 복구에 실패했습니다.");
         }
     }
 
@@ -361,7 +384,7 @@ public class PostService {
      */
     @Transactional
     public void deletePost(Long postId, Long userId) {
-        Post post = postRepository.findById(postId)
+        Post post = postRepository.findActiveById(postId)
                 .orElseThrow(() -> new NotFoundException("게시물을 찾을 수 없습니다."));
 
         if (!post.getUser().getId().equals(userId)) {
@@ -410,7 +433,7 @@ public class PostService {
      * @throws ForbiddenException 작성자가 아닌 경우
      */
     public PostStatus updateStatus(Long postId, PostStatusUpdateDto dto, Long userId) {
-        Post post = postRepository.findById(postId)
+        Post post = postRepository.findActiveById(postId)
                 .orElseThrow(() -> new NotFoundException("게시글을 찾을 수 없습니다."));
 
         if (!post.getUser().getId().equals(userId)) {
@@ -471,7 +494,7 @@ public class PostService {
      */
     public Page<Post> getPostsByUsername(String username, int page) {
         PageRequest pageRequest = PageRequest.of(page - 1, 20);
-        return postRepository.findByUser_Username(username, pageRequest);
+        return postRepository.findByUser_UsernameAndDeletedFalse(username, pageRequest);
     }
 
     /**

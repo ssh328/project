@@ -50,7 +50,7 @@ public class DirectDealService {
             return;
         }
 
-        Post post = postRepository.findById(postId)
+        Post post = postRepository.findActiveById(postId)
             .orElseThrow(() -> new NotFoundException("게시글을 찾을 수 없습니다."));
 
         if (post.getUser() == null) {
@@ -91,7 +91,7 @@ public class DirectDealService {
      */
     @Transactional(readOnly = true)
     public List<UserSummary> getChatCandidates(Long postId, Long sellerId) {
-        Post post = postRepository.findById(postId)
+        Post post = postRepository.findActiveById(postId)
             .orElseThrow(() -> new NotFoundException("게시글을 찾을 수 없습니다."));
 
         if (post.getUser() == null || !post.getUser().getId().equals(sellerId)) {
@@ -119,7 +119,7 @@ public class DirectDealService {
             throw new BadRequestException("구매자를 선택해 주세요.");
         }
 
-        Post post = postRepository.findById(postId)
+        Post post = postRepository.findActiveById(postId)
             .orElseThrow(() -> new NotFoundException("게시글을 찾을 수 없습니다."));
 
         if (post.getUser() == null || !post.getUser().getId().equals(sellerId)) {

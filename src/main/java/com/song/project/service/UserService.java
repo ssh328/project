@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -48,7 +49,7 @@ public class UserService {
      */
     public MyPostResult getMyPosts(Long userId, int page) {
         // 사용자가 작성한 게시물을 최신순으로 조회 (페이지당 20개)
-        Page<Post> data = postRepository.findByUserIdOrderByIdDesc(userId, 
+        Page<Post> data = postRepository.findByUserIdAndDeletedFalseOrderByIdDesc(userId, 
             PageRequest.of(page - 1, 20));
         
         Page<PostListDto> postDtos = toPostDtos(data);
@@ -74,7 +75,11 @@ public class UserService {
             PageRequest.of(page - 1, 20));
 
         // Likes에서 Post 엔티티 추출
-        Page<Post> postPage = data.map(Likes::getPost);
+        List<Post> visiblePosts = data.getContent().stream()
+            .map(Likes::getPost)
+            .filter(post -> post != null && !post.isDeleted())
+            .toList();
+        Page<Post> postPage = new PageImpl<>(visiblePosts, data.getPageable(), visiblePosts.size());
 
         Page<PostListDto> postDtos = toPostDtos(postPage);
 
@@ -167,7 +172,7 @@ public class UserService {
      */
     public Page<Post> getPostsByUsername(String username, int page) {
         PageRequest pageRequest = PageRequest.of(page - 1, 20);
-        return postRepository.findByUser_Username(username, pageRequest);
+        return postRepository.findByUser_UsernameAndDeletedFalse(username, pageRequest);
     }
 
     /**
@@ -264,6 +269,7 @@ public class UserService {
      */
     private List<Long> getLikedPostIds(Long userId) {
         return likeRepository.findByUserId(userId).stream()
+                .filter(like -> like.getPost() != null && !like.getPost().isDeleted())
                 .map(like -> like.getPost().getId())
                 .collect(Collectors.toList());
     }

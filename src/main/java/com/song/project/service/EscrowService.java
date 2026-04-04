@@ -68,7 +68,7 @@ public class EscrowService {
             }
         } else {
             // 주문이 없으면 생성
-            Post post = postRepository.findById(postId)
+            Post post = postRepository.findActiveById(postId)
                     .orElseThrow(() -> new NotFoundException("게시글을 찾을 수 없습니다."));
 
             if (post.getStatus() != PostStatus.ON_SALE) {
