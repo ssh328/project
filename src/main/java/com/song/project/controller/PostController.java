@@ -302,8 +302,12 @@ public class PostController {
             Long userId = getUserId(auth);
             postService.deletePost(id, userId);
             return ResponseEntity.ok("삭제완료");
-        } catch (NotFoundException | ForbiddenException e) {
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch (ForbiddenException e) {
             return ResponseEntity.status(403).body(e.getMessage());
+        } catch (BadRequestException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 

@@ -50,6 +50,8 @@ public class SecurityConfig {
             authorize
             // 공개 경로 (인증 불필요)
             .requestMatchers(
+                "/",
+                "/actuator/health",
                 // 인증 관련
                 "/login", "/login/jwt",
                 "/register", "/user-register",
@@ -65,6 +67,8 @@ public class SecurityConfig {
                 // 정적 리소스
                 "/main.css", "/pagination.css", "/star.css",
                 "/js/**",
+                "/favicon.ico",
+                "/.well-known/**",
                 
                 // Swagger (dev 환경)
                 "/swagger-ui/**", "/api-docs/**", "/v3/api-docs/**",

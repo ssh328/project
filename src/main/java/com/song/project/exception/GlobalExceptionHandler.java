@@ -34,13 +34,26 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(body);
     }
 
+    // 루트/목록 페이지에서 예외가 발생하면 같은 경로로 다시 보내지 않아야 리다이렉트 루프를 피할 수 있음
+    private boolean shouldRenderErrorPage(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        return "/".equals(uri) || "/post/list".equals(uri);
+    }
+
+    private Object redirectOrError(RedirectAttributes ra, HttpServletRequest req, String message) {
+        if (shouldRenderErrorPage(req)) {
+            return "error/500";
+        }
+        ra.addFlashAttribute("errorMessage", message);
+        return "redirect:/post/list";
+    }
+
     // 인증 실패 처리
     @ExceptionHandler(UnauthorizedException.class)
     public Object handleUnauthorized(UnauthorizedException e, RedirectAttributes ra, HttpServletRequest req) {
         log.warn("인증 실패: {} - URI: {}", e.getMessage(), req.getRequestURI());
         if (isApiRequest(req)) return json(HttpStatus.UNAUTHORIZED, e.getMessage());
-        ra.addFlashAttribute("errorMessage", e.getMessage());
-        return "redirect:/post/list";
+        return redirectOrError(ra, req, e.getMessage());
     }
 
     // 권한 없음 처리
@@ -48,8 +61,7 @@ public class GlobalExceptionHandler {
     public Object handleForbidden(ForbiddenException e, RedirectAttributes ra, HttpServletRequest req) {
         log.warn("권한 없음: {} - URI: {}", e.getMessage(), req.getRequestURI());
         if (isApiRequest(req)) return json(HttpStatus.FORBIDDEN, e.getMessage());
-        ra.addFlashAttribute("errorMessage", e.getMessage());
-        return "redirect:/post/list";
+        return redirectOrError(ra, req, e.getMessage());
     }
 
     // 찾을 수 없음 처리
@@ -57,8 +69,7 @@ public class GlobalExceptionHandler {
     public Object handleNotFound(NotFoundException e, RedirectAttributes ra, HttpServletRequest req) {
         log.warn("리소스 없음: {} - URI: {}", e.getMessage(), req.getRequestURI());
         if (isApiRequest(req)) return json(HttpStatus.NOT_FOUND, e.getMessage());
-        ra.addFlashAttribute("errorMessage", e.getMessage());
-        return "redirect:/post/list";
+        return redirectOrError(ra, req, e.getMessage());
     }
 
     // 잘못된 요청 처리
@@ -66,8 +77,7 @@ public class GlobalExceptionHandler {
     public Object handleBadRequest(BadRequestException e, RedirectAttributes ra, HttpServletRequest req) {
         log.warn("잘못된 요청: {} - URI: {}", e.getMessage(), req.getRequestURI());
         if (isApiRequest(req)) return json(HttpStatus.BAD_REQUEST, e.getMessage());
-        ra.addFlashAttribute("errorMessage", e.getMessage());
-        return "redirect:/post/list";
+        return redirectOrError(ra, req, e.getMessage());
     }
 
     // 유효성 검사 실패 처리
@@ -94,7 +104,6 @@ public class GlobalExceptionHandler {
         log.error("예상치 못한 예외 발생: URI={}, 메시지={}", req.getRequestURI(), e.getMessage(), e);
         String errorMsg = e.getMessage();
         if (isApiRequest(req)) return json(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다.");
-        ra.addFlashAttribute("errorMessage", errorMsg);
-        return "redirect:/post/list";
+        return redirectOrError(ra, req, errorMsg);
     }
 }

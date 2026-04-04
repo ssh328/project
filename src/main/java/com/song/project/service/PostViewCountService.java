@@ -104,7 +104,7 @@ public class PostViewCountService {
      * Redis의 조회수를 MySQL에 주기적으로 동기화
      * 10분마다 자동 실행되며, Redis의 조회수를 DB에 반영
      */
-    @Scheduled(fixedRate = 10 * 60 * 1000) // 10분마다 실행
+    // @Scheduled(fixedRate = 10 * 60 * 1000) // 10분마다 실행
     public void flushViewCountsToDB() {
         // Redis에 있는 모든 조회수 키 가져오기 (post:view:* 형태)
         Set<String> keys = redisTemplate.keys(VIEW_PREFIX + "*");

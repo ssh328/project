@@ -45,6 +45,9 @@ out/
 ### Env files ###
 .env
 
+### EB deploy bundle (regenerate locally) ###
+eb-deploy.zip
+
 ### Logs ###
 *.log
 logs/
