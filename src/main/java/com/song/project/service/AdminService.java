@@ -79,7 +79,7 @@ public class AdminService {
             return postRepository.findByTitleContainingIgnoreCase(keyword, pageRequest);
         }
 
-        // 관리자 목록은 soft delete된 게시글도 함께 조회한다.
+        // 관리자 목록은 기존 soft delete 잔여 데이터도 함께 조회한다.
         return postRepository.findAdminWithFilter(category, null, null, status, pageRequest);
     }
 
@@ -105,6 +105,13 @@ public class AdminService {
                 .orElseThrow(() -> new NotFoundException("게시글을 찾을 수 없습니다."));
 
         postService.deletePostInternal(post);
+    }
+
+    public void hardDeletePostAsAdmin(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("게시글을 찾을 수 없습니다."));
+
+        postService.hardDeletePostInternal(post);
     }
 
     public void restorePostAsAdmin(Long postId) {

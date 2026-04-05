@@ -20,13 +20,18 @@
                     <hr class="mb-4" style="width: 100%; margin: 0 auto; border-top: 2px dashed;">
 
                     <div class="mb-4">
-                        <a th:href="@{'/post/detail/' + ${order.post.id}}" class="text-decoration-none text-dark d-flex align-items-start gap-3">
-                            <img th:if="${order.post.images != null and !order.post.images.isEmpty()}" 
+                        <a th:if="${order.hasActivePost()}" th:href="@{'/post/detail/' + ${order.post.id}}" class="text-decoration-none text-dark d-flex align-items-start gap-3">
+                            <img th:if="${order.postThumbnailUrl != null}" 
+                                 th:src="${order.postThumbnailUrl}" 
+                                 class="rounded" 
+                                 style="width: 150px; height: 150px; object-fit: cover; flex-shrink: 0;" 
+                                 alt="상품 이미지">
+                            <img th:if="${order.postThumbnailUrl == null and order.post != null and order.post.images != null and !order.post.images.isEmpty()}" 
                                  th:src="${order.post.images[0].imgUrl}" 
                                  class="rounded" 
                                  style="width: 150px; height: 150px; object-fit: cover; flex-shrink: 0;" 
                                  alt="상품 이미지">
-                            <img th:unless="${order.post.images != null and !order.post.images.isEmpty()}" 
+                            <img th:if="${order.postThumbnailUrl == null and (order.post == null or order.post.images == null or order.post.images.isEmpty())}" 
                                  src="https://placehold.co/300" 
                                  class="rounded" 
                                  style="width: 150px; height: 150px; object-fit: cover; flex-shrink: 0;" 
@@ -36,9 +41,30 @@
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="fs-4 fw-bold" th:text="${#numbers.formatInteger(order.amount, 0, 'COMMA')} + '원'">0원</div>
                                     <span class="badge rounded-pill bg-primary" id="statusBadge" th:text="${order.status.description}">상태</span>
+                                    <span th:if="${!order.hasActivePost()}" class="badge rounded-pill bg-secondary">원본 게시글 삭제됨</span>
                                 </div>
                             </div>
                         </a>
+                        <div th:if="${!order.hasActivePost()}" class="text-dark d-flex align-items-start gap-3">
+                            <img th:if="${order.postThumbnailUrl != null}" 
+                                 th:src="${order.postThumbnailUrl}" 
+                                 class="rounded" 
+                                 style="width: 150px; height: 150px; object-fit: cover; flex-shrink: 0;" 
+                                 alt="상품 이미지">
+                            <img th:if="${order.postThumbnailUrl == null}" 
+                                 src="https://placehold.co/300" 
+                                 class="rounded" 
+                                 style="width: 150px; height: 150px; object-fit: cover; flex-shrink: 0;" 
+                                 alt="기본 이미지">
+                            <div class="flex-grow-1">
+                                <h3 class="fw-semibold mb-2" th:text="|상품명: ${order.orderName}|"></h3>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="fs-4 fw-bold" th:text="${#numbers.formatInteger(order.amount, 0, 'COMMA')} + '원'">0원</div>
+                                    <span class="badge rounded-pill bg-primary" id="statusBadge" th:text="${order.status.description}">상태</span>
+                                    <span class="badge rounded-pill bg-secondary">원본 게시글 삭제됨</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="alert alert-info">

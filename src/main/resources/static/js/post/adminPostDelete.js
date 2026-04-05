@@ -37,14 +37,17 @@ async function submitAdminPostAction({ postId, page, keyword, method, action, su
 
 document.querySelectorAll('.admin-delete-btn').forEach(btn => {
     btn.addEventListener('click', async function() {
+        const isPermanentDelete = this.dataset.deleteMode === 'permanent';
         await submitAdminPostAction({
             postId: this.getAttribute('data-post-id'),
             page: this.getAttribute('data-page'),
             keyword: this.getAttribute('data-keyword'),
             method: 'DELETE',
-            action: 'delete',
-            successMessage: '삭제',
-            confirmMessage: '정말 이 게시글을 삭제하시겠습니까?'
+            action: isPermanentDelete ? 'hard-delete' : 'delete',
+            successMessage: isPermanentDelete ? '영구 삭제' : '삭제',
+            confirmMessage: isPermanentDelete
+                ? '이미 숨겨진 게시글입니다. 정말 영구 삭제하시겠습니까?'
+                : '정말 이 게시글을 삭제하시겠습니까? 나중에 관리자에서 복구할 수 있습니다.'
         });
     });
 });

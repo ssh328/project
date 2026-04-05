@@ -25,12 +25,17 @@
                     <div th:if="${settlements.size() == 0}" class="text-muted">정산 내역이 없습니다.</div>
                     <div th:each="s : ${settlements}" class="border rounded-3 p-3 mb-2">
                         <div class="d-flex align-items-center gap-3">
-                            <img th:if="${s.order.post.images != null and !s.order.post.images.isEmpty()}" 
+                            <img th:if="${s.order.postThumbnailUrl != null}" 
+                                 th:src="${s.order.postThumbnailUrl}" 
+                                 class="rounded" 
+                                 style="width: 80px; height: 80px; object-fit: cover; flex-shrink: 0;" 
+                                 alt="상품 이미지">
+                            <img th:if="${s.order.postThumbnailUrl == null and s.order.post != null and s.order.post.images != null and !s.order.post.images.isEmpty()}" 
                                  th:src="${s.order.post.images[0].imgUrl}" 
                                  class="rounded" 
                                  style="width: 80px; height: 80px; object-fit: cover; flex-shrink: 0;" 
                                  alt="상품 이미지">
-                            <img th:unless="${s.order.post.images != null and !s.order.post.images.isEmpty()}" 
+                            <img th:if="${s.order.postThumbnailUrl == null and (s.order.post == null or s.order.post.images == null or s.order.post.images.isEmpty())}" 
                                  src="https://placehold.co/300" 
                                  class="rounded" 
                                  style="width: 80px; height: 80px; object-fit: cover; flex-shrink: 0;" 

@@ -88,12 +88,12 @@ public class EscrowService {
 
             order = new EscrowOrder();
             order.setOrderId(orderId); // 클라이언트에서 생성한 orderId 사용
-            order.setOrderName(post.getTitle());
-            order.setAmount(amount);
             order.setStatus(EscrowStatus.CREATED);
             order.setPost(post);
             order.setBuyer(buyer);
             order.setSeller(seller);
+            order.capturePostSnapshot(post);
+            order.setAmount(amount);
             escrowOrderRepository.save(order);
         }
 
@@ -106,10 +106,12 @@ public class EscrowService {
         order.setStatus(EscrowStatus.PAYMENT_CONFIRMED);
         order.setPaidAt(LocalDateTime.now());
 
-        // 에스크로 진행 중이므로 상품은 예약 상태로 잠금
+        // 원본 게시글이 남아 있으면 에스크로 진행 중 예약 상태로 잠금
         Post post = order.getPost();
-        post.setStatus(PostStatus.RESERVED);
-        postRepository.save(post);
+        if (post != null) {
+            post.setStatus(PostStatus.RESERVED);
+            postRepository.save(post);
+        }
 
         return escrowOrderRepository.save(order);
     }
@@ -171,10 +173,12 @@ public class EscrowService {
             settleToWallet(settlement);
         }
 
-        // 상품 판매완료 처리
+        // 원본 게시글이 남아 있으면 판매완료 상태도 함께 반영
         Post post = order.getPost();
-        post.setStatus(PostStatus.SOLD);
-        postRepository.save(post);
+        if (post != null) {
+            post.setStatus(PostStatus.SOLD);
+            postRepository.save(post);
+        }
 
         order.setStatus(EscrowStatus.SETTLED);
         order.setSettledAt(LocalDateTime.now());

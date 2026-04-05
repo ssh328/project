@@ -96,7 +96,9 @@ public class EscrowApiController {
     private Map<String, Object> toResponse(EscrowOrder order) {
         Map<String, Object> response = new HashMap<>();
         response.put("orderId", order.getOrderId());
-        response.put("postId", order.getPost().getId());
+        response.put("postId", order.getPost() != null ? order.getPost().getId() : null);
+        response.put("postAvailable", order.hasActivePost());
+        response.put("postThumbnailUrl", order.getPostThumbnailUrl());
         response.put("amount", order.getAmount());
         response.put("status", order.getStatus().name());
         response.put("statusDescription", order.getStatus().getDescription());

@@ -76,7 +76,7 @@
                 <td th:text="${post.viewCount}">0</td>
                 <td th:text="${post.likeCnt}">0</td>
                 <td>
-                    <button th:if="${!post.deleted}" type="button" 
+                    <button th:if="${!post.deleted}" type="button"
                             class="btn btn-sm btn-outline-danger admin-delete-btn"
                             th:data-post-id="${post.id}"
                             th:data-page="${currentPage}"
@@ -89,6 +89,14 @@
                             th:data-page="${currentPage}"
                             th:data-keyword="${keyword ?: ''}">
                         복구
+                    </button>
+                    <button th:if="${post.deleted}" type="button"
+                            class="btn btn-sm btn-outline-danger admin-delete-btn ms-1"
+                            th:data-post-id="${post.id}"
+                            th:data-page="${currentPage}"
+                            th:data-keyword="${keyword ?: ''}"
+                            data-delete-mode="permanent">
+                        영구 삭제
                     </button>
                 </td>
             </tr>

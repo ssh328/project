@@ -139,7 +139,7 @@ public class AdminController {
      * @param keyword 삭제 후 유지할 검색 키워드 (선택적)
      * @return 게시물 목록 페이지로의 리다이렉트 URL
      */
-    @Operation(summary = "관리자 권한으로 게시물을 삭제", description = "관리자 권한으로 게시물을 삭제합니다.")
+    @Operation(summary = "관리자 권한으로 게시물을 삭제", description = "관리자 권한으로 게시물을 soft delete 합니다.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "삭제 성공"),
         @ApiResponse(responseCode = "404", description = "게시물 없음")
@@ -165,6 +165,19 @@ public class AdminController {
         try {
             adminService.restorePostAsAdmin(id);
             return ResponseEntity.ok("복구완료");
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch (BadRequestException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/posts/{id}/hard-delete")
+    @ResponseBody
+    public ResponseEntity<String> hardDeletePost(@PathVariable Long id) {
+        try {
+            adminService.hardDeletePostAsAdmin(id);
+            return ResponseEntity.ok("영구삭제완료");
         } catch (NotFoundException e) {
             return ResponseEntity.status(404).body(e.getMessage());
         } catch (BadRequestException e) {

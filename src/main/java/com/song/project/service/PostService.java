@@ -1,8 +1,9 @@
 package com.song.project.service;
 
+import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -18,6 +19,7 @@ import com.song.project.dto.PostStatusUpdateDto;
 import com.song.project.dto.PostUpdateDto;
 import com.song.project.dto.RecommendedPostDto;
 import com.song.project.entity.Post;
+import com.song.project.entity.EscrowOrder;
 import com.song.project.entity.PostImage;
 import com.song.project.entity.PostStatus;
 import com.song.project.exception.BadRequestException;
@@ -25,6 +27,7 @@ import com.song.project.exception.ForbiddenException;
 import com.song.project.exception.NotFoundException;
 import com.song.project.exception.UnauthorizedException;
 import com.song.project.repository.LikeRepository;
+import com.song.project.repository.EscrowOrderRepository;
 import com.song.project.repository.PostChatCandidateRepository;
 import com.song.project.repository.PostImageRepository;
 import com.song.project.repository.PostRepository;
@@ -46,6 +49,7 @@ public class PostService {
     private final PostImageRepository postImageRepository;
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
+    private final EscrowOrderRepository escrowOrderRepository;
     private final PostChatCandidateRepository postChatCandidateRepository;
     private final PostViewCountService postViewCountService;
     private final RecommendedPostService recommendedPostService;
@@ -345,12 +349,57 @@ public class PostService {
             postChatCandidateRepository.deleteAllByPostId(post.getId());
             likeRepository.deleteAllByPostId(post.getId());
             postRepository.save(post);
-            
-            log.info("게시글 soft delete 성공: postId={}, title={}", 
+
+            log.info("게시글 soft delete 성공: postId={}, title={}",
                 post.getId(), post.getTitle());
         } catch (Exception e) {
             log.error("게시물 soft delete 실패: postId={}, title={}", post.getId(), post.getTitle(), e);
             throw new BadRequestException("게시물 삭제에 실패했습니다.");
+        }
+    }
+
+    /**
+     * 게시글 영구 삭제 공통 로직
+     * soft delete된 게시글을 주문 스냅샷을 남긴 뒤 hard delete 한다.
+     * 관리자 영구 삭제 기능에서만 사용한다.
+     * @param post 삭제할 Post 엔티티 (이미 조회된 상태여야 함)
+     * @throws BadRequestException 게시물 영구 삭제 실패 시
+     */
+    @Transactional
+    public void hardDeletePostInternal(Post post) {
+        if (!post.isDeleted()) {
+            throw new BadRequestException("영구 삭제는 먼저 soft delete된 게시글에 대해서만 가능합니다.");
+        }
+
+        try {
+            List<PostImage> images = new ArrayList<>(post.getImages());
+            List<EscrowOrder> relatedOrders = escrowOrderRepository.findByPost_Id(post.getId());
+
+            for (EscrowOrder order : relatedOrders) {
+                order.fillMissingSnapshotFromPost(post);
+            }
+            if (!relatedOrders.isEmpty()) {
+                escrowOrderRepository.saveAll(relatedOrders);
+                escrowOrderRepository.detachPostByPostId(post.getId());
+            }
+
+            // 게시글을 참조하는 부가 데이터부터 먼저 정리한다.
+            postChatCandidateRepository.deleteAllByPostId(post.getId());
+            likeRepository.deleteAllByPostId(post.getId());
+
+            // 실제 파일은 삭제하되, 주문 스냅샷에는 이미 URL이 남아 있어 주문 화면은 유지된다.
+            for (PostImage img : images) {
+                String key = s3Service.extractS3Key(img.getImgUrl());
+                s3Service.deleteFile(key);
+            }
+
+            postRepository.delete(post);
+            
+            log.info("게시글 hard delete 성공: postId={}, title={}", 
+                post.getId(), post.getTitle());
+        } catch (Exception e) {
+            log.error("게시물 hard delete 실패: postId={}, title={}", post.getId(), post.getTitle(), e);
+            throw new BadRequestException("게시물 영구 삭제에 실패했습니다.");
         }
     }
 

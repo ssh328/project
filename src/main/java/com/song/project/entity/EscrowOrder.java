@@ -36,6 +36,12 @@ public class EscrowOrder {
     @Column(nullable = false)
     private Integer amount; // 결제 금액
 
+    @Column(length = 500)
+    private String postThumbnailUrl; // 주문 시점 대표 썸네일 URL
+
+    @Column(length = 100)
+    private String postCategorySnapshot; // 주문 시점 카테고리
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private EscrowStatus status = EscrowStatus.CREATED; // 에스크로 상태
@@ -61,7 +67,7 @@ public class EscrowOrder {
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "postId", nullable = false)
+    @JoinColumn(name = "postId", nullable = true)
     private Post post; // 게시글
 
     @ToString.Exclude
@@ -73,4 +79,42 @@ public class EscrowOrder {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sellerId", nullable = false)
     private User seller; // 판매자
+
+    public void capturePostSnapshot(Post post) {
+        if (post == null) {
+            return;
+        }
+
+        this.orderName = post.getTitle();
+        this.amount = post.getPrice();
+        this.postCategorySnapshot = post.getCategory();
+
+        if (post.getImages() != null && !post.getImages().isEmpty()) {
+            this.postThumbnailUrl = post.getImages().get(0).getImgUrl();
+        }
+    }
+
+    public void fillMissingSnapshotFromPost(Post post) {
+        if (post == null) {
+            return;
+        }
+
+        if (this.orderName == null || this.orderName.isBlank()) {
+            this.orderName = post.getTitle();
+        }
+        if (this.amount == null) {
+            this.amount = post.getPrice();
+        }
+        if (this.postCategorySnapshot == null || this.postCategorySnapshot.isBlank()) {
+            this.postCategorySnapshot = post.getCategory();
+        }
+        if ((this.postThumbnailUrl == null || this.postThumbnailUrl.isBlank())
+                && post.getImages() != null && !post.getImages().isEmpty()) {
+            this.postThumbnailUrl = post.getImages().get(0).getImgUrl();
+        }
+    }
+
+    public boolean hasActivePost() {
+        return this.post != null && !this.post.isDeleted();
+    }
 }

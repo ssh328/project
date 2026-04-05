@@ -12,6 +12,6 @@ public interface SettlementRepository extends JpaRepository<Settlement, Long> {
     Optional<Settlement> findByOrder_OrderId(String orderId);
 
     // 판매자 ID로 정산 내역 목록 조회 (ID 내림차순 정렬)
-    @EntityGraph(attributePaths = {"order.post.images", "order.post", "order"})
+    @EntityGraph(attributePaths = {"order", "order.post"})
     List<Settlement> findBySeller_IdOrderByIdDesc(Long sellerId);
 }

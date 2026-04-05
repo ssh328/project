@@ -146,8 +146,7 @@ public class DirectDealService {
         EscrowOrder order = new EscrowOrder();
         order.setOrderType(OrderType.DIRECT);
         order.setOrderId("DIRECT-" + UUID.randomUUID().toString()); // 직거래용 고유 ID
-        order.setOrderName(post.getTitle());
-        order.setAmount(post.getPrice());
+        order.capturePostSnapshot(post);
         order.setStatus(EscrowStatus.SETTLED); // 직거래는 즉시 완료/정산됨 간주
         order.setPost(post);
         order.setBuyer(buyer);
