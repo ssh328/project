@@ -13,7 +13,7 @@
         <!--카드-->
         <div class="row row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3 mb-5">
             <div class="col" th:each="post : ${posts.content}">
-                <th:block th:replace="~{partial/post-card.html :: postCard(${post}, ${likedPostIds})}"></th:block>
+                <th:block th:replace="~{partial/post-card.html :: postCard(${post}, ${likedPostIds}, ${viewCounts})}"></th:block>
             </div>
         </div>
     </main>

@@ -118,7 +118,12 @@ public class PostService {
      */
     public SearchResult getSearchResult(Page<PostListDto> postDtos, Long userId) {
         List<Long> likedPostIds = getLikedPostIds(userId);
-        return new SearchResult(postDtos, likedPostIds);
+        List<Long> postIds = postDtos.stream()
+                .map(PostListDto::getId)
+                .collect(Collectors.toList());
+        Map<Long, Long> viewCounts = getViewCountsForPosts(postIds);
+        
+        return new SearchResult(postDtos, likedPostIds, viewCounts);
     }
 
     /**
@@ -536,17 +541,6 @@ public class PostService {
     }
 
     /**
-     * 사용자명으로 게시글 목록 조회
-     * @param username 사용자명
-     * @param page 페이지 번호 (기본값: 1)
-     * @return 게시글 페이지
-     */
-    public Page<Post> getPostsByUsername(String username, int page) {
-        PageRequest pageRequest = PageRequest.of(page - 1, 20);
-        return postRepository.findByUser_UsernameAndDeletedFalse(username, pageRequest);
-    }
-
-    /**
      * 게시물 목록 결과를 담는 DTO
      */
     @Getter
@@ -569,10 +563,12 @@ public class PostService {
     public static class SearchResult {
         private Page<PostListDto> posts;
         private List<Long> likedPostIds;
+        private Map<Long, Long> viewCounts;
 
-        public SearchResult(Page<PostListDto> posts, List<Long> likedPostIds) {
+        public SearchResult(Page<PostListDto> posts, List<Long> likedPostIds, Map<Long, Long> viewCounts) {
             this.posts = posts;
             this.likedPostIds = likedPostIds;
+            this.viewCounts = viewCounts;
         }
     }
 

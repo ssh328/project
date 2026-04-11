@@ -15,21 +15,6 @@ import com.song.project.entity.PostStatus;
 import org.springframework.data.jpa.repository.EntityGraph;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
-    // 페이지 조회
-    Page<Post> findPageBy(Pageable page);
-
-    // 제목으로 검색
-    @Query(value = "select * from store.post where match(title) against(?1)",
-            countQuery = "select count(*) from store.post where match(title) against(?1)",
-            nativeQuery = true)
-    Page<Post> fullTextSearchWithPaging(String text, Pageable pageable);
-
-    // 사용자 ID로 게시물 목록 조회
-    Page<Post> findByUserIdOrderByIdDesc(Long userId, Pageable pageable);
-
-    // 카테고리로 게시물 목록 조회
-    Page<Post> findByCategory(String category, Pageable pageable);
-
     // 제목으로 검색
     Page<Post> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
@@ -83,16 +68,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findByUserIdAndDeletedFalseOrderByIdDesc(Long userId, Pageable pageable);
     
     @EntityGraph(attributePaths = {"user", "images"})
-    Page<Post> findByUser_UsernameAndDeletedFalse(String username, Pageable pageable);
     
+    Page<Post> findByUser_UsernameAndDeletedFalse(String username, Pageable pageable);
     @EntityGraph(attributePaths = {"user", "images"})
     @Query("SELECT p FROM Post p WHERE p.id IN :ids AND p.deleted = false")
     List<Post> findAllActiveByIdIn(@Param("ids") Iterable<Long> ids);
-
-    // 사용자명으로 게시물 목록 조회
-    @EntityGraph(attributePaths = {"user", "images"})
-    Page<Post> findByUser_Username(String username, Pageable pageable);
-
 
     // 주어진 ID 목록에 해당하는 게시물 조회
     @EntityGraph(attributePaths = {"user", "images"})

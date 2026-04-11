@@ -131,6 +131,7 @@ public class PostController {
 
         model.addAttribute("posts", postDtos);
         model.addAttribute("likedPostIds", result.getLikedPostIds());
+        model.addAttribute("viewCounts", result.getViewCounts());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", postDtos.getTotalPages());
         model.addAttribute("searchText", searchText);

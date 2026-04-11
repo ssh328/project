@@ -32,13 +32,15 @@ saveButton.addEventListener('click', async (e) => {
             window.location.href = '/post/list';
         } else {
             // 로그인 실패 시 에러 메시지 표시
+            form.querySelector('.login-error-alert')?.remove();
+
             const errorDiv = document.createElement('div');
-            errorDiv.className = 'alert alert-danger alert-dismissible fade show';
+            errorDiv.className = 'alert alert-danger alert-dismissible fade show login-error-alert';
             errorDiv.innerHTML = `
                 <strong>${data.message}</strong>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
-            document.querySelector('form').insertBefore(errorDiv, document.querySelector('form').firstChild);
+            form.insertBefore(errorDiv, form.firstChild);
         }
     } catch (err) {
         console.error(err);

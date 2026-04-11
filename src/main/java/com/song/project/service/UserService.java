@@ -221,7 +221,7 @@ public class UserService {
                 userDto.getId(), reviewPageRequest);
 
         // 로그인한 사용자가 좋아요한 게시물 ID 목록 조회
-        List<Long> likedPostIds = getLikedPostIds(user.getId());
+        List<Long> likedPostIds = getLikedPostIds(loginUserId);
 
         return new ProfileResult(userDto,
                                  postDtos, 

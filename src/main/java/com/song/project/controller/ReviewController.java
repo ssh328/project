@@ -52,7 +52,7 @@ public class ReviewController {
             String encodedUsername = reviewService.encodeUsername(review.getTargetUser().getUsername());
             redirectAttributes.addFlashAttribute("successMessage", "리뷰가 등록되었습니다.");
 
-            return "redirect:/post/profile/" + encodedUsername + "?tab=reviews";
+            return "redirect:/user/profile/" + encodedUsername + "?tab=reviews";
         } catch (NotFoundException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/post/list";
