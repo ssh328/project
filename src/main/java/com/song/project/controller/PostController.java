@@ -13,11 +13,12 @@ import com.song.project.exception.NotFoundException;
 import com.song.project.exception.UnauthorizedException;
 import com.song.project.security.CustomUser;
 import com.song.project.service.DirectDealService;
-import com.song.project.service.PostService;
-import com.song.project.service.PostService.PostDetailResult;
-import com.song.project.service.PostService.PostListResult;
-import com.song.project.service.PostService.PostStatusParseResult;
-import com.song.project.service.PostService.SearchResult;
+import com.song.project.service.post.PostCommandService;
+import com.song.project.service.post.PostQueryService;
+import com.song.project.service.post.PostQueryService.PostDetailResult;
+import com.song.project.service.post.PostQueryService.PostListResult;
+import com.song.project.service.post.PostQueryService.PostStatusParseResult;
+import com.song.project.service.post.PostQueryService.SearchResult;
 
 import lombok.RequiredArgsConstructor;
 
@@ -56,7 +57,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/post")
 public class PostController {
-    private final PostService postService;
+    private final PostQueryService postQueryService;
+    private final PostCommandService postCommandService;
     private final DirectDealService directDealService;
 
     /**
@@ -81,23 +83,23 @@ public class PostController {
                     @RequestParam(required = false) String status) {
         
         // 상태 문자열을 PostStatus enum으로 변환
-        PostStatusParseResult statusResult = postService.getPostStatusParseResult(status);
+        PostStatusParseResult statusResult = postQueryService.getPostStatusParseResult(status);
 
         // 필터 조건에 맞는 게시물 목록 조회
-        Page<PostListDto> postDtos = postService.getPosts(category, start_price, end_price,
+        Page<PostListDto> postDtos = postQueryService.getPosts(category, start_price, end_price,
                     statusResult.getPostStatus(), page, sort_by);
 
         Long userId = getUserId(auth);
                     
         // 좋아요 여부, 조회수 등 추가 정보 포함한 결과 생성
-        PostListResult result = postService.getPostListResult(postDtos, userId);
+        PostListResult result = postQueryService.getPostListResult(postDtos, userId);
 
         model.addAttribute("posts", postDtos);
         model.addAttribute("likedPostIds", result.getLikedPostIds());
         model.addAttribute("viewCounts", result.getViewCounts());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", postDtos.getTotalPages());
-        model.addAttribute("categories", postService.getCategories());
+        model.addAttribute("categories", postQueryService.getCategories());
         model.addAttribute("selectedCategory", category);
         model.addAttribute("selectedSort", sort_by);
         model.addAttribute("selectedStartPrice", start_price);
@@ -122,12 +124,12 @@ public class PostController {
         
                 
         // 검색어와 페이지 번호를 전달 -> 해당 키워드가 포함된 게시물 페이지를 조회
-        Page<PostListDto> postDtos = postService.searchPosts(searchText, page);
+        Page<PostListDto> postDtos = postQueryService.searchPosts(searchText, page);
 
         Long userId = getUserId(auth);
 
         // 좋아요 여부 등 추가 정보 포함한 검색 결과 생성
-        SearchResult result = postService.getSearchResult(postDtos, userId);
+        SearchResult result = postQueryService.getSearchResult(postDtos, userId);
 
         model.addAttribute("posts", postDtos);
         model.addAttribute("likedPostIds", result.getLikedPostIds());
@@ -161,7 +163,7 @@ public class PostController {
         }
 
         // 게시물 상세 정보, 조회수, 추천 게시글 등 포함한 결과 조회
-        PostDetailResult result = postService.getPostDetailResult(id, loginUserId, viewToken);
+        PostDetailResult result = postQueryService.getPostDetailResult(id, loginUserId, viewToken);
 
         model.addAttribute("data", result.getPost());
         model.addAttribute("postWriterId", result.getPostWriterId());
@@ -180,7 +182,7 @@ public class PostController {
     @GetMapping("/new-post")
     @PreAuthorize("isAuthenticated()")
     String add_post(Model model) {
-        model.addAttribute("categories", postService.getCategories());
+        model.addAttribute("categories", postQueryService.getCategories());
         return "post/add.html";
     }
 
@@ -208,7 +210,7 @@ public class PostController {
         // 게시물 생성 처리
         try {
             Long userId = getUserId(auth);
-            postService.createPost(userId, dto);
+            postCommandService.createPost(userId, dto);
             redirectAttributes.addFlashAttribute("successMessage", "게시물이 등록되었습니다.");
             return "redirect:/post/list";
         } catch (NotFoundException e) {
@@ -233,11 +235,11 @@ public class PostController {
         Long userId = getUserId(auth);
 
         // 게시물 수정 폼에 사용할 게시글 정보를 작성자 본인만 조회
-        Post post = postService.getPostForEdit(id, userId);
+        Post post = postQueryService.getPostForEdit(id, userId);
 
         PostEditDto postEditDto = PostEditDto.from(post);
         model.addAttribute("data", postEditDto);
-        model.addAttribute("categories", postService.getCategories());
+        model.addAttribute("categories", postQueryService.getCategories());
         return "post/edit.html";
     }
 
@@ -267,7 +269,7 @@ public class PostController {
             Long userId = getUserId(auth);
             
             // 사용자가 작성한 정보와 인증된 사용자 ID를 전달 -> 게시물 수정 처리
-            postService.updatePost(dto, userId);
+            postCommandService.updatePost(dto, userId);
             redirectAttributes.addFlashAttribute("successMessage", "게시물이 수정되었습니다.");
             return "redirect:/post/detail/" + dto.getPostId();
         } catch (NotFoundException e) {
@@ -301,7 +303,7 @@ public class PostController {
         // 작성자 권한 확인 후 게시물 삭제
         try {
             Long userId = getUserId(auth);
-            postService.deletePost(id, userId);
+            postCommandService.deletePost(id, userId);
             return ResponseEntity.ok("삭제완료");
         } catch (NotFoundException e) {
             return ResponseEntity.status(404).body(e.getMessage());
@@ -350,7 +352,7 @@ public class PostController {
         Long userId = getUserId(auth);
 
         // 게시물 ID, 상태 변경 정보, 인증된 사용자 ID를 전달 -> 상태 변경 처리
-        PostStatus postStatus = postService.updateStatus(id, dto, userId);
+        PostStatus postStatus = postCommandService.updateStatus(id, dto, userId);
         
         response.put("success", true);
         response.put("message", "상태가 변경되었습니다.");

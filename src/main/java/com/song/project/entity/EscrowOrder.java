@@ -21,14 +21,14 @@ import java.time.LocalDateTime;
         }
 )
 // 주문 자체에 대한 기록
-// “이 거래가 지금 어디까지 진행됐는지(결제→배송→구매확정→정산완료)”를 추적하는 테이블
+// “이 거래가 지금 어디까지 진행됐는지(결제->배송->구매확정->정산완료)”를 추적하는 테이블
 public class EscrowOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 주문 ID
 
     @Column(nullable = false, unique = true, length = 64)
-    private String orderId; // Toss Payments orderId와 동일하게 사용 (포트폴리오용)
+    private String orderId; // Toss Payments orderId와 동일하게 사용
 
     @Column(nullable = false, length = 250)
     private String orderName; // 주문명

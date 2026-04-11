@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.song.project.security.CustomUser;
-import com.song.project.service.PostService;
+import com.song.project.service.post.PostImageService;
 import com.song.project.service.S3Service;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 public class FileController {
-    private final PostService postService;
+    private final PostImageService postImageService;
     private final S3Service s3Service;
 
     @Operation(summary = "Presigned URL 생성", description = "S3에 파일을 업로드하기 위한 Presigned URL을 생성합니다.")
@@ -78,7 +78,7 @@ public class FileController {
         Authentication auth) {
 
         CustomUser user = (CustomUser) auth.getPrincipal();
-        postService.deleteImage(imageId, user.id);
+        postImageService.deleteImage(imageId, user.id);
         return ResponseEntity.ok("삭제완료");
     }
 }

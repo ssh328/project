@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <th:block th:replace="~{partial/header.html :: headerfrag}"></th:block>
 </head>
@@ -9,9 +9,9 @@
     <main class="container d-flex flex-column justify-content-center align-items-center text-center flex-grow-1">
         <h1 class="display-5 mb-3">페이지를 불러오지 못했습니다.</h1>
         <p class="text-muted mb-4">요청을 처리하는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.</p>
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 justify-content-center flex-wrap w-100">
             <a href="/post/list" class="btn btn-primary">목록으로 이동</a>
-            <a href="/login" class="btn btn-outline-secondary">로그인 페이지</a>
+            <a href="/login" sec:authorize="isAnonymous()" class="btn btn-outline-secondary">로그인 페이지</a>
         </div>
     </main>
 

@@ -4,7 +4,8 @@ import com.song.project.dto.PostStatusUpdateDto;
 import com.song.project.entity.PostStatus;
 import com.song.project.exception.ForbiddenException;
 import com.song.project.exception.NotFoundException;
-import com.song.project.service.PostService;
+import com.song.project.service.post.PostCommandService;
+import com.song.project.service.post.PostQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,10 @@ class PostControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private PostService postService;
+    private PostQueryService postQueryService;
+
+    @MockBean
+    private PostCommandService postCommandService;
 
     @Test
     @DisplayName("게시글 삭제 성공")
@@ -38,7 +42,7 @@ class PostControllerTest {
         Long postId = 1L;
         
         // Security를 제외했기 때문에 auth가 null이고, getUserId()가 null을 반환
-        doNothing().when(postService).deletePost(eq(postId), isNull());
+        doNothing().when(postCommandService).deletePost(eq(postId), isNull());
 
         // When & Then
         mockMvc.perform(delete("/post/delete")
@@ -46,7 +50,7 @@ class PostControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("삭제완료"));
 
-        verify(postService, times(1)).deletePost(eq(postId), isNull());
+        verify(postCommandService, times(1)).deletePost(eq(postId), isNull());
     }
 
     @Test
@@ -56,7 +60,7 @@ class PostControllerTest {
         Long postId = 999L;
         
         doThrow(new NotFoundException("게시글을 찾을 수 없습니다."))
-                .when(postService).deletePost(eq(postId), isNull());
+                .when(postCommandService).deletePost(eq(postId), isNull());
 
         // When & Then
         mockMvc.perform(delete("/post/delete")
@@ -64,7 +68,7 @@ class PostControllerTest {
                 .andExpect(status().isForbidden())
                 .andExpect(content().string("게시글을 찾을 수 없습니다."));
 
-        verify(postService, times(1)).deletePost(eq(postId), isNull());
+        verify(postCommandService, times(1)).deletePost(eq(postId), isNull());
     }
 
     @Test
@@ -74,7 +78,7 @@ class PostControllerTest {
         Long postId = 1L;
         
         doThrow(new ForbiddenException("본인이 작성한 게시글만 삭제할 수 있습니다."))
-                .when(postService).deletePost(eq(postId), isNull());
+                .when(postCommandService).deletePost(eq(postId), isNull());
 
         // When & Then
         mockMvc.perform(delete("/post/delete")
@@ -82,7 +86,7 @@ class PostControllerTest {
                 .andExpect(status().isForbidden())
                 .andExpect(content().string("본인이 작성한 게시글만 삭제할 수 있습니다."));
 
-        verify(postService, times(1)).deletePost(eq(postId), isNull());
+        verify(postCommandService, times(1)).deletePost(eq(postId), isNull());
     }
 
     @Test
@@ -91,7 +95,7 @@ class PostControllerTest {
         // Given
         Long postId = 1L;
         
-        when(postService.updateStatus(eq(postId), any(PostStatusUpdateDto.class), isNull()))
+        when(postCommandService.updateStatus(eq(postId), any(PostStatusUpdateDto.class), isNull()))
                 .thenReturn(PostStatus.SOLD);
 
         // When & Then
@@ -103,7 +107,7 @@ class PostControllerTest {
                 .andExpect(jsonPath("$.status").value("SOLD"))
                 .andExpect(jsonPath("$.statusDescription").value("판매완료"));
 
-        verify(postService, times(1)).updateStatus(eq(postId), any(PostStatusUpdateDto.class), isNull());
+        verify(postCommandService, times(1)).updateStatus(eq(postId), any(PostStatusUpdateDto.class), isNull());
     }
 
     @Test
@@ -118,7 +122,7 @@ class PostControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false));
 
-        verify(postService, never()).updateStatus(anyLong(), any(), anyLong());
+        verify(postCommandService, never()).updateStatus(anyLong(), any(), anyLong());
     }
 
     @Test
@@ -133,6 +137,6 @@ class PostControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false));
 
-        verify(postService, never()).updateStatus(anyLong(), any(), anyLong());
+        verify(postCommandService, never()).updateStatus(anyLong(), any(), anyLong());
     }
 }

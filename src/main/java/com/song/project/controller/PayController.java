@@ -8,7 +8,7 @@ import com.song.project.exception.ForbiddenException;
 import com.song.project.exception.NotFoundException;
 import com.song.project.security.CustomUser;
 import com.song.project.service.EscrowService;
-import com.song.project.service.PostService;
+import com.song.project.service.post.PostQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,7 +31,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class PayController {
 
     private final EscrowService escrowService;
-    private final PostService postService;
+    private final PostQueryService postQueryService;
 
     @Value("${toss.client-key}")
     private String tossClientKey;
@@ -50,7 +50,7 @@ public class PayController {
             throw new ForbiddenException("로그인이 필요합니다.");
         }
 
-        Post post = postService.getPostOrThrow(postId);
+        Post post = postQueryService.getPostOrThrow(postId);
         if (post.getStatus() != PostStatus.ON_SALE) {
             throw new BadRequestException("판매중인 상품만 결제할 수 있습니다.");
         }

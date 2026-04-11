@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import com.song.project.service.PostService;
+import com.song.project.service.post.PostQueryService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -42,7 +42,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class AdminController {
 
     private final AdminService adminService;
-    private final PostService postService;
+    private final PostQueryService postQueryService;
 
     /**
      * 관리자 대시보드 페이지를 조회
@@ -111,7 +111,7 @@ public class AdminController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", posts.getTotalPages());
         model.addAttribute("statuses", PostStatus.values());
-        model.addAttribute("categories", postService.getCategories());
+        model.addAttribute("categories", postQueryService.getCategories());
 
         return "admin/posts";
     }

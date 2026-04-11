@@ -9,6 +9,7 @@ import com.song.project.repository.LikeRepository;
 import com.song.project.repository.PostRepository;
 import com.song.project.repository.ReviewRepository;
 import com.song.project.repository.UserRepository;
+import com.song.project.service.post.PostCommandService;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class AdminService {
     private final PostRepository postRepository;
     private final ReviewRepository reviewRepository;
     private final LikeRepository likeRepository;
-    private final PostService postService;
+    private final PostCommandService postCommandService;
     private final ReviewService reviewService;
 
     /**
@@ -104,21 +105,21 @@ public class AdminService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("게시글을 찾을 수 없습니다."));
 
-        postService.deletePostInternal(post);
+        postCommandService.deletePostInternal(post);
     }
 
     public void hardDeletePostAsAdmin(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("게시글을 찾을 수 없습니다."));
 
-        postService.hardDeletePostInternal(post);
+        postCommandService.hardDeletePostInternal(post);
     }
 
     public void restorePostAsAdmin(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("게시글을 찾을 수 없습니다."));
 
-        postService.restorePostInternal(post);
+        postCommandService.restorePostInternal(post);
     }
 
     /**
