@@ -3,7 +3,7 @@
 * 핵심 포인트: JWT(쿠키) 인증 + Spring Security, JPA 기반 데이터 처리, Redis(조회수/최근 본 글), S3 Presigned URL 업로드, Toss Payments 연동
 
 ## 1. ERD
-<img width="700" height="600" alt="Untitled (1)" src="https://github.com/user-attachments/assets/683219a6-d5ac-42ea-b598-c8eae277098d" />
+<img width="700" height="600" alt="ERD" src="./img/ERD.png"/>
 
 ## 2. 주요 기능
 ### 회원/인증 기능
