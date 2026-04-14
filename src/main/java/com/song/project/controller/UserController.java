@@ -106,7 +106,7 @@ public class UserController {
                                     @RequestParam String image) {
         
         userService.updateUserProfileImage(userId, image);
-        return "redirect:/setting";
+        return "redirect:/user/setting";
     }
 
     /**
@@ -170,16 +170,16 @@ public class UserController {
             setVerifiedTokenCookie(response, verifiedToken);
 
             String redirectUrl = "delete-account".equals(nextAction)
-                ? "/delete-account"
-                : "/change-password";
+                ? "/user/delete-account"
+                : "/user/change-password";
             
             redirectAttributes.addFlashAttribute("successMessage", "본인 인증이 완료되었습니다.");
             return "redirect:" + redirectUrl;
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             String redirectUrl = "delete-account".equals(nextAction)
-                ? "/verify-password?nextAction=delete-account"
-                : "/verify-password?nextAction=change-password";
+                ? "/user/verify-password?nextAction=delete-account"
+                : "/user/verify-password?nextAction=change-password";
             return "redirect:" + redirectUrl;
         }
     }
@@ -207,7 +207,7 @@ public class UserController {
         String validationError = validateVerifiedToken(verifiedToken);
         if (validationError != null) {
             redirectAttributes.addFlashAttribute("errorMessage", validationError);
-            return "redirect:/verify-password";
+            return "redirect:/user/verify-password";
         }
 
         Long loginUserId = getUserId(auth);
@@ -220,11 +220,11 @@ public class UserController {
             clearVerifiedTokenCookie(response);
             
             redirectAttributes.addFlashAttribute("successMessage", "비밀번호가 성공적으로 변경되었습니다.");
-            return "redirect:/setting";
+            return "redirect:/user/setting";
             
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/verify-password";
+            return "redirect:/user/verify-password";
         }
     }
 
@@ -250,7 +250,7 @@ public class UserController {
         String validationError = validateVerifiedToken(verifiedToken);
         if (validationError != null) {
             redirectAttributes.addFlashAttribute("errorMessage", validationError);
-            return "redirect:/verify-password?nextAction=delete-account";
+            return "redirect:/user/verify-password?nextAction=delete-account";
         }
 
         Long loginUserId = getUserId(auth);
@@ -267,7 +267,7 @@ public class UserController {
             
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/verify-password?nextAction=delete-account";
+            return "redirect:/user/verify-password?nextAction=delete-account";
         }
     }
 
