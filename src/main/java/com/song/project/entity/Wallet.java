@@ -26,12 +26,12 @@ import java.time.LocalDateTime;
 public class Wallet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 지갑 ID
+    private Long id;
 
     @ToString.Exclude
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false, unique = true)
-    private User user; // 사용자
+    private User user;
 
     @Column(nullable = false)
     private Long balance = 0L; // 잔액
