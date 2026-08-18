@@ -5,11 +5,16 @@
 ## 1. ERD
 <img width="700" height="600" alt="ERD" src="./img/ERD.png"/>
 
-
 ## 2. 시스템 아키텍처
 <img width="700" alt="아키텍처" src="./img/아키텍처.png"/>
 
-## 3. 주요 기능
+## 3. 상태 다이어그램
+<img width="700" alt="아키텍처" src="./img/상태_다이어그램.jpg"/>
+
+## 4. 컴포넌트 다이어그램
+<img width="700" alt="아키텍처" src="./img/컴포넌트_다이어그램.jpg"/>
+
+## 5. 주요 기능
 ### 🔎 게시물 탐색
 > 사용자가 원하는 상품을 빠르게 찾을 수 있도록 검색, 필터, 정렬, 추천 기능을 한 화면에서 사용할 수 있게 구성했습니다.
 * FullText Index를 사용한 제목 기반 검색 지원
@@ -96,7 +101,7 @@
 * 게시글 상세 화면에서 이미지 슬라이드, 채팅 이동, 상태 변경 액션 제공
 * 게시글 삭제 시 권한 체크 후 S3 이미지, 좋아요, DB 데이터를 함께 정리
 
-## 4. 보안/품질
+## 6. 보안/품질
 * SQL Injection 점검
 * Repository에서 파라미터 바인딩 방식(JPA)을 사용하여 SQL Injection 위험을 낮춤
 * CSRF
@@ -108,13 +113,13 @@
 * 프로파일 분리(dev/prod)
 * prod: Swagger 비활성화, ddl-auto validate, SQL 로그 최소화
 
-## 5. API 명세서
+## 7. API 명세서
 [API 명세서](https://thinkable-earthquake-735.notion.site/Resale-Store-API-2e7a5166124c800c861dfa772bbac7c0?source=copy_link)
 
-## 6. 트러블 슈팅
+## 8. 트러블 슈팅
 [트러블 슈팅](https://thinkable-earthquake-735.notion.site/2eea5166124c80f88b1bcf93f60225f0?source=copy_link)
 
-## 7. 기술스택
+## 9. 기술스택
 ### 백엔드
 ![Java](https://img.shields.io/badge/Java%2021-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Gradle](https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white)
